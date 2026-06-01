@@ -6,11 +6,12 @@ WORKDIR /app
 ARG VERSION=0.0.0
 ARG BUILD_SHA=unknown
 
-# API URL build args. NEXT_PUBLIC_* is inlined into the client bundle at build
-# time, so the production URL must be supplied here (not at runtime). Defaults
-# target local dev.
+# API URL build args. API_URL is read at runtime (server-side proxy), so its
+# default just needs to be valid for the build. NEXT_PUBLIC_* is inlined into the
+# client bundle at build time; we bake a unique placeholder URL and rewrite it to
+# the real value at startup (see docker-entrypoint.sh), so it stays overridable.
 ARG API_URL=http://localhost:15567
-ARG NEXT_PUBLIC_API_URL=http://localhost:15567
+ARG NEXT_PUBLIC_API_URL=https://runtime-api-url.invalid
 
 COPY frontend/package*.json ./
 RUN npm ci
@@ -40,6 +41,8 @@ ENV NEXT_PUBLIC_APP_VERSION=${VERSION}
 ENV NEXT_PUBLIC_BUILD_SHA=${BUILD_SHA}
 
 COPY --from=build /app ./
+RUN chmod +x ./docker-entrypoint.sh
 EXPOSE 3000
+ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD ["npm","start"]
 

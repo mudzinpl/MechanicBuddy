@@ -75,9 +75,12 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-web:${{ steps.vars.outputs.sha_short }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-web:latest
+          # NEXT_PUBLIC_API_URL is intentionally NOT passed: the Dockerfile bakes a
+          # placeholder that docker-entrypoint.sh rewrites to the runtime value, so
+          # the image stays portable (set NEXT_PUBLIC_API_URL at deploy). API_URL is
+          # server-side and read at runtime; the build default is fine.
           build-args: |
             API_URL=https://api.mechanicbuddy.demos.d4m13n.dev
-            NEXT_PUBLIC_API_URL=https://api.mechanicbuddy.demos.d4m13n.dev
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
@@ -117,8 +120,9 @@ jobs:
           tags: |
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-management-portal:${{ steps.vars.outputs.sha_short }}
             ${{ env.REGISTRY }}/${{ env.IMAGE_PREFIX }}-management-portal:latest
-          build-args: |
-            NEXT_PUBLIC_MANAGEMENT_API_URL=https://manage-api.mechanicbuddy.demos.d4m13n.dev
+          # NEXT_PUBLIC_MANAGEMENT_API_URL / NEXT_PUBLIC_APP_URL are intentionally NOT
+          # passed: the Dockerfile bakes placeholders that docker-entrypoint.sh rewrites
+          # to the runtime values, so the image stays portable (set them at deploy).
           cache-from: type=gha
           cache-to: type=gha,mode=max
 

@@ -19,9 +19,11 @@ ARG VERSION=0.0.0
 ARG BUILD_SHA=unknown
 
 # Public client build args. NEXT_PUBLIC_* is inlined into the client bundle at
-# build time, so production values must be supplied here (not at runtime).
-# Defaults target local dev.
-ARG NEXT_PUBLIC_MANAGEMENT_API_URL=http://localhost:15568
+# build time. For the URL vars we bake unique placeholders and rewrite them to
+# the real values at startup (see docker-entrypoint.sh), so they stay overridable
+# at container runtime. The Stripe publishable key default targets local dev.
+ARG NEXT_PUBLIC_MANAGEMENT_API_URL=https://runtime-management-api-url.invalid
+ARG NEXT_PUBLIC_APP_URL=https://runtime-app-url.invalid
 ARG NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_placeholder
 
 WORKDIR /app
@@ -31,6 +33,7 @@ COPY . .
 # Set dummy env vars for build time (actual values injected at runtime)
 ENV SESSION_SECRET=build-time-placeholder-secret-32chars
 ENV NEXT_PUBLIC_MANAGEMENT_API_URL=$NEXT_PUBLIC_MANAGEMENT_API_URL
+ENV NEXT_PUBLIC_APP_URL=$NEXT_PUBLIC_APP_URL
 ENV NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=$NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
 ENV NEXT_PUBLIC_APP_VERSION=${VERSION}
 ENV NEXT_PUBLIC_BUILD_SHA=${BUILD_SHA}
@@ -64,6 +67,8 @@ RUN chown nextjs:nodejs .next
 # Automatically leverage output traces to reduce image size
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/docker-entrypoint.sh ./docker-entrypoint.sh
+RUN chmod +x ./docker-entrypoint.sh
 
 USER nextjs
 
@@ -72,4 +77,5 @@ EXPOSE 3026
 ENV PORT=3026
 ENV HOSTNAME="0.0.0.0"
 
+ENTRYPOINT ["./docker-entrypoint.sh"]
 CMD ["node", "server.js"]
