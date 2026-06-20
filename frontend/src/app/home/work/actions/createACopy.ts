@@ -11,7 +11,7 @@ export async function createACopy(workId: string) {
         body: {}
     });
     const newWorkId = await response.json();
-    pushToast('New copy of a work created successfully.')
+    pushToast('Utworzono kopię zlecenia.')
     redirect(`/home/work/${newWorkId}`);
 }
 

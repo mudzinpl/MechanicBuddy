@@ -11,7 +11,7 @@ export async function togglePaid(workId: string,isPaid:boolean) {
         body:isPaid
     });
     await response.text();
-    pushToast('Payment status changed successfully.')
+    pushToast('Status płatności został zmieniony.')
 
     redirect(`/home/work/${workId}`);
 } 

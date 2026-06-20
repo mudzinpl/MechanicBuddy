@@ -28,7 +28,7 @@ type Props = {
 
 const BaseDialog = React.forwardRef<BaseDialogHandle, Props>((props, ref) => {
 
-  const { title, description, center = true, noButtonText = 'Cancel', yesButtonText = 'Yes', onConfirm, children } = props;
+  const { title, description, center = true, noButtonText = 'Anuluj', yesButtonText = 'Tak', onConfirm, children } = props;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 

@@ -40,7 +40,7 @@ export async function createOrUpdate(
 
      await response.text();
         
-    pushToast(`Options updated successfully!`)
+    pushToast(`Ustawienia zostały zaktualizowane.`)
 
     redirect('/home/settings') 
 }

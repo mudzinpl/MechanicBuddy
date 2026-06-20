@@ -30,28 +30,28 @@ export default function UserInput({
         let hasError = false;
 
         if (!firstName) {
-            setFirstNameError("First name is required");
+            setFirstNameError("Imię jest wymagane");
             hasError = true;
         } else {
             setFirstNameError("");
         }
 
         if (!lastName) {
-            setLastNameError("Last name is required");
+            setLastNameError("Nazwisko jest wymagane");
             hasError = true;
         } else {
             setLastNameError("");
         }
 
         if (!userName) {
-            setUserNameError("Username is required");
+            setUserNameError("Nazwa użytkownika jest wymagana");
             hasError = true;
         } else {
             setUserNameError("");
         }
 
         if (!email) {
-            setEmailError("Email is required");
+            setEmailError("Adres e-mail jest wymagany");
             hasError = true;
         } else {
             setEmailError("");
@@ -63,10 +63,10 @@ export default function UserInput({
             const confirmPassword = (document.querySelector('[name="confirmPassword"]') as HTMLInputElement)?.value;
 
             if (!password) {
-                setPasswordError("Password is required");
+                setPasswordError("Hasło jest wymagane");
                 hasError = true;
             } else if (password !== confirmPassword) {
-                setPasswordError("Passwords do not match");
+                setPasswordError("Hasła nie są zgodne");
                 hasError = true;
             } else {
                 setPasswordError("");
@@ -77,7 +77,7 @@ export default function UserInput({
 
             if (password || confirmPassword) {
                 if (password !== confirmPassword) {
-                    setPasswordError("Passwords do not match");
+                    setPasswordError("Hasła nie są zgodne");
                     hasError = true;
                 } else {
                     setPasswordError("");

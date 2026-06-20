@@ -18,7 +18,7 @@ export default function ChangePasswordPage() {
             <div>
               <h2 className="mt-8 text-2xl/9 font-bold tracking-tight text-white">Change Your Password</h2>
               <p className="mt-2 text-sm/6 text-slate-400">
-                For security reasons, you must change your password before continuing.
+                Ze względów bezpieczeństwa przed kontynuowaniem musisz zmienić hasło.
               </p>
             </div>
 

@@ -27,7 +27,7 @@ export default function ProfileImage({
             const fileSize = Math.round((fsize / 1024));
             // The size of the file.
             if (fileSize >= 5120) {
-                alert("Image too big, please select a file not bigger than 5mb");
+                alert("Obraz jest zbyt duży. Wybierz plik nie większy niż 5 MB.");
             }
             else {
                 const base64File = await toBase64(file) as string; 
@@ -58,7 +58,7 @@ export default function ProfileImage({
                 >
                     Change avatar
                 </button>
-                <p className="mt-2 text-xs/5 text-gray-400">JPG, GIF or PNG. 5MB max.</p>
+                <p className="mt-2 text-xs/5 text-gray-400">JPG, GIF lub PNG. Maksymalnie 5 MB.</p>
             </div>
         </div>
     )

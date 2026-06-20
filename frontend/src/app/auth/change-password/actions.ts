@@ -15,12 +15,12 @@ export async function changePasswordOnLogin(
 
   // Validate passwords match
   if (newPassword !== confirmPassword) {
-    return { error: "New passwords do not match" };
+    return { error: "Nowe hasła nie są zgodne" };
   }
 
   // Validate password is not empty
   if (!newPassword || newPassword.toString().trim() === '') {
-    return { error: "Password cannot be empty" };
+    return { error: "Hasło nie może być puste" };
   }
 
   let success = false;
@@ -37,7 +37,7 @@ export async function changePasswordOnLogin(
     if (!response.ok) {
       const responseText = await response.text();
       console.log(responseText);
-      return { error: "Failed to change password" };
+      return { error: "Nie udało się zmienić hasła" };
     }
 
     await response.text();
@@ -48,7 +48,7 @@ export async function changePasswordOnLogin(
     success = true;
   } catch (error) {
     console.error('Error changing password:', error);
-    return { error: "An error occurred while changing password" };
+    return { error: "Wystąpił błąd podczas zmiany hasła" };
   }
 
   // Redirect outside try-catch to avoid catching Next.js redirect error

@@ -11,6 +11,6 @@ export async function deleteInvoice(workId: string) {
         body: {}
     });
     await response.text();
-    pushToast('Invoice deleted successfully.')
+    pushToast('Faktura została usunięta.')
     redirect(`/home/work/${workId}`);
 }

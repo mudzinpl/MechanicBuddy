@@ -55,7 +55,7 @@ export default function Activities({
             { name: 'Usuń',onClick:() => {
               confirmRemoveActivityRef.current?.open({
                 title: name,
-                description: "Are you sure you want to delete it?",
+                description: "Czy na pewno chcesz to usunąć?",
                 confirmObj: item
               })
             }}
