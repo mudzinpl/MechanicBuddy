@@ -39,7 +39,7 @@ export default function AuditLogsFilters({ searchParams }: Props) {
             id="searchText"
             value={searchText}
             onChange={(e) => setSearchText(e.target.value)}
-            placeholder="Search by user, endpoint, or description..."
+            placeholder="Szukaj według użytkownika, endpointu lub opisu..."
             className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           />
         </div>
@@ -53,11 +53,11 @@ export default function AuditLogsFilters({ searchParams }: Props) {
             onChange={(e) => setActionType(e.target.value)}
             className="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
           >
-            <option value="">All Types</option>
-            <option value="api_request">API Request</option>
+            <option value="">Wszystkie typy</option>
+            <option value="api_request">Żądanie API</option>
             <option value="crud">CRUD</option>
-            <option value="auth">Auth</option>
-            <option value="admin">Admin</option>
+            <option value="auth">Logowanie</option>
+            <option value="admin">Administracja</option>
           </select>
         </div>
         <div className="flex gap-2">
@@ -65,7 +65,7 @@ export default function AuditLogsFilters({ searchParams }: Props) {
             type="submit"
             className="px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
           >
-            Filter
+            Filtruj
           </button>
           {(searchText || actionType) && (
             <button
@@ -73,7 +73,7 @@ export default function AuditLogsFilters({ searchParams }: Props) {
               onClick={handleClear}
               className="px-4 py-2 bg-gray-100 text-gray-700 text-sm font-medium rounded-md hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
             >
-              Clear
+              Wyczyść
             </button>
           )}
         </div>
