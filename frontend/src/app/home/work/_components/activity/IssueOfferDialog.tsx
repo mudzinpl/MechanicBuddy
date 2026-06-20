@@ -25,9 +25,9 @@ export default function IssueOfferDialog({
      
     return (
         <BaseDialog ref={dialogRef}
-                title="Issue an offer"
+                title="Wystaw ofertę"
                 center={false}
-                yesButtonText="OK"
+                yesButtonText="OK" noButtonText="Anuluj"
                 onConfirm={async () => {
 
                    const offer = activities.items.find(x => x.id === activities.current.id);
@@ -56,7 +56,7 @@ export default function IssueOfferDialog({
                                 <div className="col-span-full">
                                 <div className="flex items-end">
                                         <div className="flex-auto  ">
-                                        <FormLabel name="isVehicelLinesOnPricing" label={'Show vehicle information on ' + (activityName == 'repairjob' ? 'invoice' : 'offer')} ></FormLabel>
+                                        <FormLabel name="isVehicelLinesOnPricing" label={'Pokaż dane pojazdu na ' + (activityName == 'repairjob' ? 'fakturze' : 'ofercie')} ></FormLabel>
                                         </div>
                                         <div className="mt-2  ">
                                         <FormSwitch name='isVehicelLinesOnPricing' checked={isVehicelLinesOnPricing} onChange={(value) => setIsVehicelLinesOnPricing(value)}></FormSwitch>
@@ -66,7 +66,7 @@ export default function IssueOfferDialog({
                                 <div className="col-span-full">
                                 <div className="flex items-end">
                                         <div className="flex-auto  ">
-                                        <FormLabel name="sendClientAnEmail" label='Send client an email' ></FormLabel>
+                                        <FormLabel name="sendClientAnEmail" label='Wyślij wiadomość e-mail do klienta' ></FormLabel>
                                         </div>
                                         <div className="mt-2  ">
                                         <FormSwitch name='sendClientAnEmail' checked={sendClientAnEmail} onChange={(value) => {
@@ -77,7 +77,7 @@ export default function IssueOfferDialog({
                                     </div> 
                                 </div>
                                 {sendClientAnEmail&&<div className="col-span-full mt-4">
-                                    <FormLabel name='name' label='Client email'></FormLabel> 
+                                    <FormLabel name='name' label='Adres e-mail klienta'></FormLabel> 
                                     <div className="mt-2 col-span-2 grid grid-cols-1">
                                         <FormInput
                                             name='clientEmail'
