@@ -12,7 +12,7 @@ export default async function Page(
   const columns = [
     {
       dataField: 'code',
-      headerText: 'Product code',
+      headerText: 'Kod produktu',
       dataFormatter: ({ code, id }: { code: string, id: string }) => {
         return (
           <Link href={'/home/inventory/' + id} >
@@ -23,7 +23,7 @@ export default async function Page(
     },
     {
       dataField: 'name',
-      headerText: 'Nimi',
+      headerText: 'Nazwa',
       dataFormatter: ({ name }: { name: string }) => {
         return <p title={name} className="truncate" style={{ maxWidth: '500px', marginBottom: "-5px" }} >
           {name}
@@ -32,7 +32,7 @@ export default async function Page(
     },
     {
       dataField: 'price',
-      headerText: 'Price',
+      headerText: 'Cena',
       dataFormatter: ({ price }: { price?: number }) => {
         return (
           <Fragment>
@@ -43,11 +43,11 @@ export default async function Page(
     },
     {
       dataField: 'quantity',
-      headerText: 'Quantity',
+      headerText: 'Ilość',
     },
     {
       dataField: 'discount',
-      headerText: 'Discount',
+      headerText: 'Rabat',
       dataFormatter: ({ discount }: { discount?: number }) => {
         return (
           <Fragment>
@@ -58,7 +58,7 @@ export default async function Page(
     },
     {
       dataField: 'storageName',
-      headerText: 'Location'
+      headerText: 'Lokalizacja'
     }
   ];
    
