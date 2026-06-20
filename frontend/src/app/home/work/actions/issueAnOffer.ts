@@ -30,11 +30,11 @@ export async function issueAnOffer({
     });
     const workingOfferId = await response.json();
     
-    const issuingType = workingOfferId == activityId ? 'issued' : 're-issued';
+    const issuingType = workingOfferId == activityId ? 'wystawiona' : 'wystawiona ponownie';
     if(sendClientEmail){
-        pushToast(`Offer ${issuingType} successully and email sent to client.`)
+        pushToast(`Oferta została ${issuingType} i wysłana do klienta.`)
     }
-    else pushToast(`Offer ${issuingType} successully.`)
+    else pushToast(`Oferta została ${issuingType}.`)
  
     redirect(`/home/work/${workId}/${workingOfferId}`);
 } 
