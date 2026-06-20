@@ -105,7 +105,7 @@ function Plan({
         className="mt-8"
         aria-label={`Rozpocznij z planem ${name} za ${price}`}
       >
-        Get started
+        Rozpocznij
       </Button>
     </section>
   )
