@@ -51,8 +51,8 @@ export default function Activities({
          
           
           const options =work.issuance?[ ]: [
-            { name: 'Edit' ,href:editRef},
-            { name: 'Delete',onClick:() => {
+            { name: 'Edytuj' ,href:editRef},
+            { name: 'Usuń',onClick:() => {
               confirmRemoveActivityRef.current?.open({
                 title: name,
                 description: "Are you sure you want to delete it?",
