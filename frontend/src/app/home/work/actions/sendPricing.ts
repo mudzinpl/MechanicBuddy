@@ -21,7 +21,7 @@ export async function sendPricing({
             }
         });
         await response.text();
-        pushToast('Offer sent.')
+        pushToast('Oferta została wysłana.')
         redirect(`/home/work/${workId}/${offerId}`); 
     }
 
@@ -32,7 +32,7 @@ export async function sendPricing({
         }
     });
     await response.text();
-    pushToast('Invoice sent.')
+    pushToast('Faktura została wysłana.')
     redirect(`/home/work/${workId}`);
    
 }
