@@ -19,12 +19,12 @@ export default function SendPricingDialog({
     const [clientEmail,setlientEmail] = useState(work.clientEmail??'');
 
     const forInvoice = !offerId;
-    const title = forInvoice? 'Send invoice': 'Send offer';
+    const title = forInvoice? 'Wyślij fakturę': 'Wyślij ofertę';
     return (
         <BaseDialog ref={dialogRef}
             title={title}
             center={false} 
-            yesButtonText="OK"
+            yesButtonText="OK" noButtonText="Anuluj"
             onConfirm={async () => {
                 dialogRef.current?.loading(true);
 
@@ -41,7 +41,7 @@ export default function SendPricingDialog({
             }}>
             <div className="space-y-12  ">
                 <div className="border-b mt-4  border-gray-900/10 pb-12">
-                      <FormLabel name='name' label='Client email'></FormLabel>
+                      <FormLabel name='name' label='Adres e-mail klienta'></FormLabel>
                             <div className="mt-2   ">
                                 <FormInput
                                     name='clientEmail' 

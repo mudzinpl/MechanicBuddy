@@ -10,7 +10,7 @@ export default async function Page(
 
 
   return <Main header={
-    <SearchCardHeader title="Find Clients" pageName="clients">
+    <SearchCardHeader title="Znajdź klientów" pageName="clients">
     </SearchCardHeader>
   } narrow={false}>
     <form method="GET" > <Search
@@ -33,7 +33,7 @@ export default async function Page(
         dataField: "address",
       }]}>
 
-      <SimpleSearchBar searchParams={searchParams} placeholder="name, address or phone ..."></SimpleSearchBar>
+      <SimpleSearchBar searchParams={searchParams} placeholder="nazwa, adres lub telefon ..."></SimpleSearchBar>
     </Search></form>
 
   </Main>

@@ -27,20 +27,20 @@ export default function NamedLocation({
  
     const addOrRemoveOption = [
         {
-            name: 'New',
+            name: 'Nowa',
             onClick:() => {
                 newLocationDialogRef?.current?.open();
            },
            inMenu:false
         },
         {
-            name:'Delete location',
+            name:'Usuń lokalizację',
             onClick:() => {
                 if(!selectedLocationId) return; 
                  const itemToRemove =   locations.find(x=>x.id.toString() == selectedLocationId)?.name;
                   confirmRemoveLocationRef?.current?.open({
-                    title:"About to remove '"+itemToRemove+"'",
-                      description:"Are you sure you want to remove the location? Make sure no spare parts are using this location, otherwise it cannot be removed.",
+                    title:"Usuwanie lokalizacji: '"+itemToRemove+"'",
+                      description:"Czy na pewno usunąć tę lokalizację? Upewnij się, że nie korzystają z niej żadne części.",
                     confirmObj: selectedLocationId
                  });
             },
@@ -76,7 +76,7 @@ export default function NamedLocation({
                 setLocations([...locations]); 
            }}  ref={confirmRemoveLocationRef} ></ConfirmDialog>
 
-            <BaseDialog ref={newLocationDialogRef} yesButtonText="Save" title='Add new named location' 
+            <BaseDialog ref={newLocationDialogRef} yesButtonText="Zapisz" noButtonText="Anuluj" title='Dodaj nową lokalizację' 
                 onConfirm={async () => { 
                      
                     newLocationDialogRef.current?.loading(true);
@@ -97,7 +97,7 @@ export default function NamedLocation({
                         name='item'
                         defaultValue={newLocation}
                         
-                        placeholder='Enter new location name'
+                        placeholder='Wpisz nazwę nowej lokalizacji'
                         onInputChange={(e) => setNewLocation(e.currentTarget.value)}
                     ></FormInput>
                 </div>

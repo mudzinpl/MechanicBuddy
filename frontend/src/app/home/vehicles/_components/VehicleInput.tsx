@@ -35,13 +35,13 @@ export default function VehicleInput({
                     
                     <div className="grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                     <div className="sm:col-span-2">
-                        <FormLabel name='producer' label='Car make'></FormLabel>
+                        <FormLabel name='producer' label='Marka pojazdu'></FormLabel>
                         <TypeAheadCombobox 
                           name="producer" 
                           defaultValue={producer} 
                           displayFormatter={(item)=>!item?'':item?.name} 
                           optionFormatter={(item)=>!item?'':item?.name} 
-                          placeholder="Enter car make" 
+                          placeholder="Wpisz markę pojazdu" 
                           onItemChange={(item)=>{
                               
                             setProducer(item);
@@ -59,12 +59,12 @@ export default function VehicleInput({
                           }}
                           ></TypeAheadCombobox> 
                        </div> 
-                        <div className="sm:col-span-2">  <FormInput name='model' defaultValue={vehicle?.model} label='Vehicle model'></FormInput></div>
-                        <div className="sm:col-span-2">  <FormInput name='vin' defaultValue={vehicle?.vin} label='VIN Code'></FormInput></div>
-                        <div className="sm:col-span-2">  <FormInput name='regNr' defaultValue={vehicle?.regNr} label='Registration nr'></FormInput></div>
-                        <div className="sm:col-span-2">  <FormInput name='odo' defaultValue={vehicle?.odo} label='Odometer'></FormInput> </div>
+                        <div className="sm:col-span-2">  <FormInput name='model' defaultValue={vehicle?.model} label='Model pojazdu'></FormInput></div>
+                        <div className="sm:col-span-2">  <FormInput name='vin' defaultValue={vehicle?.vin} label='Numer VIN'></FormInput></div>
+                        <div className="sm:col-span-2">  <FormInput name='regNr' defaultValue={vehicle?.regNr} label='Numer rejestracyjny'></FormInput></div>
+                        <div className="sm:col-span-2">  <FormInput name='odo' defaultValue={vehicle?.odo} label='Przebieg'></FormInput> </div>
                         <div className="col-span-full">
-                            <FormLabel name='ownerId' label='Owner'></FormLabel>
+                            <FormLabel name='ownerId' label='Właściciel'></FormLabel>
                             <ClientsCombobox  
                                name='ownerId'
                                 defaultValue={{
@@ -81,14 +81,14 @@ export default function VehicleInput({
                 <div className="mt-4 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
 
                     <div className="col-span-full">
-                        <FormTextArea name='about' label='About' defaultValue={vehicle?.description}>
+                        <FormTextArea name='about' label='Uwagi' defaultValue={vehicle?.description}>
                         </FormTextArea>
                     </div>
                 </div>
             </div>
             <div className="mt-6 flex items-center justify-end gap-x-6">
-                <SecondaryButton onClick={() => router.back()}>Cancel</SecondaryButton>
-                <PrimaryButton onClick={() => { }}>Save</PrimaryButton>
+                <SecondaryButton onClick={() => router.back()}>Anuluj</SecondaryButton>
+                <PrimaryButton onClick={() => { }}>Zapisz</PrimaryButton>
             </div>
         </>
     )

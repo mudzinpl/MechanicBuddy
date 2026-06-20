@@ -30,10 +30,10 @@ export default function OfferAcceptedDialog({
 
     return (
         <BaseDialog ref={dialogRef}
-            title="Offer was accepted by client"
+            title="Oferta została zaakceptowana przez klienta"
 
             center={false}
-            yesButtonText="OK"
+            yesButtonText="OK" noButtonText="Anuluj"
             onConfirm={async () => {
 
                 const offer = activities.items.find(x => x.id === activities.current.id);
@@ -58,7 +58,7 @@ export default function OfferAcceptedDialog({
                 <div className="border-b border-gray-900/10 pb-12">
                     <div className=" pt-8">
                         <p className="text-sm   text-gray-500">
-                            Create a new job or update existing based on what offer contained.
+                            Utwórz nowe zlecenie lub zaktualizuj istniejące na podstawie zaakceptowanej oferty.
                         </p>
                     </div>
                     <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
@@ -66,7 +66,7 @@ export default function OfferAcceptedDialog({
                         {repairJobs.length > 0 && <>  <div className="sm:col-span-full">
                             <div className="sm:flex sm:items-end">
                                 <div className="sm:flex-auto  ">
-                                    <FormLabel name="startNewRepairJob" label='Start a new repair job' ></FormLabel>
+                                    <FormLabel name="startNewRepairJob" label='Rozpocznij nowe zlecenie naprawy' ></FormLabel>
                                 </div>
                                 <div className="mt-2  ">
                                     <FormSwitch name='startNewRepairJob' checked={startNewRepairJob} onChange={(value) => setStartNewRepairJob(value)}></FormSwitch>
@@ -74,7 +74,7 @@ export default function OfferAcceptedDialog({
                             </div>
                         </div>
                             {!startNewRepairJob && <div className="sm:col-span-full">
-                                <FormLabel name='name' label='Repair job to add services/products'></FormLabel>
+                                <FormLabel name='name' label='Zlecenie, do którego dodać usługi i produkty'></FormLabel>
                                 <div className="mt-6 sm:col-span-2 grid grid-cols-1">
                                     <Select
                                         id="selectedRepairJob"
@@ -89,7 +89,7 @@ export default function OfferAcceptedDialog({
                             </div>}</>} 
 
                         {startNewRepairJob && <div className="sm:col-span-full">
-                            <FormLabel name="notes" label={'Notes to add to new job'} ></FormLabel>
+                            <FormLabel name="notes" label={'Notatki do nowego zlecenia'} ></FormLabel>
                             <div className="mt-2  ">
                                 <FormTextArea
                                     name="notes"

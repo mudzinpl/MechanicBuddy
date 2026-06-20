@@ -12,6 +12,6 @@ export default function ActivityNotes({
 }) {
     return (
         !edit ? <SecondaryText>{notes}</SecondaryText> :
-        <FormTextArea placeholder={'Add notes ...'} defaultValue={notes} name="notes"></FormTextArea>
+        <FormTextArea placeholder={'Dodaj notatki ...'} defaultValue={notes} name="notes"></FormTextArea>
     );
 }

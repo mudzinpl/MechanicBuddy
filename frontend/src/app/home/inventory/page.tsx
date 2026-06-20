@@ -65,11 +65,11 @@ export default async function Page(
   return (
  
       <Main  header={
-        <SearchCardHeader title="Find Inventory" pageName="inventory">
+        <SearchCardHeader title="Znajdź w magazynie" pageName="inventory">
       </SearchCardHeader>
       } narrow={false}>
         <form method="GET" > <Search searchParams={searchParams} pageName="inventory" resourceName="spareparts" columns={columns}>
-          <SimpleSearchBar searchParams={searchParams} placeholder="code or name ..."></SimpleSearchBar>
+          <SimpleSearchBar searchParams={searchParams} placeholder="kod lub nazwa ..."></SimpleSearchBar>
           </Search></form>
       </Main> 
   )

@@ -41,7 +41,7 @@ export default function FormInputWithButton({
                         className="flex shrink-0 items-center gap-x-1.5 rounded-r-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white outline-1 -outline-offset-1 outline-indigo-300 hover:bg-indigo-500 focus:relative focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
                     >
                         {children}
-                        Add
+                        Dodaj
                     </button>
                 </div>
         </>

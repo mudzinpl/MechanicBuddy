@@ -19,9 +19,9 @@ export default function ApplyDiscountsDialog({
 
     return (
         <BaseDialog ref={dialogRef}
-        yesButtonText="Apply"
+        yesButtonText="Zastosuj" noButtonText="Anuluj"
         center={false} 
-        title="Apply Discount" 
+        title="Zastosuj rabat" 
         onConfirm={() => {
             if (discount)
                 tableRef.current.forEach(r => {
@@ -31,7 +31,7 @@ export default function ApplyDiscountsDialog({
         }}>
          <div className="space-y-12  ">
          <div className="border-b mt-4  border-gray-900/10 pb-12">
-          <FormLabel name='name' label='Percent'></FormLabel>
+          <FormLabel name='name' label='Procent'></FormLabel>
          <FormInput
                 name='item'
                 type="number" 

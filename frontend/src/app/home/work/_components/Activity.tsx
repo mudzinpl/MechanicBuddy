@@ -47,12 +47,12 @@ export default function Activity({
     const pathEdit = pathCancel + '/edit#items'
     const activityIsOffer = activities.items.find(x => x.id === activities.current.id)?.name == 'offer';
     const editOptions =work.issuance?[]: [
-        { name: 'Add row', onClick: () =>{
+        { name: 'Dodaj wiersz', onClick: () =>{
             addEmptyRow(1);
             setScrollDown(true);
         } },
-        { name: 'Cancel ', href: pathCancel },
-        { name: 'Save', isPrimary: true },
+        { name: 'Anuluj ', href: pathCancel },
+        { name: 'Zapisz', isPrimary: true },
         { name: 'Zastosuj rabat', inMenu: true, onClick: () => applyDiscountsRef.current?.open() },
         { name: 'Dodaj więcej wierszy', inMenu: true, onClick: () =>{
             addEmptyRow(5);
@@ -75,7 +75,7 @@ export default function Activity({
         if(data.length > 0) //if there is data something to issue
         { 
             readOptions.push({ 
-                name:  (issued?'Wystaw ofertę ponownie':'Issue offer'),
+                name:  (issued?'Wystaw ofertę ponownie':'Wystaw ofertę'),
                  inMenu:issued,
                  isPrimary: !issued, //if not issued, issue is primary this is the next logical step
                  onClick: () => { issueOfferRef.current?.open() } 
@@ -84,7 +84,7 @@ export default function Activity({
         if(issued){ //if issued, can send offer
             readOptions.push(
                 {
-                    name: (sent?'Wyślij ofertę ponownie':'Send offer'),
+                    name: (sent?'Wyślij ofertę ponownie':'Wyślij ofertę'),
                     inMenu:sent,
                     isPrimary: false,
                     onClick:()=>{
@@ -95,7 +95,7 @@ export default function Activity({
         } 
         if(issued && !accepted){ //issued but but not accepted
             readOptions.push({ 
-                name:  'Client accepted' ,
+                name:  'Klient zaakceptował' ,
                  isPrimary: true, 
                  onClick: () => { offerAcceptedRef.current?.open()   } 
                 } as IButtonOption)

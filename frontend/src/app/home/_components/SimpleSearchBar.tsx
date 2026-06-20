@@ -10,7 +10,7 @@ export default async function SimpleSearchBar({ searchParams,placeholder }: { se
           <SearchInput searchParams={searchParams} placeholder={placeholder} ></SearchInput>
         </div>
         <div >
-          <PrimaryButton className="float-right" id="btnSubmit">Search</PrimaryButton>
+          <PrimaryButton className="float-right" id="btnSubmit">Szukaj</PrimaryButton>
         </div>
       </div>
     </div>
