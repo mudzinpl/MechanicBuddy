@@ -156,7 +156,7 @@ export default async function Page(
 
           <Card header={
             
-            <SearchCardHeader title="Find Work" pageName="work">
+            <SearchCardHeader title="Znajdź zlecenia" pageName="work">
             </SearchCardHeader>}  >
 
             <Search
@@ -171,10 +171,10 @@ export default async function Page(
                  <div className="  grid grid-cols-1  md:grid-cols-12 md:grid-flow-row md:gap-x-2 3xl:grid-flow-col  3xl:grid-cols-24   p-0 3xl:gap-x-2  gap-y-2  "> 
                       <div className="3xl:col-span-6 md:col-span-7 "   >
                         <SearchStatusFilter issued={options.issued === 'on'} status={options.status}></SearchStatusFilter>
-                        <SearchInput searchParams={searchParams} placeholder="number, client, vehicle vin or reg nr." ></SearchInput> 
+                        <SearchInput searchParams={searchParams} placeholder="numer, klient, VIN lub nr rejestracyjny pojazdu" ></SearchInput> 
                       </div> 
                       <div className="3xl:col-span-4  md:col-span-5 ">
-                         <FormInput name="saleable" label="Product or service" placeholder="code or name ..." defaultValue={options.saleable}  ></FormInput>
+                         <FormInput name="saleable" label="Produkt lub usługa" placeholder="kod lub nazwa ..." defaultValue={options.saleable}  ></FormInput>
                       </div>
                       <div  className="3xl:col-span-14  md:col-span-12  " >
                       <SearchParams options={options}></SearchParams>
@@ -182,7 +182,7 @@ export default async function Page(
                       
                   </div> 
                   <div className="mx-2 text-right mt-8">
-                        <PrimaryButton   id="btnSubmit">Search</PrimaryButton>
+                        <PrimaryButton   id="btnSubmit">Szukaj</PrimaryButton>
                    </div>
               </div>
                 
