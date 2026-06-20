@@ -32,7 +32,7 @@ export default function AuditLogsFilters({ searchParams }: Props) {
       <div className="flex flex-wrap gap-4 items-end">
         <div className="flex-1 min-w-[200px]">
           <label htmlFor="searchText" className="block text-sm font-medium text-gray-700 mb-1">
-            Search
+            Szukaj
           </label>
           <input
             type="text"
@@ -45,7 +45,7 @@ export default function AuditLogsFilters({ searchParams }: Props) {
         </div>
         <div className="min-w-[150px]">
           <label htmlFor="actionType" className="block text-sm font-medium text-gray-700 mb-1">
-            Action Type
+            Typ działania
           </label>
           <select
             id="actionType"
