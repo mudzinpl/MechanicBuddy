@@ -53,8 +53,8 @@ export default function Activity({
         } },
         { name: 'Cancel ', href: pathCancel },
         { name: 'Save', isPrimary: true },
-        { name: 'Apply discount', inMenu: true, onClick: () => applyDiscountsRef.current?.open() },
-        { name: 'Add more rows', inMenu: true, onClick: () =>{
+        { name: 'Zastosuj rabat', inMenu: true, onClick: () => applyDiscountsRef.current?.open() },
+        { name: 'Dodaj więcej wierszy', inMenu: true, onClick: () =>{
             addEmptyRow(5);
             setScrollDown(true);
         } }
@@ -63,7 +63,7 @@ export default function Activity({
     const issued = !!issuance?.issuedOn;
 
     const readOptions =work.issuance?[]: [
-        { name: 'Edit ', isPrimary: true, inMenu:issued, href: pathEdit },
+        { name: issued ? 'Edytuj ' : 'Edit ', isPrimary: true, inMenu:issued, href: pathEdit },
 
     
     ] as IButtonOption[]
@@ -75,7 +75,7 @@ export default function Activity({
         if(data.length > 0) //if there is data something to issue
         { 
             readOptions.push({ 
-                name:  (issued?'Reissue offer':'Issue offer'),
+                name:  (issued?'Wystaw ofertę ponownie':'Issue offer'),
                  inMenu:issued,
                  isPrimary: !issued, //if not issued, issue is primary this is the next logical step
                  onClick: () => { issueOfferRef.current?.open() } 
@@ -84,7 +84,7 @@ export default function Activity({
         if(issued){ //if issued, can send offer
             readOptions.push(
                 {
-                    name: (sent?'Resend offer':'Send offer'),
+                    name: (sent?'Wyślij ofertę ponownie':'Send offer'),
                     inMenu:sent,
                     isPrimary: false,
                     onClick:()=>{
