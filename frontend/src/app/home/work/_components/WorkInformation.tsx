@@ -47,7 +47,7 @@ export function WorkInformation({
         { name: 'Rozpocznij naprawę', onClick: async () => { await startAnActivity(work.id, "repairjob") } },
         { name: 'Edytuj', href: editPath },
         { name: 'Usuń', redText:true, onClick:   () => { deleteWorkRef.current?.open({
-            title:'Delete work',description:'Are you sure you want to delete it?',confirmObj:work.id
+            title:'Usuń zlecenie',description:'Czy na pewno chcesz usunąć to zlecenie?',confirmObj:work.id
         })  } },
     ] as IButtonOption[];
    
