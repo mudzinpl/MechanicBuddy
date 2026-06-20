@@ -1,6 +1,7 @@
 'use client'
 
 import { formatDistanceToNow } from 'date-fns';
+import { pl } from 'date-fns/locale';
 import clsx from 'clsx';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -41,7 +42,7 @@ export default function AuditLogsTable({ logs, total, hasMore, currentOffset, li
   if (logs.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow p-8 text-center">
-        <p className="text-gray-500">No audit logs found matching your criteria.</p>
+        <p className="text-gray-500">Nie znaleziono wpisów dziennika spełniających kryteria.</p>
       </div>
     );
   }
@@ -52,13 +53,13 @@ export default function AuditLogsTable({ logs, total, hasMore, currentOffset, li
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Time</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Type</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Action</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Czas</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Użytkownik</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Typ</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Działanie</th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Endpoint</th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
+              <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Czas trwania</th>
               <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IP</th>
             </tr>
           </thead>
@@ -67,7 +68,7 @@ export default function AuditLogsTable({ logs, total, hasMore, currentOffset, li
               <tr key={log.id} className="hover:bg-gray-50">
                 <td className="px-4 py-3 whitespace-nowrap text-sm text-gray-500">
                   <span title={new Date(log.timestamp).toLocaleString()}>
-                    {formatDistanceToNow(new Date(log.timestamp), { addSuffix: true })}
+                    {formatDistanceToNow(new Date(log.timestamp), { addSuffix: true, locale: pl })}
                   </span>
                 </td>
                 <td className="px-4 py-3 whitespace-nowrap text-sm font-medium text-gray-900">
@@ -101,9 +102,9 @@ export default function AuditLogsTable({ logs, total, hasMore, currentOffset, li
       {/* Pagination */}
       <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200">
         <div className="text-sm text-gray-700">
-          Showing <span className="font-medium">{currentOffset + 1}</span> to{' '}
-          <span className="font-medium">{Math.min(currentOffset + limit, total)}</span> of{' '}
-          <span className="font-medium">{total}</span> results
+          Wyświetlanie <span className="font-medium">{currentOffset + 1}</span> do{' '}
+          <span className="font-medium">{Math.min(currentOffset + limit, total)}</span> z{' '}
+          <span className="font-medium">{total}</span> wyników
         </div>
         <div className="flex gap-2">
           {currentOffset > 0 && (
@@ -111,7 +112,7 @@ export default function AuditLogsTable({ logs, total, hasMore, currentOffset, li
               href={buildPaginationUrl(Math.max(0, currentOffset - limit))}
               className="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
-              Previous
+              Poprzednia
             </Link>
           )}
           {hasMore && (
@@ -119,7 +120,7 @@ export default function AuditLogsTable({ logs, total, hasMore, currentOffset, li
               href={buildPaginationUrl(currentOffset + limit)}
               className="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50"
             >
-              Next
+              Następna
             </Link>
           )}
         </div>
@@ -137,9 +138,9 @@ function ActionTypeBadge({ type }: { type: string }) {
   };
 
   const labels = {
-    auth: 'Auth',
+    auth: 'Logowanie',
     crud: 'CRUD',
-    admin: 'Admin',
+    admin: 'Administracja',
     api_request: 'API',
   };
 
