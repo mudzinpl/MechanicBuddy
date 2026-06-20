@@ -11,7 +11,7 @@ export default async function Page(
   { searchParams }: { searchParams: Promise<Record<string, string>> }) {
 
   return <Main header={
-    <SearchCardHeader title="Find Vehicles" pageName="vehicles">
+    <SearchCardHeader title="Znajdź pojazdy" pageName="vehicles">
     </SearchCardHeader>
   } narrow={false}>
      <form method="GET" > <Search
@@ -74,7 +74,7 @@ export default async function Page(
           }
         }
       ]}>
-        <SimpleSearchBar searchParams={searchParams} placeholder="vin, reg nr., owner or make ..."></SimpleSearchBar> 
+        <SimpleSearchBar searchParams={searchParams} placeholder="VIN, nr rejestracyjny, właściciel lub marka ..."></SimpleSearchBar> 
         </Search></form>
    
   </Main>
