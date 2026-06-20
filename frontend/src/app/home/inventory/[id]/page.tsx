@@ -22,16 +22,16 @@ export default async function Page({
 
         <Main header={
             <CardHeader  > 
-                     <h3 className="px-1 text-base font-semibold text-gray-900">Spare part information</h3> 
+                     <h3 className="px-1 text-base font-semibold text-gray-900">Informacje o części</h3> 
                     <DisplayOptionsMenu id={id} pageName='inventory'></DisplayOptionsMenu> 
             </CardHeader>}>  
             <dl className="divide-y divide-gray-100">
-                    <DescriptionItem label='Product code' value={sparepart.code}></DescriptionItem> 
-                    <DescriptionItem label='Product name' value={sparepart.name}></DescriptionItem>   
-                    <DescriptionItem label='Quantity' value={sparepart.quantity}></DescriptionItem>  
-                    <DescriptionItem label='Price' value={sparepart.price}></DescriptionItem> 
-                    <DescriptionItem label='Location' value={sparepart.storageName}></DescriptionItem> 
-                    <DescriptionItem label='About' value={sparepart.description}></DescriptionItem> 
+                    <DescriptionItem label='Kod produktu' value={sparepart.code}></DescriptionItem> 
+                    <DescriptionItem label='Nazwa produktu' value={sparepart.name}></DescriptionItem>   
+                    <DescriptionItem label='Ilość' value={sparepart.quantity}></DescriptionItem>  
+                    <DescriptionItem label='Cena' value={sparepart.price}></DescriptionItem> 
+                    <DescriptionItem label='Lokalizacja' value={sparepart.storageName}></DescriptionItem> 
+                    <DescriptionItem label='Uwagi' value={sparepart.description}></DescriptionItem> 
                 </dl>
         </Main>
     )
