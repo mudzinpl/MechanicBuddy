@@ -94,7 +94,7 @@ const DataItemRow = React.forwardRef<DataItemRowHandle<IProduct>, IDataItemRowPr
         <td className={clsx("min-w-50 w-50",tdStyle)} >
           
             <EditableCodeCell //todo auto complete 
-                placeholder="code ..."
+                placeholder="kod ..."
                 defaultValue={item.code}
                 isEditing={isEditing}
                 ref={codeRef}
@@ -113,7 +113,7 @@ const DataItemRow = React.forwardRef<DataItemRowHandle<IProduct>, IDataItemRowPr
                     className={nameStyle}
                     required={true}
                     ref={nameRef}
-                    placeholder="(no value)"
+                    placeholder="(brak wartości)"
                     defaultValue={item.name}
                     isEditing={isEditing}
                 >
@@ -148,7 +148,7 @@ const DataItemRow = React.forwardRef<DataItemRowHandle<IProduct>, IDataItemRowPr
             <EditableTextCell  
                     id={item.id}
                     name='unit'
-                        placeholder="(no value)"
+                        placeholder="(brak wartości)"
                         ref={unitRef}
                         className={clsx("w-15",pricePropsClass)}
                         defaultValue={item.unit} isEditing={isEditing}></EditableTextCell>
