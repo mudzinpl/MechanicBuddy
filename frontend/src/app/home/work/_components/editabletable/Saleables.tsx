@@ -41,7 +41,7 @@ export default function Saleables({
                                 <tr>
                                     {edit && <th></th>}
                                     <th className="py-3.5 pr-3 pl-4   text-sm font-semibold whitespace-nowrap text-gray-900 sm:pl-0"
-                                    >Code
+                                    >Kod
                                     </th>
                                     <th className="px-2 py-3.5  text-sm font-semibold whitespace-nowrap text-gray-900">
                                         Name
@@ -88,16 +88,16 @@ export default function Saleables({
                                             <div className="flex flex-row-reverse " >
 
                                                 <div className="hidden pt-4 pr-3 pl-4 text-right text-sm font-normal text-gray-500 sm:table-cell sm:pl-0 w-25">{moneyFormatter.format(priceSummary.totalWithoutVat)}</div>
-                                                <div className="hidden pt-4 pr-3 pl-4 text-right text-sm font-normal text-gray-500 sm:table-cell sm:pl-0">Subtotal</div>
+                                                <div className="hidden pt-4 pr-3 pl-4 text-right text-sm font-normal text-gray-500 sm:table-cell sm:pl-0">Suma częściowa</div>
                                             </div>
                                             <div className="flex flex-row-reverse " >
                                                 <div className="hidden pt-4 pr-3 pl-4 text-right text-sm font-normal text-gray-500 sm:table-cell sm:pl-0 w-25">{moneyFormatter.format(priceSummary.totalWithVat - priceSummary.totalWithoutVat)}</div>
-                                                <div className="hidden pt-4 pr-3 pl-4 text-right text-sm font-normal text-gray-500 sm:table-cell sm:pl-0">Tax</div>
+                                                <div className="hidden pt-4 pr-3 pl-4 text-right text-sm font-normal text-gray-500 sm:table-cell sm:pl-0">Podatek</div>
                                             </div>
                                             <div className="flex flex-row-reverse  " >
 
                                                 <div className="hidden pt-4 pr-3 pl-4 text-right text-sm font-semibold text-gray-900 sm:table-cell sm:pl-0 w-25">{moneyFormatter.format(priceSummary.totalWithVat)}</div>
-                                                <div className="hidden pt-4 pr-3 pl-4 text-right text-sm font-semibold text-gray-900 sm:table-cell sm:pl-0">Total</div>
+                                                <div className="hidden pt-4 pr-3 pl-4 text-right text-sm font-semibold text-gray-900 sm:table-cell sm:pl-0">Razem</div>
                                             </div>
                                         </div>
                                     </th>
