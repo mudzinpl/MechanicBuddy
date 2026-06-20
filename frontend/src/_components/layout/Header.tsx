@@ -44,7 +44,7 @@ function MobileNavigation() {
         type="button"
         onClick={() => setIsOpen(!isOpen)}
         className="relative z-10 flex h-8 w-8 items-center justify-center"
-        aria-label="Toggle Navigation"
+        aria-label="Przełącz nawigację"
       >
         <MobileNavIcon open={isOpen} />
       </button>
@@ -61,8 +61,8 @@ function MobileNavigation() {
       {isOpen && (
         <div className="absolute right-0 top-full z-50 mt-4 w-72 origin-top-right rounded-2xl bg-white p-4 text-lg tracking-tight text-slate-900 ring-1 shadow-xl ring-slate-900/5">
           <div className="space-y-2 mb-4">
-            <a href="#features" className="block py-2 hover:text-blue-600" onClick={() => setIsOpen(false)}>Features</a>
-            <a href="#pricing" className="block py-2 hover:text-blue-600" onClick={() => setIsOpen(false)}>Pricing</a>
+            <a href="#features" className="block py-2 hover:text-blue-600" onClick={() => setIsOpen(false)}>Funkcje</a>
+            <a href="#pricing" className="block py-2 hover:text-blue-600" onClick={() => setIsOpen(false)}>Cennik</a>
           </div>
           <hr className="m-2 border-slate-300/40" />
           <Button
@@ -70,7 +70,7 @@ function MobileNavigation() {
             variant="outline"
             onClick={() => setIsOpen(false)}
           >
-            View on GitHub
+            Zobacz na GitHubie
           </Button>
           <Button
             href="/auth/login"
@@ -78,7 +78,7 @@ function MobileNavigation() {
             className="mt-2"
             onClick={() => setIsOpen(false)}
           >
-            Log in
+            Zaloguj się
           </Button>
         </div>
       )}
@@ -92,12 +92,12 @@ export function Header() {
       <Container>
         <nav className="relative z-50 flex justify-between">
           <div className="flex items-center md:gap-x-12">
-            <Link href="/" aria-label="Home" className="flex items-center gap-2">
+            <Link href="/" aria-label="Strona główna" className="flex items-center gap-2">
               <span className="text-xl font-bold text-slate-900">MechanicBuddy</span>
             </Link>
             <div className="hidden md:flex md:gap-x-6">
-              <NavLink href="#features">Features</NavLink>
-              <NavLink href="#pricing">Pricing</NavLink>
+              <NavLink href="#features">Funkcje</NavLink>
+              <NavLink href="#pricing">Cennik</NavLink>
             </div>
           </div>
           <div className="flex items-center gap-x-5 md:gap-x-8">
@@ -106,11 +106,11 @@ export function Header() {
                 href="https://github.com/d4m13n-de/MechanicBuddy"
                 variant="outline"
               >
-                View on GitHub
+                Zobacz na GitHubie
               </Button>
             </div>
             <Button href="/auth/login" color="blue">
-              <span>Log in</span>
+              <span>Zaloguj się</span>
             </Button>
             <div className="-mr-1 md:hidden">
               <MobileNavigation />
