@@ -66,7 +66,7 @@ async function apiCall({
     console.log('headers: '+JSON.stringify(requestHeaders));
     console.log('body: '+request.body);
     const hasContentType = response.headers.has('Content-Type');
-    let message = 'API Error occurred server side';
+    let message = 'Wystąpił błąd po stronie serwera API';
     let isUserError = false;
     if(hasContentType){
       const contentType = response.headers.get('Content-Type');
