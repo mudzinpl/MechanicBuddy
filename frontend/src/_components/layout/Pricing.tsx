@@ -103,7 +103,7 @@ function Plan({
         variant={featured ? 'solid' : 'outline'}
         color="white"
         className="mt-8"
-        aria-label={`Get started with the ${name} plan for ${price}`}
+        aria-label={`Rozpocznij z planem ${name} za ${price}`}
       >
         Get started
       </Button>
@@ -115,7 +115,7 @@ export function Pricing() {
   return (
     <section
       id="pricing"
-      aria-label="Pricing"
+      aria-label="Cennik"
       className="bg-slate-900 py-20 sm:py-32"
     >
       <Container>
@@ -123,57 +123,57 @@ export function Pricing() {
           <h2 className="font-display text-3xl tracking-tight text-white sm:text-4xl">
             <span className="relative whitespace-nowrap">
               <SwirlyDoodle className="absolute top-1/2 left-0 h-[1em] w-full fill-blue-400" />
-              <span className="relative">Simple pricing,</span>
+              <span className="relative">Prosty cennik,</span>
             </span>{' '}
-            for every shop.
+            dla każdego warsztatu.
           </h2>
           <p className="mt-4 text-lg text-slate-400">
-            Start free and scale as your business grows. No hidden fees, no surprises.
+            Zacznij bezpłatnie i rozwijaj się wraz ze swoim warsztatem. Bez ukrytych opłat i niespodzianek.
           </p>
         </div>
         <div className="-mx-4 mt-16 grid max-w-2xl grid-cols-1 gap-y-10 sm:mx-auto lg:-mx-8 lg:max-w-none lg:grid-cols-3 xl:mx-0 xl:gap-x-8">
           <Plan
             name="Solo"
             price="$0"
-            description="Perfect for independent mechanics just getting started."
+            description="Idealny dla niezależnych mechaników rozpoczynających działalność."
             href="/auth/login"
             features={[
-              '1 user account',
-              'Unlimited quotes and invoices',
-              'Unlimited clients and vehicles',
-              'Full inventory management',
-              'PDF generation',
-              'Email support',
+              '1 konto użytkownika',
+              'Nielimitowane oferty i faktury',
+              'Nielimitowani klienci i pojazdy',
+              'Pełne zarządzanie magazynem',
+              'Generowanie plików PDF',
+              'Wsparcie e-mail',
             ]}
           />
           <Plan
             featured
-            name="Team"
+            name="Zespół"
             price="$20/mo"
-            description="For growing shops that need unlimited team access."
+            description="Dla rozwijających się warsztatów, które potrzebują nielimitowanego dostępu dla zespołu."
             href="/auth/login"
             features={[
-              'Unlimited users',
-              'Unlimited quotes and invoices',
-              'Unlimited clients and vehicles',
-              'Full inventory management',
-              'PDF generation',
-              'Priority support',
+              'Nielimitowani użytkownicy',
+              'Nielimitowane oferty i faktury',
+              'Nielimitowani klienci i pojazdy',
+              'Pełne zarządzanie magazynem',
+              'Generowanie plików PDF',
+              'Priorytetowe wsparcie',
             ]}
           />
           <Plan
-            name="Lifetime"
+            name="Bezterminowy"
             price="$250"
-            description="One-time payment for unlimited access forever."
+            description="Jednorazowa opłata za bezterminowy, nielimitowany dostęp."
             href="/auth/login"
             features={[
-              'Unlimited users',
-              'Unlimited quotes and invoices',
-              'Unlimited clients and vehicles',
-              'Full inventory management',
-              'PDF generation',
-              'Lifetime updates',
-              'Priority support',
+              'Nielimitowani użytkownicy',
+              'Nielimitowane oferty i faktury',
+              'Nielimitowani klienci i pojazdy',
+              'Pełne zarządzanie magazynem',
+              'Generowanie plików PDF',
+              'Bezterminowe aktualizacje',
+              'Priorytetowe wsparcie',
             ]}
           />
         </div>
