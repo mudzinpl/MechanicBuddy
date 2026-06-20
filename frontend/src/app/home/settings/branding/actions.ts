@@ -39,7 +39,7 @@ export async function updateBranding(formData: FormData) {
 
     await httpPut({ url: 'branding', body });
 
-    pushToast('Branding updated successfully!');
+    pushToast('Ustawienia marki zostały zaktualizowane.');
     redirect('/home/settings/branding');
 }
 
@@ -70,7 +70,7 @@ export async function updateHero(formData: FormData) {
 
     await httpPut({ url: 'branding/hero', body });
 
-    pushToast('Hero section updated successfully!');
+    pushToast('Sekcja główna została zaktualizowana.');
     redirect('/home/settings/landing');
 }
 
@@ -84,7 +84,7 @@ export async function updateAbout(formData: FormData) {
 
     await httpPut({ url: 'branding/about', body });
 
-    pushToast('About section updated successfully!');
+    pushToast('Sekcja „O nas” została zaktualizowana.');
     redirect('/home/settings/landing');
 }
 
@@ -98,7 +98,7 @@ export async function updateTipsSection(formData: FormData) {
 
     await httpPut({ url: 'branding/tips-section', body });
 
-    pushToast('Tips section updated successfully!');
+    pushToast('Sekcja porad została zaktualizowana.');
     redirect('/home/settings/landing');
 }
 
@@ -112,7 +112,7 @@ export async function updateFooter(formData: FormData) {
 
     await httpPut({ url: 'branding/footer', body });
 
-    pushToast('Footer updated successfully!');
+    pushToast('Stopka została zaktualizowana.');
     redirect('/home/settings/landing');
 }
 
@@ -138,7 +138,7 @@ export async function updateContact(formData: FormData) {
 
     await httpPut({ url: 'branding/contact', body });
 
-    pushToast('Contact section updated successfully!');
+    pushToast('Sekcja kontaktowa została zaktualizowana.');
     redirect('/home/settings/landing');
 }
 
@@ -154,7 +154,7 @@ export async function createService(formData: FormData) {
 
     await httpPost({ url: 'branding/services', body });
 
-    pushToast('Service created successfully!');
+    pushToast('Usługa została utworzona.');
     redirect('/home/settings/landing/services');
 }
 
@@ -170,7 +170,7 @@ export async function updateService(formData: FormData) {
 
     await httpPut({ url: `branding/services/${id}`, body });
 
-    pushToast('Service updated successfully!');
+    pushToast('Usługa została zaktualizowana.');
     redirect('/home/settings/landing/services');
 }
 
@@ -179,7 +179,7 @@ export async function deleteService(formData: FormData) {
 
     await httpDelete({ url: `branding/services/${id}`, body: {} });
 
-    pushToast('Service deleted successfully!');
+    pushToast('Usługa została usunięta.');
     redirect('/home/settings/landing/services');
 }
 
@@ -201,7 +201,7 @@ export async function createStat(formData: FormData) {
 
     await httpPost({ url: 'branding/stats', body });
 
-    pushToast('Stat created successfully!');
+    pushToast('Statystyka została utworzona.');
     redirect('/home/settings/landing/stats');
 }
 
@@ -214,7 +214,7 @@ export async function updateStat(formData: FormData) {
 
     await httpPut({ url: `branding/stats/${id}`, body });
 
-    pushToast('Stat updated successfully!');
+    pushToast('Statystyka została zaktualizowana.');
     redirect('/home/settings/landing/stats');
 }
 
@@ -223,7 +223,7 @@ export async function deleteStat(formData: FormData) {
 
     await httpDelete({ url: `branding/stats/${id}`, body: {} });
 
-    pushToast('Stat deleted successfully!');
+    pushToast('Statystyka została usunięta.');
     redirect('/home/settings/landing/stats');
 }
 
@@ -246,7 +246,7 @@ export async function createTip(formData: FormData) {
 
     await httpPost({ url: 'branding/tips', body });
 
-    pushToast('Tip created successfully!');
+    pushToast('Porada została utworzona.');
     redirect('/home/settings/landing/tips');
 }
 
@@ -260,7 +260,7 @@ export async function updateTip(formData: FormData) {
 
     await httpPut({ url: `branding/tips/${id}`, body });
 
-    pushToast('Tip updated successfully!');
+    pushToast('Porada została zaktualizowana.');
     redirect('/home/settings/landing/tips');
 }
 
@@ -269,7 +269,7 @@ export async function deleteTip(formData: FormData) {
 
     await httpDelete({ url: `branding/tips/${id}`, body: {} });
 
-    pushToast('Tip deleted successfully!');
+    pushToast('Porada została usunięta.');
     redirect('/home/settings/landing/tips');
 }
 
@@ -290,7 +290,7 @@ export async function createAboutFeature(formData: FormData) {
 
     await httpPost({ url: 'branding/about/features', body });
 
-    pushToast('Feature created successfully!');
+    pushToast('Wyróżnik został utworzony.');
     redirect('/home/settings/landing/about');
 }
 
@@ -302,7 +302,7 @@ export async function updateAboutFeature(formData: FormData) {
 
     await httpPut({ url: `branding/about/features/${id}`, body });
 
-    pushToast('Feature updated successfully!');
+    pushToast('Wyróżnik został zaktualizowany.');
     redirect('/home/settings/landing/about');
 }
 
@@ -311,7 +311,7 @@ export async function deleteAboutFeature(formData: FormData) {
 
     await httpDelete({ url: `branding/about/features/${id}`, body: {} });
 
-    pushToast('Feature deleted successfully!');
+    pushToast('Wyróżnik został usunięty.');
     redirect('/home/settings/landing/about');
 }
 
@@ -338,7 +338,7 @@ export async function updateSectionVisibility(formData: FormData) {
 
     await httpPut({ url: 'branding/section-visibility', body });
 
-    pushToast('Section visibility updated successfully!');
+    pushToast('Widoczność sekcji została zaktualizowana.');
     redirect('/home/settings/landing/visibility');
 }
 
@@ -352,7 +352,7 @@ export async function updateGallerySection(formData: FormData) {
 
     await httpPut({ url: 'branding/gallery-section', body });
 
-    pushToast('Gallery section updated successfully!');
+    pushToast('Sekcja galerii została zaktualizowana.');
     redirect('/home/settings/landing/gallery');
 }
 
@@ -377,7 +377,7 @@ export async function createGalleryPhoto(formData: FormData) {
 
     await httpPost({ url: 'branding/gallery-photos', body });
 
-    pushToast('Photo added successfully!');
+    pushToast('Zdjęcie zostało dodane.');
     redirect('/home/settings/landing/gallery');
 }
 
@@ -402,7 +402,7 @@ export async function updateGalleryPhoto(formData: FormData) {
 
     await httpPut({ url: `branding/gallery-photos/${id}`, body });
 
-    pushToast('Photo updated successfully!');
+    pushToast('Zdjęcie zostało zaktualizowane.');
     redirect('/home/settings/landing/gallery');
 }
 
@@ -411,7 +411,7 @@ export async function deleteGalleryPhoto(formData: FormData) {
 
     await httpDelete({ url: `branding/gallery-photos/${id}`, body: {} });
 
-    pushToast('Photo deleted successfully!');
+    pushToast('Zdjęcie zostało usunięte.');
     redirect('/home/settings/landing/gallery');
 }
 
@@ -438,7 +438,7 @@ export async function createSocialLink(formData: FormData) {
 
     await httpPost({ url: 'branding/social-links', body });
 
-    pushToast('Social link created successfully!');
+    pushToast('Link społecznościowy został utworzony.');
     redirect('/home/settings/landing/social');
 }
 
@@ -456,7 +456,7 @@ export async function updateSocialLink(formData: FormData) {
 
     await httpPut({ url: `branding/social-links/${id}`, body });
 
-    pushToast('Social link updated successfully!');
+    pushToast('Link społecznościowy został zaktualizowany.');
     redirect('/home/settings/landing/social');
 }
 
@@ -465,7 +465,7 @@ export async function deleteSocialLink(formData: FormData) {
 
     await httpDelete({ url: `branding/social-links/${id}`, body: {} });
 
-    pushToast('Social link deleted successfully!');
+    pushToast('Link społecznościowy został usunięty.');
     redirect('/home/settings/landing/social');
 }
 
