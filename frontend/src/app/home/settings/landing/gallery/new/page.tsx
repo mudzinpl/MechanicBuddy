@@ -14,14 +14,14 @@ export default async function Page() {
                     href="/home/settings/landing/gallery"
                     className="text-sm text-indigo-600 hover:text-indigo-500"
                 >
-                    &larr; Back to Gallery
+                    &larr; Wróć do galerii
                 </Link>
             </div>
 
             <div className="mb-6">
-                <h2 className="text-base/7 font-semibold text-gray-900">Add Photo</h2>
+                <h2 className="text-base/7 font-semibold text-gray-900">Dodaj zdjęcie</h2>
                 <p className="mt-1 text-sm text-gray-500">
-                    Upload a new photo to your gallery.
+                    Prześlij nowe zdjęcie do galerii.
                 </p>
             </div>
 
@@ -45,7 +45,7 @@ export default async function Page() {
                                 hover:file:bg-indigo-100"
                         />
                         <p className="mt-1 text-xs text-gray-500">
-                            Recommended: JPEG or PNG, at least 800x600 pixels
+                            Zalecane: JPEG lub PNG, co najmniej 800 × 600 pikseli
                         </p>
                     </div>
 
@@ -57,15 +57,15 @@ export default async function Page() {
                             type="text"
                             id="caption"
                             name="caption"
-                            placeholder="Describe this photo..."
+                            placeholder="Opisz zdjęcie..."
                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         />
                     </div>
 
                     <div className="flex items-center justify-between">
                         <div>
-                            <label className="text-sm font-medium text-gray-700">Active</label>
-                            <p className="text-sm text-gray-500">Show this photo on the landing page</p>
+                            <label className="text-sm font-medium text-gray-700">Aktywne</label>
+                            <p className="text-sm text-gray-500">Pokaż zdjęcie na stronie startowej</p>
                         </div>
                         <FormSwitch name="isActive" defaultChecked={true} />
                     </div>
@@ -76,13 +76,13 @@ export default async function Page() {
                         href="/home/settings/landing/gallery"
                         className="rounded-md bg-white px-4 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                     >
-                        Cancel
+                        Anuluj
                     </Link>
                     <button
                         type="submit"
                         className="rounded-md bg-indigo-600 px-4 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                     >
-                        Add Photo
+                        Dodaj zdjęcie
                     </button>
                 </div>
             </form>
