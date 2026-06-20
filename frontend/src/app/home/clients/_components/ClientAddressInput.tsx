@@ -82,7 +82,7 @@ export default function ClientAddress({
   return (
     <> 
       <div className="sm:col-span-3  sm:col-start-1"> 
-        <FormLabel name='country' label='Country'></FormLabel>
+        <FormLabel name='country' label='Kraj'></FormLabel>
         <div className="mt-2 grid grid-cols-1">
           <Select  
             id="country"
@@ -102,12 +102,12 @@ export default function ClientAddress({
         </div>
       </div>
       <div className="col-span-full">
-      <FormLabel name='street' label=' Street address'></FormLabel>
+      <FormLabel name='street' label='Ulica i numer'></FormLabel>
       {useEhak ? (
         <TypeAheadCombobox
            name={name}
 
-           placeholder='Estonian address ...'
+           placeholder='Adres w Estonii ...'
            defaultValue={selectedAddress}
            onSearch={(event,datasourceTarget) => {
             queryRemoteAddressData(event.currentTarget.value)
@@ -141,15 +141,15 @@ export default function ClientAddress({
       </div>
     
       <div className="sm:col-span-2 sm:col-start-1">
-        <FormInput name='city' label='City' defaultValue={selectedAddress?.city} ></FormInput>
+        <FormInput name='city' label='Miasto' defaultValue={selectedAddress?.city} ></FormInput>
       </div>
 
       <div className="sm:col-span-2">
-        <FormInput name='region' label='State / Province' defaultValue={selectedAddress?.region} ></FormInput>
+        <FormInput name='region' label='Województwo / region' defaultValue={selectedAddress?.region} ></FormInput>
       </div>
 
       <div className="sm:col-span-2">
-      <FormInput name='postal-code' label='ZIP / Postal code' defaultValue={selectedAddress?.postalCode} ></FormInput>
+      <FormInput name='postal-code' label='Kod pocztowy' defaultValue={selectedAddress?.postalCode} ></FormInput>
       </div></>
   )
 }
