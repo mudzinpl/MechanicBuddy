@@ -25,52 +25,52 @@ export default async function Page() {
                     href="/home/settings/landing"
                     className="text-sm text-indigo-600 hover:text-indigo-500"
                 >
-                    ← Back to Landing Page Settings
+                    ← Wróć do ustawień strony publicznej
                 </Link>
             </div>
 
-            {/* Tips Section Settings */}
+            {/* Ustawienia sekcji porad */}
             <form action={updateTipsSection}>
                 <div className="space-y-12">
                     <div className="border-b border-gray-900/10 pb-12">
-                        <h2 className="text-base/7 font-semibold text-gray-900 my-4">Tips Section Settings</h2>
+                        <h2 className="text-base/7 font-semibold text-gray-900 my-4">Ustawienia sekcji porad</h2>
                         <p className="mt-1 text-sm text-gray-500">
-                            Configure the tips section of your landing page.
+                            Skonfiguruj sekcję porad na stronie startowej.
                         </p>
 
                         <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                             <div className="sm:col-span-3">
-                                <FormLabel name="isVisible" label="Show Tips Section" />
+                                <FormLabel name="isVisible" label="Pokaż sekcję porad" />
                                 <div className="mt-3">
                                     <FormSwitch name="isVisible" defaultChecked={tipsSection.isVisible} />
                                 </div>
                                 <p className="mt-1 text-xs text-gray-500">
-                                    Toggle visibility of the entire tips section
+                                    Włącz lub wyłącz widoczność całej sekcji porad
                                 </p>
                             </div>
 
                             <div className="sm:col-span-3">
                                 <FormInput
                                     name="sectionLabel"
-                                    label="Section Label"
+                                    label="Etykieta sekcji"
                                     defaultValue={tipsSection.sectionLabel}
-                                    placeholder="e.g., Expert Advice"
+                                    placeholder="np. Porady ekspertów"
                                 />
                             </div>
 
                             <div className="sm:col-span-4">
                                 <FormInput
                                     name="headline"
-                                    label="Headline"
+                                    label="Nagłówek"
                                     defaultValue={tipsSection.headline}
-                                    placeholder="e.g., Auto Care Tips"
+                                    placeholder="np. Porady dotyczące samochodu"
                                 />
                             </div>
 
                             <div className="sm:col-span-6">
                                 <FormTextArea
                                     name="description"
-                                    label="Description"
+                                    label="Opis"
                                     rows={2}
                                     defaultValue={tipsSection.description || ''}
                                 />
@@ -84,7 +84,7 @@ export default async function Page() {
                         type="submit"
                         className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                     >
-                        Save Section Settings
+                        Zapisz ustawienia sekcji
                     </button>
                 </div>
             </form>
@@ -93,9 +93,9 @@ export default async function Page() {
             <div className="mt-12 pt-8 border-t border-gray-200">
                 <div className="flex items-center justify-between">
                     <div>
-                        <h3 className="text-base/7 font-semibold text-gray-900">Tips</h3>
+                        <h3 className="text-base/7 font-semibold text-gray-900">Porady</h3>
                         <p className="mt-1 text-sm text-gray-500">
-                            Manage individual tips displayed in this section.
+                            Zarządzaj poradami wyświetlanymi w tej sekcji.
                         </p>
                     </div>
                     <Link
@@ -103,14 +103,14 @@ export default async function Page() {
                         className="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                     >
                         <PlusIcon className="h-5 w-5" />
-                        Add Tip
+                        Dodaj poradę
                     </Link>
                 </div>
 
                 <div className="mt-6 bg-white rounded-lg border border-gray-200 shadow-sm">
                     {tips.length === 0 ? (
                         <div className="p-8 text-center">
-                            <p className="text-sm text-gray-500">No tips yet. Add your first tip to get started.</p>
+                            <p className="text-sm text-gray-500">Brak porad. Dodaj pierwszą poradę, aby rozpocząć.</p>
                         </div>
                     ) : (
                         <div className="divide-y divide-gray-100">
@@ -148,7 +148,7 @@ export default async function Page() {
                                                 <h4 className="text-sm font-medium text-gray-900">{tip.title}</h4>
                                                 {!tip.isActive && (
                                                     <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
-                                                        Inactive
+                                                        Nieaktywna
                                                     </span>
                                                 )}
                                             </div>
