@@ -44,19 +44,19 @@ export default function Saleables({
                                     >Kod
                                     </th>
                                     <th className="px-2 py-3.5  text-sm font-semibold whitespace-nowrap text-gray-900">
-                                        Name
+                                        Nazwa
                                     </th>
                                     <th className="px-2 py-3.5 text-end  text-sm font-semibold whitespace-nowrap text-gray-900">
-                                        Price
+                                        Cena
                                     </th>
                                     <th className="px-2 py-3.5 text-end   text-sm font-semibold whitespace-nowrap text-gray-900">
-                                        Quantity
+                                        Ilość
                                     </th>
                                     <th className="px-2 py-3.5 text-end  text-sm font-semibold whitespace-nowrap text-gray-900">
-                                        Unit
+                                        Jednostka
                                     </th>
                                     <th className="px-2 py-3.5 text-end  text-sm font-semibold whitespace-nowrap text-gray-900">
-                                        Discount
+                                        Rabat
                                     </th>
                                     {edit && <th className="px-2 py-3.5 text-end text-sm font-semibold whitespace-nowrap text-gray-900"></th>}
                                 </tr>
