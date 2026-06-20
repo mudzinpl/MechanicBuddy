@@ -17,11 +17,11 @@ export function Navigation({ data }: NavigationProps) {
     const headerSocialLinks = (content.socialLinks || []).filter(l => l.isActive && l.showInHeader).sort((a, b) => a.sortOrder - b.sortOrder);
 
     const navLinks = [
-        { name: "Services", href: "#services" },
-        { name: "About Us", href: "#about" },
-        ...(content.tipsSection.isVisible && content.sectionVisibility?.tipsVisible ? [{ name: "Auto Tips", href: "#tips" }] : []),
-        ...(content.sectionVisibility?.galleryVisible && content.galleryPhotos?.length > 0 ? [{ name: "Gallery", href: "#gallery" }] : []),
-        { name: "Contact", href: "#contact" },
+        { name: "Usługi", href: "#services" },
+        { name: "O nas", href: "#about" },
+        ...(content.tipsSection.isVisible && content.sectionVisibility?.tipsVisible ? [{ name: "Porady motoryzacyjne", href: "#tips" }] : []),
+        ...(content.sectionVisibility?.galleryVisible && content.galleryPhotos?.length > 0 ? [{ name: "Galeria", href: "#gallery" }] : []),
+        { name: "Kontakt", href: "#contact" },
     ]
 
     return (
@@ -92,7 +92,7 @@ export function Navigation({ data }: NavigationProps) {
                             href="/auth/login"
                             className="ml-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all shadow-lg hover:opacity-90 bg-landing-secondary"
                         >
-                            Mechanic Portal
+                            Portal mechanika
                         </Link>
                     </div>
 
@@ -100,7 +100,7 @@ export function Navigation({ data }: NavigationProps) {
                     <button
                         onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                         className="md:hidden p-2 hover:bg-slate-800 rounded-lg transition-colors"
-                        aria-label="Toggle menu"
+                        aria-label="Przełącz menu"
                     >
                         {mobileMenuOpen ? (
                             <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -137,7 +137,7 @@ export function Navigation({ data }: NavigationProps) {
                                         onClick={() => setMobileMenuOpen(false)}
                                         className="mt-2 px-5 py-3 rounded-lg text-base font-semibold text-center transition-all shadow-lg hover:opacity-90 bg-landing-secondary"
                                     >
-                                        Mechanic Portal
+                                        Portal mechanika
                                     </Link>
                                 </div>
                             </div>
