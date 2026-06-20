@@ -43,20 +43,20 @@ export function WorkInformation({
     const deleteWorkRef = React.useRef<ConfirmDialogHandle>(null);
     
     const workMenuOptions = work.issuance ? [] : [
-        { name: 'Make an offer', onClick: async () => { await startAnActivity(work.id, "offer") } },
-        { name: 'Start repair job', onClick: async () => { await startAnActivity(work.id, "repairjob") } },
-        { name: 'Edit', href: editPath },
-        { name: 'Delete', redText:true, onClick:   () => { deleteWorkRef.current?.open({
+        { name: 'Przygotuj ofertę', onClick: async () => { await startAnActivity(work.id, "offer") } },
+        { name: 'Rozpocznij naprawę', onClick: async () => { await startAnActivity(work.id, "repairjob") } },
+        { name: 'Edytuj', href: editPath },
+        { name: 'Usuń', redText:true, onClick:   () => { deleteWorkRef.current?.open({
             title:'Delete work',description:'Are you sure you want to delete it?',confirmObj:work.id
         })  } },
     ] as IButtonOption[];
    
-    workMenuOptions.push({ name: 'Create a copy', onClick: async () => { await createACopy(work.id) } })
+    workMenuOptions.push({ name: 'Utwórz kopię', onClick: async () => { await createACopy(work.id) } })
         ;
 
     const issuedButtonOptions = !work.issuance? []: [
         {
-            name: 'Delete invoice',
+            name: 'Usuń fakturę',
             isPrimary:false,
             redText:true,
             inMenu:true,
