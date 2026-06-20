@@ -35,11 +35,11 @@ export default function ClientInput({
     function validate(event: React.MouseEvent) {
 
         if (isCompany && !companyName) {
-            setCompanyNameError("Company name required");
+            setCompanyNameError("Nazwa firmy jest wymagana");
             event.preventDefault();
         }
         if (!isCompany && !firstName) {
-            setFirstNameError("Firstname is required");
+            setFirstNameError("Imię jest wymagane");
             event.preventDefault();
         } 
     }
@@ -59,7 +59,7 @@ export default function ClientInput({
                             }}></FormSwitch> 
 
                             <Label as="span" className="ml-3 text-sm">
-                                <BlueBadge  text={isCompany ? 'Company' : 'Private person'}></BlueBadge>{' '}
+                                <BlueBadge  text={isCompany ? 'Firma' : 'Osoba prywatna'}></BlueBadge>{' '}
                             </Label>
                         </Field>
                     <div className=" grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
@@ -70,27 +70,27 @@ export default function ClientInput({
                                     inputError={companyNameRequired}
                                     onInputChange={(e) => setCompanyName(e.currentTarget.value)}
                                     defaultValue={companyName}
-                                    label='Company name'></FormInput>
+                                    label='Nazwa firmy'></FormInput>
                             </div> : <>
                                 <div className="sm:col-span-3">
                                     <FormInput name='first-name'
                                       inputError={firstNameRequired}
                                       onInputChange={(e) => setFirstName(e.currentTarget.value)}
-                                     defaultValue={firstName} label='First name'></FormInput>
+                                     defaultValue={firstName} label='Imię'></FormInput>
                                 </div>
                                 <div className="sm:col-span-3">
-                                    <FormInput name='last-name' defaultValue={client?.lastName} label='Last name'></FormInput>
+                                    <FormInput name='last-name' defaultValue={client?.lastName} label='Nazwisko'></FormInput>
                                 </div>
                             </>
                         }
 
                         <div className="sm:col-span-3">
-                            {isCompany ? <FormInput name='regNr' defaultValue={client?.regNr} label='Registry code'></FormInput>
-                                : <FormInput name='personal-code' defaultValue={client?.personalCode} label='Personal code'></FormInput>}
+                            {isCompany ? <FormInput name='regNr' defaultValue={client?.regNr} label='Kod rejestrowy'></FormInput>
+                                : <FormInput name='personal-code' defaultValue={client?.personalCode} label='Numer identyfikacyjny'></FormInput>}
 
                         </div>
                         <div className="sm:col-span-3">
-                            <FormInput name='phone' defaultValue={client?.phone} label='Phone'></FormInput>
+                            <FormInput name='phone' defaultValue={client?.phone} label='Telefon'></FormInput>
                         </div> 
                         <ClientEmailsInput client={client}></ClientEmailsInput>
                         <ClientAddress address={client?.address} name='street-address'></ClientAddress>
@@ -100,17 +100,17 @@ export default function ClientInput({
             <div className="border-b border-gray-900/10 pb-12">
                 <div className="mt-4 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                     <div className="col-span-full">
-                        <FormCheckBox name='complicated' label='Complicated client' defaultChecked={client?.isAsshole}></FormCheckBox>
+                        <FormCheckBox name='complicated' label='Klient problematyczny' defaultChecked={client?.isAsshole}></FormCheckBox>
                     </div>
                     <div className="col-span-full">
-                        <FormTextArea name='about' label='About'  defaultValue={client?.description}>
+                        <FormTextArea name='about' label='Uwagi'  defaultValue={client?.description}>
                         </FormTextArea> 
                     </div>
                 </div>
             </div>
             <div className="mt-6 flex items-center justify-end gap-x-6"> 
-                <SecondaryButton  onClick={() => router.back()}>Cancel</SecondaryButton>
-                <PrimaryButton  onClick={validate}>Save</PrimaryButton> 
+                <SecondaryButton  onClick={() => router.back()}>Anuluj</SecondaryButton>
+                <PrimaryButton  onClick={validate}>Zapisz</PrimaryButton> 
             </div> 
         </>
     )
