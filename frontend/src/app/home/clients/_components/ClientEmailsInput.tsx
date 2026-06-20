@@ -101,7 +101,7 @@ export default function ClientEmailsInput({
                                         }}
                                         type="button"
                                         className="rounded-md bg-white font-medium text-indigo-600 hover:text-indigo-500">
-                                        Set as primary
+                                        Ustaw jako główny
                                     </button>}
                                 <span aria-hidden="true" className="text-gray-200">
                                     |
@@ -115,7 +115,7 @@ export default function ClientEmailsInput({
                                         } 
                                     }}
                                     className="rounded-md bg-white font-medium text-gray-900 hover:text-gray-800">
-                                    Remove
+                                    Usuń
                                 </button>
                             </div>
                           </>
