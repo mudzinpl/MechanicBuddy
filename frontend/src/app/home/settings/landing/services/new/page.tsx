@@ -52,7 +52,7 @@ export default async function Page() {
                                 <HeroiconPicker
                                     name="iconName"
                                     label="Ikona"
-                                    defaultValue="WrenchIkona"
+                                    defaultValue="WrenchIcon"
                                 />
                             </div>
 
@@ -67,9 +67,9 @@ export default async function Page() {
                             </div>
 
                             <div className="sm:col-span-3">
-                                <FormLabel name="isAktywna" label="Aktywna" />
+                                <FormLabel name="isActive" label="Aktywna" />
                                 <div className="mt-3">
-                                    <FormSwitch name="isAktywna" defaultChecked={true} />
+                                    <FormSwitch name="isActive" defaultChecked={true} />
                                 </div>
                                 <p className="mt-1 text-xs text-gray-500">
                                     Pokaż usługę na stronie startowej
