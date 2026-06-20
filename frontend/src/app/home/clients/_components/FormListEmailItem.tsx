@@ -16,7 +16,7 @@ export default function FormListEmailItem({
         <EnvelopeIcon aria-hidden="true" className="size-5 shrink-0 text-gray-400" />
         <div className="ml-4 flex min-w-0 flex-1 gap-2">
             <span className="truncate font-medium">{mail}</span>
-            {isPrimary &&<BlueBadge   text='Primary' ></BlueBadge>}
+            {isPrimary &&<BlueBadge   text='Główny' ></BlueBadge>}
         </div>
     </div> 
     )
