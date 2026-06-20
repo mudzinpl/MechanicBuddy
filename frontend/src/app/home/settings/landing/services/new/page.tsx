@@ -18,61 +18,61 @@ export default async function Page() {
                     href="/home/settings/landing/services"
                     className="text-sm text-indigo-600 hover:text-indigo-500"
                 >
-                    ← Back to Services
+                    ← Wróć do usług
                 </Link>
             </div>
 
             <form action={createService}>
                 <div className="space-y-12">
                     <div className="border-b border-gray-900/10 pb-12">
-                        <h2 className="text-base/7 font-semibold text-gray-900 my-4">New Service</h2>
+                        <h2 className="text-base/7 font-semibold text-gray-900 my-4">Nowa usługa</h2>
                         <p className="mt-1 text-sm text-gray-500">
-                            Add a new service to display on your landing page.
+                            Dodaj usługę wyświetlaną na stronie startowej.
                         </p>
 
                         <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                             <div className="sm:col-span-4">
                                 <FormInput
                                     name="title"
-                                    label="Title"
-                                    placeholder="e.g., Engine Diagnostics"
+                                    label="Tytuł"
+                                    placeholder="np. Diagnostyka silnika"
                                 />
                             </div>
 
                             <div className="sm:col-span-6">
                                 <FormTextArea
                                     name="description"
-                                    label="Description"
+                                    label="Opis"
                                     rows={3}
-                                    placeholder="Describe this service..."
+                                    placeholder="Opisz usługę..."
                                 />
                             </div>
 
                             <div className="sm:col-span-4">
                                 <HeroiconPicker
                                     name="iconName"
-                                    label="Icon"
-                                    defaultValue="WrenchIcon"
+                                    label="Ikona"
+                                    defaultValue="WrenchIkona"
                                 />
                             </div>
 
                             <div className="sm:col-span-3">
-                                <FormLabel name="usePrimaryColor" label="Use Primary Color" />
+                                <FormLabel name="usePrimaryColor" label="Użyj koloru podstawowego" />
                                 <div className="mt-3">
                                     <FormSwitch name="usePrimaryColor" defaultChecked={false} />
                                 </div>
                                 <p className="mt-1 text-xs text-gray-500">
-                                    Highlight this service with the primary brand color
+                                    Wyróżnij usługę podstawowym kolorem marki
                                 </p>
                             </div>
 
                             <div className="sm:col-span-3">
-                                <FormLabel name="isActive" label="Active" />
+                                <FormLabel name="isAktywna" label="Aktywna" />
                                 <div className="mt-3">
-                                    <FormSwitch name="isActive" defaultChecked={true} />
+                                    <FormSwitch name="isAktywna" defaultChecked={true} />
                                 </div>
                                 <p className="mt-1 text-xs text-gray-500">
-                                    Show this service on the landing page
+                                    Pokaż usługę na stronie startowej
                                 </p>
                             </div>
                         </div>
@@ -84,13 +84,13 @@ export default async function Page() {
                         href="/home/settings/landing/services"
                         className="text-sm font-semibold text-gray-900"
                     >
-                        Cancel
+                        Anuluj
                     </Link>
                     <button
                         type="submit"
                         className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                     >
-                        Create Service
+                        Utwórz usługę
                     </button>
                 </div>
             </form>
