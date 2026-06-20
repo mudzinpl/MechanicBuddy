@@ -210,11 +210,11 @@ const TimeoutWarningModal = ({ isOpen, requestLogOffTheApp, requestUsingApp,timo
               </div>
               <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
                 <DialogTitle as="h3" className="text-base font-semibold text-gray-900">
-                Session about to expire ({time.timeSpan.m.toString().padStart(2, "0")}:{time.timeSpan.s.toString().padStart(2, "0")})
+                Sesja wkrótce wygaśnie ({time.timeSpan.m.toString().padStart(2, "0")}:{time.timeSpan.s.toString().padStart(2, "0")})
                 </DialogTitle>
                 <div className="mt-2">
                   <p className="text-sm text-gray-500">
-                    Do you want to stay logged in? 
+                    Czy chcesz pozostać zalogowany? 
                   </p>
                 </div>
               </div>
