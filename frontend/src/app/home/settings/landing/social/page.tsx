@@ -48,11 +48,11 @@ function SocialLinkRow({ link, index, total }: { link: ISocialLinkItem; index: n
                 <div>
                     <div className="flex items-center gap-2">
                         <h4 className="text-sm font-medium text-gray-900">
-                            {link.platform === 'custom' ? (link.displayName || 'Custom Link') : getPlatformLabel(link.platform)}
+                            {link.platform === 'custom' ? (link.displayName || 'Własny link') : getPlatformLabel(link.platform)}
                         </h4>
                         {!link.isActive && (
                             <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
-                                Inactive
+                                Nieaktywny
                             </span>
                         )}
                         {link.showInHeader && (
@@ -97,15 +97,15 @@ export default async function Page() {
                     href="/home/settings/landing"
                     className="text-sm text-indigo-600 hover:text-indigo-500"
                 >
-                    &larr; Back to Landing Page Settings
+                    &larr; Wróć do ustawień strony publicznej
                 </Link>
             </div>
 
             <div className="flex items-center justify-between my-4">
                 <div>
-                    <h2 className="text-base/7 font-semibold text-gray-900">Social Links</h2>
+                    <h2 className="text-base/7 font-semibold text-gray-900">Linki społecznościowe</h2>
                     <p className="mt-1 text-sm text-gray-500">
-                        Add links to your social media profiles. These will appear in the header and/or footer.
+                        Dodaj linki do profili społecznościowych. Będą wyświetlane w nagłówku lub stopce.
                     </p>
                 </div>
                 <Link
@@ -113,14 +113,14 @@ export default async function Page() {
                     className="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 >
                     <PlusIcon className="h-5 w-5" />
-                    Add Link
+                    Dodaj link
                 </Link>
             </div>
 
             <div className="mt-6 bg-white rounded-lg border border-gray-200 shadow-sm">
                 {socialLinks.length === 0 ? (
                     <div className="p-8 text-center">
-                        <p className="text-sm text-gray-500">No social links yet. Add your first link to get started.</p>
+                        <p className="text-sm text-gray-500">Brak linków społecznościowych. Dodaj pierwszy link, aby rozpocząć.</p>
                     </div>
                 ) : (
                     <div className="divide-y divide-gray-100 px-4">
