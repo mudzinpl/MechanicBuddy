@@ -12,7 +12,7 @@ export async function removeLocation(
         url:"storages",
         body:[locationId]
       })
-      pushToast(`Location removed.`) 
+      pushToast(`Lokalizacja została usunięta.`) 
 }
 
 
@@ -29,7 +29,7 @@ export async function addLocation(
 
     const newLocationId = await locationResponse.json();
 
-    pushToast(`New location added successfully`) 
+    pushToast(`Nowa lokalizacja została dodana.`) 
 
     return newLocationId;
 }
