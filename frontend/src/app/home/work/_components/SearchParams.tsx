@@ -12,23 +12,23 @@ export default function SearchParams({
         
             {options.issued === 'on' && <>
                 <div className="col-span-1  ">
-                        <FormInput name="invoiceFrom" label="Invoice from" defaultValue={options.invoiceFrom} type="date" ></FormInput>
+                        <FormInput name="invoiceFrom" label="Faktury od" defaultValue={options.invoiceFrom} type="date" ></FormInput>
                       </div>
 
                       <div className="col-span-1 ">
-                        <FormInput name="invoiceTo" label="Invoice to" defaultValue={options.invoiceTo} type="date" ></FormInput>
+                        <FormInput name="invoiceTo" label="Faktury do" defaultValue={options.invoiceTo} type="date" ></FormInput>
                       </div>
                   </>  }
                   <div className="col-span-1  ">
-                    <FormInput name="workFrom" label="Work from" defaultValue={options.workFrom} type="date" ></FormInput>
+                    <FormInput name="workFrom" label="Zlecenia od" defaultValue={options.workFrom} type="date" ></FormInput>
                   </div>
 
                   <div className="col-span-1  ">
-                    <FormInput name="workTo" label="Work to" defaultValue={options.workTo} type="date" ></FormInput>
+                    <FormInput name="workTo" label="Zlecenia do" defaultValue={options.workTo} type="date" ></FormInput>
                   </div>
 
                   <div className="col-span-1  ">
-                    <FormLabel name='clientiId' label='Client'></FormLabel>
+                    <FormLabel name='clientiId' label='Klient'></FormLabel>
                     <ClientsCombobox
                       name='clientiId'
                       defaultValue={{
@@ -38,7 +38,7 @@ export default function SearchParams({
                     </ClientsCombobox>
                   </div>
                   <div className="col-span-1 ">
-                    <FormLabel name='vehicleId' label='Vehicle'></FormLabel>
+                    <FormLabel name='vehicleId' label='Pojazd'></FormLabel>
                     <VehiclesCombobox name='vehicleId'
                       defaultValue={{
                         text: options['vehicleId[text]'],
