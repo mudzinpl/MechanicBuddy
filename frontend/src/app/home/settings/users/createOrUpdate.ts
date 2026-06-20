@@ -42,7 +42,7 @@ export async function createOrUpdate(
 
     const userId = jsonResponse;
 
-    pushToast(`User ${(isUpdating ? 'updated' : 'created')} successfully!`)
+    pushToast(isUpdating ? 'Użytkownik został zaktualizowany.' : 'Użytkownik został utworzony.')
 
     redirect('/home/settings/users/' + userId)
 }
@@ -61,7 +61,7 @@ export async function deleteUser(
 
     await httpDelete({ url });
 
-    pushToast('User deleted successfully!')
+    pushToast('Użytkownik został usunięty.')
 
     redirect('/home/settings/users')
 }
