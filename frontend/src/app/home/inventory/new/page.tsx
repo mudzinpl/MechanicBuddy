@@ -13,7 +13,7 @@ export default async function Page() {
     const locations = await data.json() as ILocation[]; 
     
     return (
-        <Main header={<CardHeader title='Create new spare part' description='Enter details' ></CardHeader>}>
+        <Main header={<CardHeader title='Dodaj część' description='Wprowadź dane' ></CardHeader>}>
                 <form action={createOrUpdate}>
                     <input type="hidden" name='id' ></input>
                     <InventoryInput allLocations={locations} ></InventoryInput>
