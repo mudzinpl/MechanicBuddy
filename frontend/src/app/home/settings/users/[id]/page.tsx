@@ -23,9 +23,9 @@ export default async function Page({
     return (
         <Main header={
             <CardHeader>
-                <h3 className="px-1 lg:px-0 text-base font-semibold text-gray-900">User Information{' '}
-                    {user.isDefaultAdmin && <BlueBadge text='Default Admin' />}{' '}
-                    {user.mustChangePassword && <YellowBadge text='Must Change Password' />}
+                <h3 className="px-1 lg:px-0 text-base font-semibold text-gray-900">Informacje o użytkowniku{' '}
+                    {user.isDefaultAdmin && <BlueBadge text='Główny administrator' />}{' '}
+                    {user.mustChangePassword && <YellowBadge text='Wymagana zmiana hasła' />}
                 </h3>
 
                 <div className="flex gap-2">
@@ -40,12 +40,12 @@ export default async function Page({
             </CardHeader>}>
             <div className="border-gray-100">
                 <dl className="divide-y divide-gray-100">
-                    <DescriptionItem label='Full name' value={`${user.firstName} ${user.lastName}`}></DescriptionItem>
-                    <DescriptionItem label='Username' value={user.userName}></DescriptionItem>
+                    <DescriptionItem label='Imię i nazwisko' value={`${user.firstName} ${user.lastName}`}></DescriptionItem>
+                    <DescriptionItem label='Nazwa użytkownika' value={user.userName}></DescriptionItem>
                     <DescriptionItem label='Email' value={user.email}></DescriptionItem>
-                    <DescriptionItem label='Phone' value={user.phone || 'N/A'}></DescriptionItem>
-                    <DescriptionItem label='Default Admin' value={user.isDefaultAdmin ? 'Yes' : 'No'}></DescriptionItem>
-                    <DescriptionItem label='Must Change Password' value={user.mustChangePassword ? 'Yes' : 'No'}></DescriptionItem>
+                    <DescriptionItem label='Telefon' value={user.phone || 'N/A'}></DescriptionItem>
+                    <DescriptionItem label='Główny administrator' value={user.isDefaultAdmin ? 'Tak' : 'Nie'}></DescriptionItem>
+                    <DescriptionItem label='Wymagana zmiana hasła' value={user.mustChangePassword ? 'Tak' : 'Nie'}></DescriptionItem>
                 </dl>
             </div>
         </Main>
