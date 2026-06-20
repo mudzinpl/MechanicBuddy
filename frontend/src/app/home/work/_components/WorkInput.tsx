@@ -65,7 +65,7 @@ export default function WorkInput({
 
                     <div className="grid grid grid-flow-row grid-cols-1  gap-4">
                         {!work && <div>
-                            <FormLabel name='startWith' label='Start with'></FormLabel>
+                            <FormLabel name='startWith' label='Rozpocznij od'></FormLabel>
                             <Field className="flex mt-2 items-center">
                                 <FormSwitch
                                     name='isOffer'
@@ -75,15 +75,15 @@ export default function WorkInput({
                                     }}></FormSwitch>
 
                                 <Label as="span" className="ml-3 text-sm">
-                                    Offer
+                                    Oferta
                                 </Label>
                             </Field>
                         </div>}
 
                         <div className=" ">
-                            <FormLabel name='clientId' label='Client'>
+                            <FormLabel name='clientId' label='Klient'>
                                 <span className="ml-4 float-right text-gray-500">
-                                    Undisclosed{' '}
+                                    Nieujawniony{' '}
                                     <FormSwitch
                                         name='clientUndisclosed'
                                         small={true}
@@ -109,9 +109,9 @@ export default function WorkInput({
 
                         </div>
                         <div className='  ' >
-                            <FormLabel name='vehicleId' label='Vehicle'>
+                            <FormLabel name='vehicleId' label='Pojazd'>
                                 {!clientUndisclosed && <span className="ml-2 float-right text-gray-500">
-                                    Search all vehicles{' '}
+                                    Szukaj we wszystkich pojazdach{' '}
                                     <FormSwitch
                                         name='onlyClientVehicles'
                                         small={true}
@@ -147,22 +147,22 @@ export default function WorkInput({
                                     </div>
                                 </div>
                                 <div className='ml-2  '>
-                                    <FormInput type='number' placeholder='Odometer value' name='odo' defaultValue={work?.odo ?? 0}></FormInput>
+                                    <FormInput type='number' placeholder='Wartość przebiegu' name='odo' defaultValue={work?.odo ?? 0}></FormInput>
                                 </div>
                             </div>
 
                         </div>
                        <WorkInputMechanics mechanics={mechanics} work={work}></WorkInputMechanics>
                         <div className=" ">
-                            <FormTextArea name='about' rows={8} label='About' defaultValue={work?.notes}>
+                            <FormTextArea name='about' rows={8} label='Uwagi' defaultValue={work?.notes}>
                             </FormTextArea>
                         </div>
                     </div>
                 </div>
             </div>
             <div className="mt-6 flex items-center justify-end gap-x-6">
-                <SecondaryButton onClick={() => router.back()}>Cancel</SecondaryButton>
-                <PrimaryButton onClick={() => { }}>Save</PrimaryButton>
+                <SecondaryButton onClick={() => router.back()}>Anuluj</SecondaryButton>
+                <PrimaryButton onClick={() => { }}>Zapisz</PrimaryButton>
             </div>
         </>
     )
