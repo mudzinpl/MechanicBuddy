@@ -57,12 +57,12 @@ function SocialLinkRow({ link, index, total }: { link: ISocialLinkItem; index: n
                         )}
                         {link.showInHeader && (
                             <span className="inline-flex items-center rounded-full bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-600">
-                                Header
+                                Nagłówek
                             </span>
                         )}
                         {link.showInFooter && (
                             <span className="inline-flex items-center rounded-full bg-green-100 px-2 py-0.5 text-xs font-medium text-green-600">
-                                Footer
+                                Stopka
                             </span>
                         )}
                     </div>
