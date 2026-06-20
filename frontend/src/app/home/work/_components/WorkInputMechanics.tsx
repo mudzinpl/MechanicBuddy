@@ -28,22 +28,22 @@ export default function WorkInputMechanics({
 
     const addOrRemoveOption = [
         {
-            name: 'New',
+            name: 'Nowy',
             onClick: () => {
                 newLocationDialogRef?.current?.open();
             },
             inMenu: false
         },
         {
-            name: 'Delete mechanic',
+            name: 'Usuń mechanika',
             onClick: () => {
                 if (!selectedMechanicId) return;
                
                 const itemToRemove = allMechanics.find(x => x.id.toString() == selectedMechanicId)?.name;
                 if(!itemToRemove) return;
                 confirmRemoveLocationRef?.current?.open({
-                    title: "About to remove '" + itemToRemove + "'",
-                    description: "Are you sure you want to remove this mechanic? Make sure mechanic is not assigned to any work, otherwise it cannot be removed.",
+                    title: "Usuwanie mechanika: '" + itemToRemove + "'",
+                    description: "Czy na pewno usunąć tego mechanika? Upewnij się, że nie jest przypisany do żadnego zlecenia.",
                     confirmObj: selectedMechanicId
                 });
             },
@@ -54,7 +54,7 @@ export default function WorkInputMechanics({
 
     return (
         <div className='   ' >
-            <FormLabel name='mechanics' label='Mechanics'></FormLabel>
+            <FormLabel name='mechanics' label='Mechanicy'></FormLabel>
 
             <div className="mt-2 mb-2  flex">
                 <div className="-mr-px grid grow grid-cols-1 focus-within:relative">
@@ -88,7 +88,7 @@ export default function WorkInputMechanics({
                     }}
                     className="flex shrink-0 items-center gap-x-1.5 rounded-r-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white outline-1 -outline-offset-1 outline-indigo-300 hover:bg-indigo-500 focus:relative focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
                 >
-                    Add
+                    Dodaj
                 </button>
                 <ButtonGroup options={addOrRemoveOption}></ButtonGroup>
             </div>
@@ -100,7 +100,7 @@ export default function WorkInputMechanics({
                 setAllMechanics([...allMechanics]);
             }} ref={confirmRemoveLocationRef} ></ConfirmDialog>
 
-            <BaseDialog ref={newLocationDialogRef} yesButtonText="Save" title='Add new mechanic'
+            <BaseDialog ref={newLocationDialogRef} yesButtonText="Zapisz" noButtonText="Anuluj" title='Dodaj mechanika'
                 onConfirm={async () => {
 
                     newLocationDialogRef.current?.loading(true);
@@ -121,7 +121,7 @@ export default function WorkInputMechanics({
                         name='item'
                         defaultValue={newMechanic}
 
-                        placeholder='Enter new mechanics name'
+                        placeholder='Wpisz nazwę mechanika'
                         onInputChange={(e) => setNewMechanic(e.currentTarget.value)}
                     ></FormInput>
                 </div>
@@ -145,7 +145,7 @@ export default function WorkInputMechanics({
                                         setSelectedMechanics([...selectedMechanics]);
                                     }}
                                     className="rounded-md bg-white font-medium text-gray-900 hover:text-gray-800">
-                                    Remove
+                                    Usuń
                                 </button>
                             </div>
                         </>
