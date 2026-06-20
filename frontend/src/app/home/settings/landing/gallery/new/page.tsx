@@ -51,7 +51,7 @@ export default async function Page() {
 
                     <div>
                         <label htmlFor="caption" className="block text-sm font-medium text-gray-700">
-                            Caption
+                            Podpis
                         </label>
                         <input
                             type="text"
