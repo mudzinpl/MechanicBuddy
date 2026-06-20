@@ -22,7 +22,7 @@ export async function authenticate(prevState: { error: string }, formData: FormD
   if (!res.ok) {
     const responseText = await res.text();
     console.log(responseText);
-    return { error: "Login failed", }
+    return { error: "Logowanie nie powiodło się", }
   }
 
   const jsonResponse = await res.json();
@@ -40,5 +40,5 @@ export async function authenticate(prevState: { error: string }, formData: FormD
     redirect('/home/work');
   }
   console.log("jwt missing");
-  return { error: "Login failed", }
+  return { error: "Logowanie nie powiodło się", }
 } 
