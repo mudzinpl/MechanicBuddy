@@ -27,27 +27,27 @@ export default async function Page( ) {
         <form action={createOrUpdate}>
       <div className="space-y-12">
         <div className="border-b border-gray-900/10 pb-12">
-          <h2 className="text-base/7 font-semibold text-gray-900  my-4">Company info</h2>
+          <h2 className="text-base/7 font-semibold text-gray-900  my-4">Dane firmy</h2>
           
 
           <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
             <div className="sm:col-span-4">
-                <FormInput name='name' label='Name'  defaultValue={options.requisites.name}></FormInput> 
+                <FormInput name='name' label='Nazwa'  defaultValue={options.requisites.name}></FormInput> 
               </div>
               <div className="sm:col-span-3">
-                <FormInput name='phone' label='Phone' defaultValue={options.requisites.phone}></FormInput> 
+                <FormInput name='phone' label='Telefon' defaultValue={options.requisites.phone}></FormInput> 
               </div>
               <div className="sm:col-span-3">
-                <FormInput name='address' label='Address' defaultValue={options.requisites.address}></FormInput> 
+                <FormInput name='address' label='Adres' defaultValue={options.requisites.address}></FormInput> 
               </div>
               <div className="sm:col-span-3">
                 <FormInput name='email' label='Email' defaultValue={options.requisites.email}></FormInput> 
               </div>
               <div className="sm:col-span-3">
-                <FormInput name='bankAccount' label='Bank account' defaultValue={options.requisites.bankAccount}></FormInput> 
+                <FormInput name='bankAccount' label='Konto bankowe' defaultValue={options.requisites.bankAccount}></FormInput> 
               </div>
               <div className="sm:col-span-3">
-                <FormInput name='regNr' label='RegNr' defaultValue={options.requisites.regNr}></FormInput> 
+                <FormInput name='regNr' label='Numer rejestrowy' defaultValue={options.requisites.regNr}></FormInput> 
               </div>
               <div className="sm:col-span-3">
                 <FormInput name='kmkr' label='KMKR' defaultValue={options.requisites.kmkr}></FormInput> 
@@ -56,36 +56,36 @@ export default async function Page( ) {
           </div>
          
         <div className="border-b border-gray-900/10 pb-12">
-          <h2 className="text-base/7 font-semibold text-gray-900">Invoice options</h2> 
+          <h2 className="text-base/7 font-semibold text-gray-900">Ustawienia faktury</h2> 
 
           <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
              <div className="sm:col-span-2">
-                <FormInput name='vatRate' label='VAT Rate' defaultValue={options.pricing.invoice.vatRate}></FormInput> 
+                <FormInput name='vatRate' label='Stawka VAT' defaultValue={options.pricing.invoice.vatRate}></FormInput> 
               </div>
               <div className="sm:col-span-2">
-                <FormInput name='surCharge' label='Surcharge' defaultValue={options.pricing.invoice.surCharge}></FormInput> 
+                <FormInput name='surCharge' label='Dopłata' defaultValue={options.pricing.invoice.surCharge}></FormInput> 
               </div> 
               <div className="sm:col-span-2">
-                <FormLabel name="signatureLine" label="Signature line"></FormLabel>
+                <FormLabel name="signatureLine" label="Miejsce na podpis"></FormLabel>
                  <div className='mt-3'>
                  <FormSwitch name='signatureLine' defaultChecked={options.pricing.invoice.signatureLine}></FormSwitch>
                  </div>
                
               </div>
               <div className="sm:col-span-full">
-                <FormTextArea name='disclaimer' label='Disclaimer' defaultValue={options.pricing.invoice.disclaimer}></FormTextArea> 
+                <FormTextArea name='disclaimer' label='Zastrzeżenie' defaultValue={options.pricing.invoice.disclaimer}></FormTextArea> 
               </div>
               <div className="sm:col-span-full">
-                <FormTextArea name='emailContent' rows={10} label='Email content' defaultValue={options.pricing.invoice.emailContent}></FormTextArea> 
+                <FormTextArea name='emailContent' rows={10} label='Treść wiadomości e-mail' defaultValue={options.pricing.invoice.emailContent}></FormTextArea> 
               </div>
           </div>
         </div>
 
         <div className="border-b border-gray-900/10 pb-12">
-          <h2 className="text-base/7 font-semibold text-gray-900">Offer options</h2> 
+          <h2 className="text-base/7 font-semibold text-gray-900">Ustawienia oferty</h2> 
           <div className="mt-10 space-y-10">
           <div className="sm:col-span-full">
-                <FormTextArea name='estimateEmailContent' rows={10} label='Email content' defaultValue={options.pricing.estimate.emailContent}></FormTextArea> 
+                <FormTextArea name='estimateEmailContent' rows={10} label='Treść wiadomości e-mail' defaultValue={options.pricing.estimate.emailContent}></FormTextArea> 
               </div> 
           </div>
         </div>
