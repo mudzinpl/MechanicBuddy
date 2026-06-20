@@ -17,43 +17,43 @@ export default async function Page() {
                     href="/home/settings/landing/tips"
                     className="text-sm text-indigo-600 hover:text-indigo-500"
                 >
-                    ← Back to Tips
+                    ← Wróć do porad
                 </Link>
             </div>
 
             <form action={createTip}>
                 <div className="space-y-12">
                     <div className="border-b border-gray-900/10 pb-12">
-                        <h2 className="text-base/7 font-semibold text-gray-900 my-4">New Tip</h2>
+                        <h2 className="text-base/7 font-semibold text-gray-900 my-4">Nowa porada</h2>
                         <p className="mt-1 text-sm text-gray-500">
-                            Add a new auto care tip to display on your landing page.
+                            Dodaj poradę wyświetlaną na stronie startowej.
                         </p>
 
                         <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                             <div className="sm:col-span-4">
                                 <FormInput
                                     name="title"
-                                    label="Title"
-                                    placeholder="e.g., Regular Oil Changes"
+                                    label="Tytuł"
+                                    placeholder="np. Regularna wymiana oleju"
                                 />
                             </div>
 
                             <div className="sm:col-span-6">
                                 <FormTextArea
                                     name="description"
-                                    label="Description"
+                                    label="Opis"
                                     rows={3}
-                                    placeholder="Describe this tip..."
+                                    placeholder="Opisz poradę..."
                                 />
                             </div>
 
                             <div className="sm:col-span-3">
-                                <FormLabel name="isActive" label="Active" />
+                                <FormLabel name="isActive" label="Aktywna" />
                                 <div className="mt-3">
                                     <FormSwitch name="isActive" defaultChecked={true} />
                                 </div>
                                 <p className="mt-1 text-xs text-gray-500">
-                                    Show this tip on the landing page
+                                    Pokaż poradę na stronie startowej
                                 </p>
                             </div>
                         </div>
@@ -65,13 +65,13 @@ export default async function Page() {
                         href="/home/settings/landing/tips"
                         className="text-sm font-semibold text-gray-900"
                     >
-                        Cancel
+                        Anuluj
                     </Link>
                     <button
                         type="submit"
                         className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                     >
-                        Create Tip
+                        Utwórz poradę
                     </button>
                 </div>
             </form>
