@@ -16,7 +16,7 @@ export default function ChangePasswordPage() {
         <div className="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
           <div className="mx-auto w-full max-w-sm lg:w-96">
             <div>
-              <h2 className="mt-8 text-2xl/9 font-bold tracking-tight text-white">Change Your Password</h2>
+              <h2 className="mt-8 text-2xl/9 font-bold tracking-tight text-white">Zmień hasło</h2>
               <p className="mt-2 text-sm/6 text-slate-400">
                 Ze względów bezpieczeństwa przed kontynuowaniem musisz zmienić hasło.
               </p>
@@ -28,7 +28,7 @@ export default function ChangePasswordPage() {
                 <form action={action} className="space-y-6">
                   <div>
                     <label htmlFor="currentPassword" className="block text-sm/6 font-medium text-slate-200">
-                      Current Password
+                      Aktualne hasło
                     </label>
                     <div className="mt-2">
                       <input
@@ -44,7 +44,7 @@ export default function ChangePasswordPage() {
 
                   <div>
                     <label htmlFor="newPassword" className="block text-sm/6 font-medium text-slate-200">
-                      New Password
+                      Nowe hasło
                     </label>
                     <div className="mt-2">
                       <input
@@ -60,7 +60,7 @@ export default function ChangePasswordPage() {
 
                   <div>
                     <label htmlFor="confirmPassword" className="block text-sm/6 font-medium text-slate-200">
-                      Confirm New Password
+                      Confirm Nowe hasło
                     </label>
                     <div className="mt-2">
                       <input
@@ -79,7 +79,7 @@ export default function ChangePasswordPage() {
                       type="submit"
                       className="flex w-full justify-center rounded-md bg-blue-600 px-3 py-1.5 text-sm/6 font-semibold text-white shadow-xs hover:bg-blue-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-500"
                     >
-                      Change Password
+                      Zmień hasło
                     </button>
                   </div>
                 </form>
