@@ -63,11 +63,11 @@ export function WorkInformation({
             onClick:() => { deleteInvoiceRef.current?.open() }
         },
         {
-            name: (work.issuance.isPaid?'Unpaid':'Payment received'),
+            name: (work.issuance.isPaid?'Nieopłacona':'Płatność otrzymana'),
             isPrimary:!work.issuance.isPaid,
             onClick:async () => { await togglePaid(work.id,!work.issuance.isPaid) }
         } , {
-            name: 'Send invoice',
+            name: 'Wyślij fakturę',
             isPrimary:false,
             onClick:() => { sendInvoiceRef.current?.open() }
         },
@@ -80,7 +80,7 @@ export function WorkInformation({
       
         if(work.status!=='closed'){
             editButtonOptions.push({ 
-                name: 'Close',
+                name: 'Zamknij',
                 onClick: async() => { 
                     await changeWorkStatus(work.id,'Closed');
                 }, 
@@ -88,7 +88,7 @@ export function WorkInformation({
         }
         else if(work.status==='closed'){
             editButtonOptions.push({ 
-                name: 'Open',
+                name: 'Otwórz',
                 isPrimary: true,
                 onClick: async() => { 
                     await changeWorkStatus(work.id,'Default');
@@ -98,7 +98,7 @@ export function WorkInformation({
 
         if(hasRepairJobWithProductsOrServices && work.status!=='closed' ){
             editButtonOptions.push({
-                name: 'Issue invoice',
+                name: 'Wystaw fakturę',
                 onClick:() => { createInvoiceRef.current?.open() },
                 isPrimary:true 
             });
@@ -115,10 +115,10 @@ export function WorkInformation({
                 await deleteWork(work.id) ;
             }} ></ConfirmDialog>
             <div className="lg:col-start-3 lg:row-end-1">
-                <h2 className="sr-only">Summary</h2>
+                <h2 className="sr-only">Podsumowanie</h2>
                 <dl className="flex flex-wrap">
                     <div className="flex-auto xl:pt-6 xl:pl-6">
-                        <dt className="text-base font-semibold text-gray-900 mr-2">Work nr {work.number}{' '}
+                        <dt className="text-base font-semibold text-gray-900 mr-2">Zlecenie nr {work.number}{' '}
                             <WorkStatusBadge   status={work.status}></WorkStatusBadge> 
                         </dt>
                         <dd className="text-sm/6 text-gray-500">
@@ -136,7 +136,7 @@ export function WorkInformation({
                     {clientSummary &&
                         <div className="mt-4 flex w-full flex-none gap-x-4 xl:px-6">
                             <dt className="flex-none">
-                                <span className="sr-only">Client</span>
+                                <span className="sr-only">Klient</span>
                                 <UserCircleIcon aria-hidden="true" className="h-6  w-5 text-gray-400" />
                             </dt>
                             <dd className="text-sm/6 font-medium text-gray-900">
@@ -163,7 +163,7 @@ export function WorkInformation({
                     }
                     {work.notes && <div className="mt-4 flex w-full flex-none gap-x-4 xl:px-6">
                         <dt className="flex-none">
-                            <span className="sr-only">Notes</span>
+                            <span className="sr-only">Notatki</span>
                             <DocumentTextIcon aria-hidden="true" className="h-6 w-5 text-gray-400" />
                         </dt>
                         <dd className="text-sm/6 text-gray-500 whitespace-pre-line">{work.notes}</dd>
@@ -171,7 +171,7 @@ export function WorkInformation({
                     <div className="mt-6 flex gap-x-2 xl:px-6   ">  
                         {work.issuance && <>
                             
-                        <PricingDownloadLink name='Invoice' id={work.id} hidePaperClip={false} number={work.issuance.invoiceNumber}></PricingDownloadLink>
+                        <PricingDownloadLink name='Faktura' id={work.id} hidePaperClip={false} number={work.issuance.invoiceNumber}></PricingDownloadLink>
                         <IssuanceBadges issueance={work.issuance}   ></IssuanceBadges></> } 
                     </div>
 
@@ -188,7 +188,7 @@ export function WorkInformation({
                                >
                                </FormSwitch>
                             <Label as="span" className="ml-3 text-sm"> 
-                                <span className="text-gray-500">Is in progress</span>
+                                <span className="text-gray-500">W toku</span>
                             </Label>
                             </Field> } 
                         </dt>
