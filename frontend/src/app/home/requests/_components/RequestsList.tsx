@@ -24,6 +24,14 @@ const statusColors: Record<string, string> = {
   Cancelled: "bg-red-100 text-red-800",
 }
 
+const statusLabels: Record<string, string> = {
+  New: "Nowe",
+  Contacted: "Skontaktowano się",
+  Scheduled: "Zaplanowane",
+  Completed: "Zakończone",
+  Cancelled: "Anulowane",
+}
+
 const INACTIVE_STATUSES = ["Completed", "Cancelled"]
 
 export default function RequestsList({ initialRequests }: { initialRequests: ServiceRequest[] }) {
@@ -45,18 +53,18 @@ export default function RequestsList({ initialRequests }: { initialRequests: Ser
           setSelectedRequest({ ...selectedRequest, status })
         }
       } else {
-        alert("Failed to update status: " + result.error)
+        alert("Nie udało się zaktualizować statusu: " + result.error)
       }
     } catch (error) {
-      console.error("Failed to update status:", error)
-      alert("Failed to update status")
+      console.error("Nie udało się zaktualizować statusu:", error)
+      alert("Nie udało się zaktualizować statusu")
     } finally {
       setUpdating(false)
     }
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Are you sure you want to delete this request?")) return
+    if (!confirm("Czy na pewno chcesz usunąć to zgłoszenie?")) return
     try {
       const result = await deleteServiceRequest(id)
       if (result.success) {
@@ -65,16 +73,16 @@ export default function RequestsList({ initialRequests }: { initialRequests: Ser
           setSelectedRequest(null)
         }
       } else {
-        alert("Failed to delete: " + result.error)
+        alert("Nie udało się usunąć: " + result.error)
       }
     } catch (error) {
-      console.error("Failed to delete:", error)
-      alert("Failed to delete")
+      console.error("Nie udało się usunąć:", error)
+      alert("Nie udało się usunąć")
     }
   }
 
   const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleString("en-US", {
+    return new Date(dateString).toLocaleString("pl-PL", {
       month: "short",
       day: "numeric",
       year: "numeric",
@@ -87,18 +95,18 @@ export default function RequestsList({ initialRequests }: { initialRequests: Ser
     <>
       <div className="mb-4 flex gap-4 items-center">
         <span className="text-sm text-gray-500">
-          {activeRequests.length} active request{activeRequests.length !== 1 ? "s" : ""}
-          {archivedRequests.length > 0 && ` · ${archivedRequests.length} archived`}
+          {activeRequests.length} aktywnych zgłoszeń
+          {archivedRequests.length > 0 && ` · ${archivedRequests.length} zarchiwizowanych`}
         </span>
       </div>
 
       {requests.length === 0 ? (
-        <div className="text-center py-8 text-gray-500">No service requests found.</div>
+        <div className="text-center py-8 text-gray-500">Nie znaleziono zgłoszeń serwisowych.</div>
       ) : (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <div className="space-y-3">
             {activeRequests.length === 0 ? (
-              <div className="text-center py-6 text-gray-400 text-sm">No active requests</div>
+              <div className="text-center py-6 text-gray-400 text-sm">Brak aktywnych zgłoszeń</div>
             ) : (
               activeRequests.map((request) => (
                 <div
@@ -114,7 +122,7 @@ export default function RequestsList({ initialRequests }: { initialRequests: Ser
                       <p className="text-sm text-gray-500">{formatDate(request.submittedAt)}</p>
                     </div>
                     <span className={`px-2 py-1 rounded-full text-xs font-medium ${statusColors[request.status] || "bg-gray-100 text-gray-800"}`}>
-                      {request.status}
+                      {statusLabels[request.status] || request.status}
                     </span>
                   </div>
                   {request.vehicleInfo && (
@@ -134,7 +142,7 @@ export default function RequestsList({ initialRequests }: { initialRequests: Ser
                   className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-700 mb-3"
                 >
                   <span className={`transition-transform ${showArchived ? "rotate-90" : ""}`}>▶</span>
-                  Completed & Cancelled ({archivedRequests.length})
+                  Zakończone i anulowane ({archivedRequests.length})
                 </button>
                 {showArchived && (
                   <div className="space-y-2">
@@ -154,7 +162,7 @@ export default function RequestsList({ initialRequests }: { initialRequests: Ser
                             )}
                           </div>
                           <span className={`px-2 py-0.5 rounded-full text-xs ${statusColors[request.status] || "bg-gray-100 text-gray-800"}`}>
-                            {request.status}
+                            {statusLabels[request.status] || request.status}
                           </span>
                         </div>
                       </div>
@@ -186,18 +194,18 @@ export default function RequestsList({ initialRequests }: { initialRequests: Ser
                     disabled={updating}
                     className={`mt-1 w-full px-3 py-2 rounded-lg border-2 font-medium ${statusColors[selectedRequest.status] || "bg-gray-100"} ${updating ? "opacity-50" : ""}`}
                   >
-                    <option value="New">New</option>
-                    <option value="Contacted">Contacted</option>
-                    <option value="Scheduled">Scheduled</option>
-                    <option value="Completed">Completed</option>
-                    <option value="Cancelled">Cancelled</option>
+                    <option value="New">Nowe</option>
+                    <option value="Contacted">Skontaktowano się</option>
+                    <option value="Scheduled">Zaplanowane</option>
+                    <option value="Completed">Zakończone</option>
+                    <option value="Cancelled">Anulowane</option>
                   </select>
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   {selectedRequest.phone && (
                     <div>
-                      <label className="text-xs font-medium text-gray-500 uppercase">Phone</label>
+                      <label className="text-xs font-medium text-gray-500 uppercase">Telefon</label>
                       <p className="mt-1">
                         <a href={`tel:${selectedRequest.phone}`} className="text-purple-600 hover:underline">
                           {selectedRequest.phone}
@@ -219,27 +227,27 @@ export default function RequestsList({ initialRequests }: { initialRequests: Ser
 
                 {selectedRequest.vehicleInfo && (
                   <div>
-                    <label className="text-xs font-medium text-gray-500 uppercase">Vehicle</label>
+                    <label className="text-xs font-medium text-gray-500 uppercase">Pojazd</label>
                     <p className="mt-1 text-gray-900">{selectedRequest.vehicleInfo}</p>
                   </div>
                 )}
 
                 {selectedRequest.serviceType && (
                   <div>
-                    <label className="text-xs font-medium text-gray-500 uppercase">Service Requested</label>
+                    <label className="text-xs font-medium text-gray-500 uppercase">Zgłoszona usługa</label>
                     <p className="mt-1 text-gray-900 font-medium">{selectedRequest.serviceType}</p>
                   </div>
                 )}
 
                 {selectedRequest.message && (
                   <div>
-                    <label className="text-xs font-medium text-gray-500 uppercase">Message</label>
+                    <label className="text-xs font-medium text-gray-500 uppercase">Wiadomość</label>
                     <p className="mt-1 text-gray-700 bg-white p-3 rounded-lg">{selectedRequest.message}</p>
                   </div>
                 )}
 
                 <div>
-                  <label className="text-xs font-medium text-gray-500 uppercase">Submitted</label>
+                  <label className="text-xs font-medium text-gray-500 uppercase">Przesłano</label>
                   <p className="mt-1 text-gray-600">{formatDate(selectedRequest.submittedAt)}</p>
                 </div>
 
@@ -249,14 +257,14 @@ export default function RequestsList({ initialRequests }: { initialRequests: Ser
                       href={`tel:${selectedRequest.phone}`}
                       className="flex-1 py-2 px-4 bg-green-600 text-white rounded-lg font-medium text-center hover:bg-green-700 transition-colors"
                     >
-                      Call
+                      Zadzwoń
                     </a>
                   )}
                   <button
                     onClick={() => handleDelete(selectedRequest.id)}
                     className="py-2 px-4 bg-red-100 text-red-700 rounded-lg font-medium hover:bg-red-200 transition-colors"
                   >
-                    Delete
+                    Usuń
                   </button>
                 </div>
               </div>
