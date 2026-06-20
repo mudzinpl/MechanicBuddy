@@ -38,7 +38,7 @@ function SectionCard({ title, description, href, icon: Icon, itemCount }: Sectio
                     <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
                     {itemCount !== undefined && (
                         <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
-                            {itemCount} items
+                            {itemCount} pozycji
                         </span>
                     )}
                 </div>
@@ -60,85 +60,85 @@ export default async function Page() {
     return (
         <Main header={<SettingsTabs />} narrow={true}>
             <div className="px-0">
-                <h3 className="text-base/7 font-semibold text-gray-900 my-4">Landing Page Content</h3>
+                <h3 className="text-base/7 font-semibold text-gray-900 my-4">Zawartość strony publicznej</h3>
                 <p className="text-sm text-gray-500">
-                    Customize the content displayed on your public landing page. Click on any section to edit.
+                    Dostosuj treści wyświetlane na publicznej stronie startowej. Kliknij sekcję, aby ją edytować.
                 </p>
             </div>
 
             <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <SectionCard
-                    title="Hero Section"
-                    description="Company name, tagline, and call-to-action buttons"
+                    title="Sekcja główna"
+                    description="Nazwa firmy, hasło i przyciski działania"
                     href="/home/settings/landing/hero"
                     icon={HomeIcon}
                 />
 
                 <SectionCard
-                    title="Services"
-                    description="Services you offer to customers"
+                    title="Usługi"
+                    description="Usługi oferowane klientom"
                     href="/home/settings/landing/services"
                     icon={WrenchScrewdriverIcon}
                     itemCount={activeServices}
                 />
 
                 <SectionCard
-                    title="About Us"
-                    description="Company description and feature highlights"
+                    title="O nas"
+                    description="Opis firmy i najważniejsze wyróżniki"
                     href="/home/settings/landing/about"
                     icon={InformationCircleIcon}
                     itemCount={content.about.features.length}
                 />
 
                 <SectionCard
-                    title="Stats"
-                    description="Key statistics and achievements"
+                    title="Statystyki"
+                    description="Najważniejsze statystyki i osiągnięcia"
                     href="/home/settings/landing/stats"
                     icon={ChartBarIcon}
                     itemCount={content.stats.length}
                 />
 
                 <SectionCard
-                    title="Tips Section"
-                    description="Auto care tips and advice for customers"
+                    title="Sekcja porad"
+                    description="Porady dotyczące pielęgnacji samochodu"
                     href="/home/settings/landing/tips"
                     icon={LightBulbIcon}
                     itemCount={activeTips}
                 />
 
                 <SectionCard
-                    title="Contact"
-                    description="Contact information and business hours"
+                    title="Kontakt"
+                    description="Dane kontaktowe i godziny otwarcia"
                     href="/home/settings/landing/contact"
                     icon={PhoneIcon}
                 />
 
                 <SectionCard
-                    title="Footer"
-                    description="Footer content and quick links"
+                    title="Stopka"
+                    description="Treść stopki i szybkie linki"
                     href="/home/settings/landing/footer"
                     icon={DocumentTextIcon}
                 />
 
                 <SectionCard
-                    title="Photo Gallery"
-                    description="Showcase photos of your work"
+                    title="Galeria zdjęć"
+                    description="Prezentacja zdjęć wykonanych prac"
                     href="/home/settings/landing/gallery"
                     icon={PhotoIcon}
                     itemCount={activePhotos}
                 />
 
                 <SectionCard
-                    title="Social Links"
-                    description="Social media and external links"
+                    title="Linki społecznościowe"
+                    description="Media społecznościowe i linki zewnętrzne"
                     href="/home/settings/landing/social"
                     icon={ShareIcon}
                     itemCount={activeSocialLinks}
                 />
 
                 <SectionCard
-                    title="Section Visibility"
-                    description="Show or hide landing page sections"
+                    title="Widoczność sekcji"
+                    description="Pokazuj lub ukrywaj sekcje strony"
                     href="/home/settings/landing/visibility"
                     icon={EyeIcon}
                 />
@@ -150,11 +150,11 @@ export default async function Page() {
                         <InformationCircleIcon className="h-5 w-5 text-blue-400" />
                     </div>
                     <div className="ml-3">
-                        <h3 className="text-sm font-medium text-blue-800">Preview your changes</h3>
+                        <h3 className="text-sm font-medium text-blue-800">Podgląd zmian</h3>
                         <div className="mt-2 text-sm text-blue-700">
                             <p>
-                                After making changes, visit your landing page to see them live.
-                                Changes are saved immediately.
+                                Po wprowadzeniu zmian odwiedź stronę publiczną, aby zobaczyć efekt.
+                                Zmiany są zapisywane natychmiast.
                             </p>
                         </div>
                         <div className="mt-3">
@@ -164,7 +164,7 @@ export default async function Page() {
                                 rel="noopener noreferrer"
                                 className="text-sm font-medium text-blue-800 hover:text-blue-600"
                             >
-                                Open landing page →
+                                Otwórz stronę publiczną →
                             </a>
                         </div>
                     </div>
