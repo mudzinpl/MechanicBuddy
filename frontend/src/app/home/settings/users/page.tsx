@@ -41,6 +41,7 @@ export default async function Page(
         pageName="settings/users"
         columns={[{
           dataField: "name",
+          headerText: "Imię i nazwisko",
           dataFormatter: ({ id, firstName, lastName }) => {
             return (
               <Link href={'/home/settings/users/' + id}>
@@ -50,6 +51,7 @@ export default async function Page(
           }
         }, {
           dataField: "userName",
+          headerText: "Nazwa użytkownika",
           dataFormatter: ({ userName, isDefaultAdmin }) => {
             return (
               <div className="flex items-center gap-2">
@@ -60,8 +62,10 @@ export default async function Page(
           }
         }, {
           dataField: "email",
+          headerText: "E-mail",
         }, {
           dataField: "phone",
+          headerText: "Telefon",
         }]}>
 
         <SimpleSearchBar searchParams={searchParams} placeholder="imię, nazwa użytkownika lub e-mail ..."></SimpleSearchBar>
