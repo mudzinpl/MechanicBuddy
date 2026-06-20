@@ -29,16 +29,16 @@ export default async function Page() {
             <div className="mt-6 border-t border-gray-100">
                 <dl className="divide-y divide-gray-100">
                     <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                        <dt className="text-sm/6 font-medium text-gray-900">Company Logo</dt>
+                        <dt className="text-sm/6 font-medium text-gray-900">Logo firmy</dt>
                         <dd className="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
                             {branding.logoBase64 ? (
                                 <img
                                     src={`data:${branding.logoMimeType};base64,${branding.logoBase64}`}
-                                    alt="Company Logo"
+                                    alt="Logo firmy"
                                     className="h-16 w-auto"
                                 />
                             ) : (
-                                <span className="text-gray-400">No logo uploaded</span>
+                                <span className="text-gray-400">Nie przesłano logo</span>
                             )}
                         </dd>
                     </div>
@@ -47,43 +47,43 @@ export default async function Page() {
 
             {/* Portal Colors Section */}
             <div className="pt-8 px-0">
-                <h3 className="text-base/7 font-semibold text-gray-900">Admin Portal Colors</h3>
-                <p className="mt-1 max-w-2xl text-sm/6 text-gray-500">Colors used in the admin dashboard</p>
+                <h3 className="text-base/7 font-semibold text-gray-900">Kolory panelu administracyjnego</h3>
+                <p className="mt-1 max-w-2xl text-sm/6 text-gray-500">Kolory używane w panelu administracyjnym</p>
             </div>
             <div className="mt-6 border-t border-gray-100">
                 <dl className="divide-y divide-gray-100">
                     <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                        <dt className="text-sm/6 font-medium text-gray-900">Sidebar Background</dt>
+                        <dt className="text-sm/6 font-medium text-gray-900">Tło paska bocznego</dt>
                         <dd className="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
                             <ColorSwatch color={branding.portalColors.sidebarBg} />
                         </dd>
                     </div>
                     <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                        <dt className="text-sm/6 font-medium text-gray-900">Sidebar Text</dt>
+                        <dt className="text-sm/6 font-medium text-gray-900">Tekst paska bocznego</dt>
                         <dd className="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
                             <ColorSwatch color={branding.portalColors.sidebarText} />
                         </dd>
                     </div>
                     <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                        <dt className="text-sm/6 font-medium text-gray-900">Active Item Background</dt>
+                        <dt className="text-sm/6 font-medium text-gray-900">Tło aktywnej pozycji</dt>
                         <dd className="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
                             <ColorSwatch color={branding.portalColors.sidebarActiveBg} />
                         </dd>
                     </div>
                     <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                        <dt className="text-sm/6 font-medium text-gray-900">Active Item Text</dt>
+                        <dt className="text-sm/6 font-medium text-gray-900">Tekst aktywnej pozycji</dt>
                         <dd className="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
                             <ColorSwatch color={branding.portalColors.sidebarActiveText} />
                         </dd>
                     </div>
                     <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                        <dt className="text-sm/6 font-medium text-gray-900">Accent Color</dt>
+                        <dt className="text-sm/6 font-medium text-gray-900">Kolor akcentu</dt>
                         <dd className="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
                             <ColorSwatch color={branding.portalColors.accentColor} />
                         </dd>
                     </div>
                     <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                        <dt className="text-sm/6 font-medium text-gray-900">Content Background</dt>
+                        <dt className="text-sm/6 font-medium text-gray-900">Tło zawartości</dt>
                         <dd className="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
                             <ColorSwatch color={branding.portalColors.contentBg} />
                         </dd>
@@ -91,39 +91,39 @@ export default async function Page() {
                 </dl>
             </div>
 
-            {/* Landing Page Colors Section */}
+            {/* Kolory strony publicznej Section */}
             <div className="pt-8 px-0">
-                <h3 className="text-base/7 font-semibold text-gray-900">Landing Page Colors</h3>
-                <p className="mt-1 max-w-2xl text-sm/6 text-gray-500">Colors used on the public landing page</p>
+                <h3 className="text-base/7 font-semibold text-gray-900">Kolory strony publicznej</h3>
+                <p className="mt-1 max-w-2xl text-sm/6 text-gray-500">Kolory używane na publicznej stronie startowej</p>
             </div>
             <div className="mt-6 border-t border-gray-100">
                 <dl className="divide-y divide-gray-100">
                     <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                        <dt className="text-sm/6 font-medium text-gray-900">Primary Color</dt>
+                        <dt className="text-sm/6 font-medium text-gray-900">Kolor podstawowy</dt>
                         <dd className="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
                             <ColorSwatch color={branding.landingColors.primaryColor} />
                         </dd>
                     </div>
                     <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                        <dt className="text-sm/6 font-medium text-gray-900">Secondary Color</dt>
+                        <dt className="text-sm/6 font-medium text-gray-900">Kolor dodatkowy</dt>
                         <dd className="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
                             <ColorSwatch color={branding.landingColors.secondaryColor} />
                         </dd>
                     </div>
                     <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                        <dt className="text-sm/6 font-medium text-gray-900">Accent Color</dt>
+                        <dt className="text-sm/6 font-medium text-gray-900">Kolor akcentu</dt>
                         <dd className="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
                             <ColorSwatch color={branding.landingColors.accentColor} />
                         </dd>
                     </div>
                     <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                        <dt className="text-sm/6 font-medium text-gray-900">Header Background</dt>
+                        <dt className="text-sm/6 font-medium text-gray-900">Tło nagłówka</dt>
                         <dd className="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
                             <ColorSwatch color={branding.landingColors.headerBg} />
                         </dd>
                     </div>
                     <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                        <dt className="text-sm/6 font-medium text-gray-900">Footer Background</dt>
+                        <dt className="text-sm/6 font-medium text-gray-900">Tło stopki</dt>
                         <dd className="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
                             <ColorSwatch color={branding.landingColors.footerBg} />
                         </dd>
@@ -136,7 +136,7 @@ export default async function Page() {
                     href="/home/settings/branding/edit"
                     className="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 >
-                    Edit
+                    Edytuj
                 </Link>
             </div>
         </Main>
