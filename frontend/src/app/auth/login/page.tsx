@@ -22,10 +22,10 @@ function SubmitButton() {
             <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
             <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
-          Signing in...
+          Logowanie...
         </span>
       ) : (
-        'Sign in'
+        'Zaloguj się'
       )}
     </button>
   );
@@ -41,9 +41,9 @@ export default function LoginPage() {
         <div className="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
           <div className="mx-auto w-full max-w-sm lg:w-96">
             <div>
-              <h2 className="mt-8 text-2xl/9 font-bold tracking-tight text-white">Mechanic Portal</h2>
+              <h2 className="mt-8 text-2xl/9 font-bold tracking-tight text-white">Portal mechanika</h2>
               <p className="mt-2 text-sm/6 text-slate-400">
-                Sign in to access the management system
+                Zaloguj się, aby uzyskać dostęp do systemu zarządzania
               </p>
             </div>
 
@@ -53,7 +53,7 @@ export default function LoginPage() {
                 <form action={action} className="space-y-6">
                   <div>
                     <label htmlFor="username" className="block text-sm/6 font-medium text-slate-200">
-                      Username
+                      Nazwa użytkownika
                     </label>
                     <div className="mt-2">
                       <input
@@ -68,7 +68,7 @@ export default function LoginPage() {
 
                   <div>
                     <label htmlFor="password" className="block text-sm/6 font-medium text-slate-200">
-                      Password
+                      Hasło
                     </label>
                     <div className="mt-2">
                       <input
@@ -115,7 +115,7 @@ export default function LoginPage() {
                         </div>
                       </div>
                       <label htmlFor="remember-me" className="block text-sm/6 text-slate-300">
-                        Remember me
+                        Zapamiętaj mnie
                       </label>
                     </div>
                   </div>

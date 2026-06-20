@@ -44,18 +44,18 @@ function PhotoRow({ photo, index, total }: { photo: IGalleryPhotoMetadata; index
                 <div className="h-16 w-24 rounded-md overflow-hidden bg-gray-100">
                     <img
                         src={imageUrl}
-                        alt={photo.caption || 'Gallery photo'}
+                        alt={photo.caption || 'Zdjęcie z galerii'}
                         className="h-full w-full object-cover"
                     />
                 </div>
                 <div>
                     <div className="flex items-center gap-2">
                         <h4 className="text-sm font-medium text-gray-900">
-                            {photo.caption || 'No caption'}
+                            {photo.caption || 'Brak podpisu'}
                         </h4>
                         {!photo.isActive && (
                             <span className="inline-flex items-center rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-600">
-                                Inactive
+                                Nieaktywne
                             </span>
                         )}
                     </div>
@@ -94,46 +94,46 @@ export default async function Page() {
                     href="/home/settings/landing"
                     className="text-sm text-indigo-600 hover:text-indigo-500"
                 >
-                    &larr; Back to Landing Page Settings
+                    &larr; Wróć do ustawień strony publicznej
                 </Link>
             </div>
 
-            {/* Gallery Section Settings */}
+            {/* Ustawienia sekcji galerii */}
             <div className="mb-8">
-                <h2 className="text-base/7 font-semibold text-gray-900">Gallery Section Settings</h2>
+                <h2 className="text-base/7 font-semibold text-gray-900">Ustawienia sekcji galerii</h2>
                 <p className="mt-1 text-sm text-gray-500">
-                    Configure the gallery section header.
+                    Skonfiguruj nagłówek sekcji galerii.
                 </p>
                 <form action={updateGallerySection} className="mt-4 bg-white rounded-lg border border-gray-200 shadow-sm p-4">
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div>
                             <label htmlFor="sectionLabel" className="block text-sm font-medium text-gray-700">
-                                Section Label
+                                Etykieta sekcji
                             </label>
                             <input
                                 type="text"
                                 id="sectionLabel"
                                 name="sectionLabel"
-                                defaultValue={gallerySection?.sectionLabel || 'Our Work'}
+                                defaultValue={gallerySection?.sectionLabel || 'Nasze realizacje'}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                             />
                         </div>
                         <div>
                             <label htmlFor="headline" className="block text-sm font-medium text-gray-700">
-                                Headline
+                                Nagłówek
                             </label>
                             <input
                                 type="text"
                                 id="headline"
                                 name="headline"
-                                defaultValue={gallerySection?.headline || 'Photo Gallery'}
+                                defaultValue={gallerySection?.headline || 'Galeria zdjęć'}
                                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                             />
                         </div>
                     </div>
                     <div className="mt-4">
                         <label htmlFor="description" className="block text-sm font-medium text-gray-700">
-                            Description
+                            Opis
                         </label>
                         <textarea
                             id="description"
@@ -148,7 +148,7 @@ export default async function Page() {
                             type="submit"
                             className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500"
                         >
-                            Save Section Settings
+                            Zapisz ustawienia sekcji
                         </button>
                     </div>
                 </form>
@@ -157,9 +157,9 @@ export default async function Page() {
             {/* Photos List */}
             <div className="flex items-center justify-between my-4">
                 <div>
-                    <h2 className="text-base/7 font-semibold text-gray-900">Photos</h2>
+                    <h2 className="text-base/7 font-semibold text-gray-900">Zdjęcia</h2>
                     <p className="mt-1 text-sm text-gray-500">
-                        Manage the photos displayed in your gallery.
+                        Zarządzaj zdjęciami wyświetlanymi w galerii.
                     </p>
                 </div>
                 <Link
@@ -167,14 +167,14 @@ export default async function Page() {
                     className="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 >
                     <PlusIcon className="h-5 w-5" />
-                    Add Photo
+                    Dodaj zdjęcie
                 </Link>
             </div>
 
             <div className="mt-6 bg-white rounded-lg border border-gray-200 shadow-sm">
                 {photos.length === 0 ? (
                     <div className="p-8 text-center">
-                        <p className="text-sm text-gray-500">No photos yet. Add your first photo to get started.</p>
+                        <p className="text-sm text-gray-500">Brak zdjęć. Dodaj pierwsze zdjęcie, aby rozpocząć.</p>
                     </div>
                 ) : (
                     <div className="divide-y divide-gray-100 px-4">

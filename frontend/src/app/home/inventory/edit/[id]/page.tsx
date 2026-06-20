@@ -25,7 +25,7 @@ export default async function Page({
   
     return (
         <Main header={
-                        <CardHeader title='Spare part Information' description='Edit details' >  
+                        <CardHeader title='Informacje o części' description='Edytuj dane' >  
                         </CardHeader>}>
                 <form action={createOrUpdate}>
                   <input type="hidden" name='id' value={id}></input>

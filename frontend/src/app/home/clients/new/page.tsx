@@ -9,7 +9,7 @@ export default async function Page() {
   
     return (
         <Main header={
-                        <CardHeader title='New client' description='Enter details'  >  
+                        <CardHeader title='Nowy klient' description='Wprowadź dane'  >  
                         </CardHeader>}>
                 <form action={createOrUpdate}>
                     <input type="hidden" name='id' ></input>

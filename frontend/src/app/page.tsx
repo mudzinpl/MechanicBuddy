@@ -58,13 +58,13 @@ export default async function Home() {
         return (
             <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
                 <div className="text-center">
-                    <h1 className="text-2xl font-bold mb-4">Welcome</h1>
-                    <p className="text-slate-400 mb-6">Landing page content is being configured.</p>
+                    <h1 className="text-2xl font-bold mb-4">Witamy</h1>
+                    <p className="text-slate-400 mb-6">Treść strony startowej jest obecnie konfigurowana.</p>
                     <a
                         href="/auth/login"
                         className="inline-flex items-center px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors"
                     >
-                        Sign In
+                        Zaloguj się
                     </a>
                 </div>
             </div>

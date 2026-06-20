@@ -30,7 +30,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                     href="/home/settings/landing/services"
                     className="text-sm text-indigo-600 hover:text-indigo-500"
                 >
-                    ← Back to Services
+                    ← Wróć do usług
                 </Link>
             </div>
 
@@ -38,7 +38,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                 <input type="hidden" name="id" value={id} />
                 <div className="space-y-12">
                     <div className="border-b border-gray-900/10 pb-12">
-                        <h2 className="text-base/7 font-semibold text-gray-900 my-4">Edit Service</h2>
+                        <h2 className="text-base/7 font-semibold text-gray-900 my-4">Edytuj usługę</h2>
                         <p className="mt-1 text-sm text-gray-500">
                             Update this service&apos;s information.
                         </p>
@@ -47,7 +47,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                             <div className="sm:col-span-4">
                                 <FormInput
                                     name="title"
-                                    label="Title"
+                                    label="Tytuł"
                                     defaultValue={service.title}
                                 />
                             </div>
@@ -55,7 +55,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                             <div className="sm:col-span-6">
                                 <FormTextArea
                                     name="description"
-                                    label="Description"
+                                    label="Opis"
                                     rows={3}
                                     defaultValue={service.description}
                                 />
@@ -64,28 +64,28 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                             <div className="sm:col-span-4">
                                 <HeroiconPicker
                                     name="iconName"
-                                    label="Icon"
+                                    label="Ikona"
                                     defaultValue={service.iconName}
                                 />
                             </div>
 
                             <div className="sm:col-span-3">
-                                <FormLabel name="usePrimaryColor" label="Use Primary Color" />
+                                <FormLabel name="usePrimaryColor" label="Użyj koloru podstawowego" />
                                 <div className="mt-3">
                                     <FormSwitch name="usePrimaryColor" defaultChecked={service.usePrimaryColor} />
                                 </div>
                                 <p className="mt-1 text-xs text-gray-500">
-                                    Highlight this service with the primary brand color
+                                    Wyróżnij usługę podstawowym kolorem marki
                                 </p>
                             </div>
 
                             <div className="sm:col-span-3">
-                                <FormLabel name="isActive" label="Active" />
+                                <FormLabel name="isActive" label="Aktywna" />
                                 <div className="mt-3">
                                     <FormSwitch name="isActive" defaultChecked={service.isActive} />
                                 </div>
                                 <p className="mt-1 text-xs text-gray-500">
-                                    Show this service on the landing page
+                                    Pokaż usługę na stronie startowej
                                 </p>
                             </div>
                         </div>
@@ -97,13 +97,13 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                         href="/home/settings/landing/services"
                         className="text-sm font-semibold text-gray-900"
                     >
-                        Cancel
+                        Anuluj
                     </Link>
                     <button
                         type="submit"
                         className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                     >
-                        Save Changes
+                        Zapisz zmiany
                     </button>
                 </div>
             </form>

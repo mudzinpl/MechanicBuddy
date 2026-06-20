@@ -30,7 +30,7 @@ export default async function RequestsPage() {
     <Main
       header={
         <div className="sm:px-0">
-          <CardHeader title="Service Requests" description="Customer service request submissions" />
+          <CardHeader title="Zgłoszenia serwisowe" description="Zgłoszenia usług przesłane przez klientów" />
         </div>
       }
       narrow={false}

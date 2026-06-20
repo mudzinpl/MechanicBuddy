@@ -6,8 +6,8 @@ export const SOCIAL_PLATFORMS = [
     { value: 'tiktok', label: 'TikTok', icon: 'tiktok' },
     { value: 'linkedin', label: 'LinkedIn', icon: 'linkedin' },
     { value: 'yelp', label: 'Yelp', icon: 'yelp' },
-    { value: 'google', label: 'Google Business', icon: 'google' },
-    { value: 'custom', label: 'Custom Link', icon: 'link' },
+    { value: 'google', label: 'Profil Firmy w Google', icon: 'google' },
+    { value: 'custom', label: 'Własny link', icon: 'link' },
 ] as const;
 
 export type SocialPlatform = typeof SOCIAL_PLATFORMS[number]['value'];

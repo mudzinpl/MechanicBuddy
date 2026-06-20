@@ -25,14 +25,14 @@ export default async function Page(
 
   const secondColumn = isInvoiceView ? {
     dataField: 'issuance',
-    headerText: 'Invoice',
+    headerText: 'Faktura',
 
     dataFormatter: ({ issuance, id }: { issuance: IWorkIssuance, id: string }) => {
       return (
         issuance ?
           <div className="flex gap-x-2 ">
             <div>  <PricingDownloadLink
-              name='Invoice'
+              name='Faktura'
               id={id}
               number={issuance.invoiceNumber}
               downloadingElement={<Spinner></Spinner>}
@@ -48,20 +48,20 @@ export default async function Page(
     }
   } : {
     dataField: 'offerissuance',
-    headerText: 'Repair, Offer',
+    headerText: 'Naprawa, oferta',
 
     dataFormatter: ({ offerIssuance, hasRepairs, numberOfOffers }: { hasRepairs: boolean, offerIssuance: IOfferIssuance, numberOfOffers: number }) => {
 
       return (
         <div className="flex gap-x-2">
-          {hasRepairs && <BlueBadge text="Repair job"></BlueBadge>}
+          {hasRepairs && <BlueBadge text="Zlecenie naprawy"></BlueBadge>}
           {numberOfOffers > 1 ?
-            <BlueBadge text="Many offers"></BlueBadge> :
+            <BlueBadge text="Wiele ofert"></BlueBadge> :
             <>
               {offerIssuance &&
                 <>
                   <div>  <PricingDownloadLink
-                    name='Offer'
+                    name='Oferta'
                     id={offerIssuance.id}
                     number={offerIssuance.number}
                     downloadingElement={<Spinner></Spinner>}
@@ -82,13 +82,13 @@ export default async function Page(
   const columns = [
     {
       dataField: 'workNr',
-      headerText: 'Work',
+      headerText: 'Zlecenie',
 
       dataFormatter: ({ id, workNr, status }: { id: string, status: string, workNr: string }) => {
 
         return (
           <Link href={'/home/work/' + id}>
-            <h5 >Work nr. {workNr}
+            <h5 >Zlecenie nr {workNr}
               {' '} {!isInvoiceView && <WorkStatusBadge status={status} ></WorkStatusBadge>}
             </h5>
           </Link>
@@ -98,7 +98,7 @@ export default async function Page(
     secondColumn,
     {
       dataField: 'startedOn',
-      headerText: 'Started on',//  {moment(activity?.startedOn, true).format('LLL')}
+      headerText: 'Rozpoczęto',//  {moment(activity?.startedOn, true).format('LLL')}
       dataFormatter: ({ startedOn }: { startedOn: Date }) => {
         return (
           moment(startedOn, true).format('LL')
@@ -108,7 +108,7 @@ export default async function Page(
 
     {
       dataField: 'clientId',
-      headerText: 'Client',
+      headerText: 'Klient',
       dataFormatter: ({ clientName, clientId }: { clientName: string, clientId: string }) => {
         return (
           <Link href={'/home/clients/' + clientId} >
@@ -119,7 +119,7 @@ export default async function Page(
     },
     {
       dataField: 'vehicleId',
-      headerText: 'Vehicle',
+      headerText: 'Pojazd',
       dataFormatter: ({ regNr, vehicleId }: { regNr: string, vehicleId: string }) => {
         return (
           <Link href={'/home/vehicles/' + vehicleId} >
@@ -131,11 +131,11 @@ export default async function Page(
 
     {
       dataField: 'mechanicNames',
-      headerText: 'Mechanics',
+      headerText: 'Mechanicy',
     },
     {
       dataField: 'notes',
-      headerText: 'Description',
+      headerText: 'Opis',
       dataFormatter: ({ notes }: { notes: string }) => {
         return (
           <p title={notes} className="truncate" style={{ maxWidth: '300px', marginBottom: "-5px" }} >

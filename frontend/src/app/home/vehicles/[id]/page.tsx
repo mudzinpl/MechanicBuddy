@@ -22,16 +22,16 @@ export default async function Page({
 
         <Main header={
             <CardHeader  >
-                 <h3 className="px-1 text-base font-semibold text-gray-900">Vehicle Information</h3>
+                 <h3 className="px-1 text-base font-semibold text-gray-900">Informacje o pojeździe</h3>
                 <DisplayOptionsMenu id={id} pageName='vehicles'></DisplayOptionsMenu>
             </CardHeader>}>
             <dl className="divide-y divide-gray-100"> 
-                <DescriptionItem label='Car make and model' value={[vehicle.producer, vehicle.model].join(' ')}></DescriptionItem>
+                <DescriptionItem label='Marka i model' value={[vehicle.producer, vehicle.model].join(' ')}></DescriptionItem>
                 <DescriptionItem label='VIN' value={vehicle.vin}></DescriptionItem>
-                <DescriptionItem label='Reg nr' value={vehicle.regNr}></DescriptionItem>
-                <DescriptionItem label='Odometer' value={vehicle.odo}></DescriptionItem>
-                <DescriptionItem label='Owner' value={vehicle.ownerName}></DescriptionItem>
-                <DescriptionItem label='About' value={vehicle.description}></DescriptionItem>
+                <DescriptionItem label='Numer rejestracyjny' value={vehicle.regNr}></DescriptionItem>
+                <DescriptionItem label='Przebieg' value={vehicle.odo}></DescriptionItem>
+                <DescriptionItem label='Właściciel' value={vehicle.ownerName}></DescriptionItem>
+                <DescriptionItem label='Uwagi' value={vehicle.description}></DescriptionItem>
             </dl>
         </Main>
     )

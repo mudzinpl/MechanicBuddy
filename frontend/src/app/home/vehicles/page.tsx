@@ -21,7 +21,7 @@ export default async function Page(
 
         {
           dataField: 'producer',
-          headerText: 'Producer',
+          headerText: 'Marka',
           dataClasses: () => {
             return "pl-4 font-medium gray-900 whitespace-nowrap";
           },
@@ -41,7 +41,7 @@ export default async function Page(
         },
         {
           dataField: 'regNr',
-          headerText: 'RegNr',
+          headerText: 'Numer rejestracyjny',
           dataFormatter: ({ regNr, id }) => {
             return (
               <Link href={'/home/vehicles/' + id} >
@@ -52,9 +52,9 @@ export default async function Page(
         },
         {
           dataField: 'ownerName',
-          headerText: 'Owner',
+          headerText: 'Właściciel',
           dataFormatter: ({ ownerName, ownerId }) => {
-            if (!ownerName) return <p className="font-italic text-gray-400">No owner</p>;
+            if (!ownerName) return <p className="font-italic text-gray-400">Brak właściciela</p>;
             return (
               <Link href={'/home/clients/' + ownerId} >
                 <h5 >{ownerName}</h5>

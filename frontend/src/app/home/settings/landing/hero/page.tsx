@@ -21,23 +21,23 @@ export default async function Page() {
                     href="/home/settings/landing"
                     className="text-sm text-indigo-600 hover:text-indigo-500"
                 >
-                    ← Back to Landing Page Settings
+                    ← Wróć do ustawień strony publicznej
                 </Link>
             </div>
 
             <form action={updateHero}>
                 <div className="space-y-12">
                     <div className="border-b border-gray-900/10 pb-12">
-                        <h2 className="text-base/7 font-semibold text-gray-900 my-4">Hero Section</h2>
+                        <h2 className="text-base/7 font-semibold text-gray-900 my-4">Sekcja główna</h2>
                         <p className="mt-1 text-sm text-gray-500">
-                            Customize the main banner section of your landing page.
+                            Dostosuj główny baner strony startowej.
                         </p>
 
                         <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                             <div className="sm:col-span-4">
                                 <FormInput
                                     name="companyName"
-                                    label="Company Name"
+                                    label="Nazwa firmy"
                                     defaultValue={hero.companyName}
                                 />
                             </div>
@@ -45,8 +45,8 @@ export default async function Page() {
                             <div className="sm:col-span-6">
                                 <FormInput
                                     name="tagline"
-                                    label="Tagline"
-                                    placeholder="e.g., Your Trusted Auto Care Partner"
+                                    label="Hasło"
+                                    placeholder="np. Twój zaufany serwis samochodowy"
                                     defaultValue={hero.tagline || ''}
                                 />
                             </div>
@@ -54,7 +54,7 @@ export default async function Page() {
                             <div className="sm:col-span-6">
                                 <FormTextArea
                                     name="subtitle"
-                                    label="Subtitle"
+                                    label="Podtytuł"
                                     rows={2}
                                     defaultValue={hero.subtitle || ''}
                                 />
@@ -63,8 +63,8 @@ export default async function Page() {
                             <div className="sm:col-span-4">
                                 <FormInput
                                     name="specialtyText"
-                                    label="Specialty Text"
-                                    placeholder="e.g., Specializing in European Vehicles"
+                                    label="Tekst specjalizacji"
+                                    placeholder="np. Specjalizujemy się w pojazdach europejskich"
                                     defaultValue={hero.specialtyText || ''}
                                 />
                             </div>
@@ -72,23 +72,23 @@ export default async function Page() {
                     </div>
 
                     <div className="border-b border-gray-900/10 pb-12">
-                        <h2 className="text-base/7 font-semibold text-gray-900">Call-to-Action Buttons</h2>
+                        <h2 className="text-base/7 font-semibold text-gray-900">Przyciski działania</h2>
                         <p className="mt-1 text-sm text-gray-500">
-                            Configure the buttons displayed in the hero section.
+                            Skonfiguruj przyciski wyświetlane w sekcji głównej.
                         </p>
 
                         <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-6">
                             <div className="sm:col-span-3">
                                 <FormInput
                                     name="ctaPrimaryText"
-                                    label="Primary Button Text"
+                                    label="Tekst przycisku głównego"
                                     defaultValue={hero.ctaPrimaryText}
                                 />
                             </div>
                             <div className="sm:col-span-3">
                                 <FormInput
                                     name="ctaPrimaryLink"
-                                    label="Primary Button Link"
+                                    label="Link przycisku głównego"
                                     placeholder="#services"
                                     defaultValue={hero.ctaPrimaryLink}
                                 />
@@ -97,14 +97,14 @@ export default async function Page() {
                             <div className="sm:col-span-3">
                                 <FormInput
                                     name="ctaSecondaryText"
-                                    label="Secondary Button Text"
+                                    label="Tekst przycisku dodatkowego"
                                     defaultValue={hero.ctaSecondaryText}
                                 />
                             </div>
                             <div className="sm:col-span-3">
                                 <FormInput
                                     name="ctaSecondaryLink"
-                                    label="Secondary Button Link"
+                                    label="Link przycisku dodatkowego"
                                     placeholder="#contact"
                                     defaultValue={hero.ctaSecondaryLink}
                                 />
@@ -113,9 +113,9 @@ export default async function Page() {
                     </div>
 
                     <div className="border-b border-gray-900/10 pb-12">
-                        <h2 className="text-base/7 font-semibold text-gray-900">Background Image</h2>
+                        <h2 className="text-base/7 font-semibold text-gray-900">Obraz tła</h2>
                         <p className="mt-1 text-sm text-gray-500">
-                            Upload a background image for the hero section.
+                            Prześlij obraz tła sekcji głównej.
                         </p>
 
                         <div className="mt-6">
@@ -128,7 +128,7 @@ export default async function Page() {
                                     />
                                 ) : (
                                     <div className="flex h-24 w-40 items-center justify-center rounded border border-dashed border-gray-300 bg-gray-50">
-                                        <span className="text-xs text-gray-400">No image</span>
+                                        <span className="text-xs text-gray-400">Brak obrazu</span>
                                     </div>
                                 )}
                                 <div>
@@ -136,7 +136,7 @@ export default async function Page() {
                                         htmlFor="backgroundImage"
                                         className="cursor-pointer rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                                     >
-                                        Change Image
+                                        Zmień obraz
                                     </label>
                                     <input
                                         type="file"
@@ -145,7 +145,7 @@ export default async function Page() {
                                         accept="image/*"
                                         className="sr-only"
                                     />
-                                    <p className="mt-2 text-xs text-gray-500">PNG or JPG. Recommended: 1920x1080</p>
+                                    <p className="mt-2 text-xs text-gray-500">PNG lub JPG. Zalecany rozmiar: 1920 × 1080</p>
                                 </div>
                             </div>
                         </div>
@@ -157,13 +157,13 @@ export default async function Page() {
                         href="/home/settings/landing"
                         className="text-sm font-semibold text-gray-900"
                     >
-                        Cancel
+                        Anuluj
                     </Link>
                     <button
                         type="submit"
                         className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                     >
-                        Save Changes
+                        Zapisz zmiany
                     </button>
                 </div>
             </form>

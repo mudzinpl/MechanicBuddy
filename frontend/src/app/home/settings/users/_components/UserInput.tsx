@@ -103,7 +103,7 @@ export default function UserInput({
                                 inputError={firstNameError}
                                 onInputChange={(e) => setFirstName(e.currentTarget.value)}
                                 defaultValue={firstName}
-                                label='First name'
+                                label='Imię'
                                 required
                             />
                         </div>
@@ -113,7 +113,7 @@ export default function UserInput({
                                 inputError={lastNameError}
                                 onInputChange={(e) => setLastName(e.currentTarget.value)}
                                 defaultValue={lastName}
-                                label='Last name'
+                                label='Nazwisko'
                                 required
                             />
                         </div>
@@ -124,7 +124,7 @@ export default function UserInput({
                                 inputError={userNameError}
                                 onInputChange={(e) => setUserName(e.currentTarget.value)}
                                 defaultValue={userName}
-                                label='Username'
+                                label='Nazwa użytkownika'
                                 required
                                 disabled={user?.isDefaultAdmin}
                             />
@@ -146,7 +146,7 @@ export default function UserInput({
                             <FormInput
                                 name='phone'
                                 defaultValue={user?.phone}
-                                label='Phone'
+                                label='Telefon'
                             />
                         </div>
 
@@ -159,7 +159,7 @@ export default function UserInput({
                                         name='password'
                                         type='password'
                                         inputError={passwordError}
-                                        label='Password'
+                                        label='Hasło'
                                         required
                                     />
                                 </div>
@@ -168,7 +168,7 @@ export default function UserInput({
                                     <FormInput
                                         name='confirmPassword'
                                         type='password'
-                                        label='Confirm Password'
+                                        label='Potwierdź hasło'
                                         required
                                     />
                                 </div>
@@ -179,7 +179,7 @@ export default function UserInput({
                             <>
                                 <div className="sm:col-span-6">
                                     <h3 className="text-base font-semibold text-gray-900 mb-4">
-                                        Change Password (Optional)
+                                        Zmień hasło (opcjonalnie)
                                     </h3>
                                 </div>
                                 <div className="sm:col-span-3">
@@ -187,7 +187,7 @@ export default function UserInput({
                                         name='password'
                                         type='password'
                                         inputError={passwordError}
-                                        label='New Password'
+                                        label='Nowe hasło'
                                     />
                                 </div>
 
@@ -195,7 +195,7 @@ export default function UserInput({
                                     <FormInput
                                         name='confirmPassword'
                                         type='password'
-                                        label='Confirm New Password'
+                                        label='Potwierdź nowe hasło'
                                     />
                                 </div>
                             </>
@@ -204,8 +204,8 @@ export default function UserInput({
                 </div>
             </div>
             <div className="mt-6 flex items-center justify-end gap-x-6">
-                <SecondaryButton onClick={() => router.back()}>Cancel</SecondaryButton>
-                <PrimaryButton onClick={validate}>Save</PrimaryButton>
+                <SecondaryButton onClick={() => router.back()}>Anuluj</SecondaryButton>
+                <PrimaryButton onClick={validate}>Zapisz</PrimaryButton>
             </div>
         </>
     )

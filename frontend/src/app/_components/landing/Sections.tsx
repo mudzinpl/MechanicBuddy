@@ -57,7 +57,7 @@ export function HeroSection({ data }: { data: IPublicLandingData }) {
             <Container className="relative z-10">
                 <div className="max-w-4xl mx-auto text-center">
                     <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight tracking-tight">
-                        {hero.tagline || `Professional Auto Repair You Can Trust`}
+                        {hero.tagline || `Profesjonalny serwis samochodowy, któremu możesz zaufać`}
                     </h1>
                     {hero.subtitle && (
                         <p className="text-lg md:text-xl text-slate-300 mb-4 leading-relaxed max-w-3xl mx-auto">
@@ -118,8 +118,8 @@ export function ServicesSection({ data }: { data: IPublicLandingData }) {
         <section id="services" className="py-16 bg-slate-100">
             <Container>
                 <div className="text-center mb-12">
-                    <span className="text-sm font-bold uppercase tracking-wider mb-2 block text-landing-primary">What We Offer</span>
-                    <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Our Services</h2>
+                    <span className="text-sm font-bold uppercase tracking-wider mb-2 block text-landing-primary">Co oferujemy</span>
+                    <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Nasze usługi</h2>
                 </div>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {services.map((service) => (
@@ -231,7 +231,7 @@ function GalleryPhoto({ photo }: { photo: IPublicGalleryPhotoItem }) {
         <div className="relative group overflow-hidden rounded-xl bg-slate-200 aspect-[4/3]">
             <img
                 src={photo.imageUrl}
-                alt={photo.caption || 'Gallery photo'}
+                alt={photo.caption || 'Zdjęcie z galerii'}
                 className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
             />
             {photo.caption && (
@@ -261,10 +261,10 @@ export function GallerySection({ data }: { data: IPublicLandingData }) {
                         <PhotoIcon className="h-7 w-7 text-landing-primary" />
                     </div>
                     <span className="text-sm font-bold uppercase tracking-wider mb-2 block text-landing-secondary">
-                        {gallerySection?.sectionLabel || 'Our Work'}
+                        {gallerySection?.sectionLabel || 'Nasze realizacje'}
                     </span>
                     <h2 className="text-3xl md:text-4xl font-bold text-slate-900 mb-4">
-                        {gallerySection?.headline || 'Photo Gallery'}
+                        {gallerySection?.headline || 'Galeria zdjęć'}
                     </h2>
                     {gallerySection?.description && (
                         <p className="text-base text-slate-600 max-w-2xl mx-auto leading-relaxed">
@@ -305,7 +305,7 @@ export function ContactSection({ data }: { data: IPublicLandingData }) {
                     <ServiceRequestForm services={services} />
 
                     <div className="bg-slate-900 text-white rounded-2xl p-8 shadow-xl">
-                        <h3 className="text-xl font-bold mb-8">Contact Info</h3>
+                        <h3 className="text-xl font-bold mb-8">Dane kontaktowe</h3>
                         <div className="space-y-6">
                             {companyInfo.address && (
                                 <div className="flex items-start gap-4">
@@ -313,7 +313,7 @@ export function ContactSection({ data }: { data: IPublicLandingData }) {
                                         <MapPinIcon className="h-5 w-5" />
                                     </div>
                                     <div>
-                                        <h4 className="font-semibold text-base mb-1">Address</h4>
+                                        <h4 className="font-semibold text-base mb-1">Adres</h4>
                                         <p className="text-slate-300 text-sm leading-relaxed">{companyInfo.address}</p>
                                     </div>
                                 </div>
@@ -324,7 +324,7 @@ export function ContactSection({ data }: { data: IPublicLandingData }) {
                                         <PhoneIcon className="h-5 w-5" />
                                     </div>
                                     <div>
-                                        <h4 className="font-semibold text-base mb-1">Phone</h4>
+                                        <h4 className="font-semibold text-base mb-1">Telefon</h4>
                                         <a href={`tel:${companyInfo.phone}`} className="text-slate-300 hover:text-white transition-colors">{companyInfo.phone}</a>
                                     </div>
                                 </div>
@@ -335,7 +335,7 @@ export function ContactSection({ data }: { data: IPublicLandingData }) {
                                         <TruckIcon className="h-5 w-5" />
                                     </div>
                                     <div>
-                                        <h4 className="font-semibold text-base mb-1">Towing</h4>
+                                        <h4 className="font-semibold text-base mb-1">Pomoc drogowa</h4>
                                         <p className="text-slate-300 text-sm">{contact.towingText}</p>
                                     </div>
                                 </div>
@@ -346,11 +346,11 @@ export function ContactSection({ data }: { data: IPublicLandingData }) {
                                         <ClockIcon className="h-5 w-5" />
                                     </div>
                                     <div>
-                                        <h4 className="font-semibold text-base mb-1">Hours</h4>
+                                        <h4 className="font-semibold text-base mb-1">Godziny otwarcia</h4>
                                         <div className="text-slate-300 text-sm space-y-0.5">
                                             {contact.businessHours.map((hours) => (
                                                 <p key={hours.day}>
-                                                    {hours.day}: {hours.open === 'Closed' ? 'Closed' : `${hours.open} - ${hours.close}`}
+                                                    {hours.day}: {hours.open === 'Closed' ? 'Zamknięte' : `${hours.open} - ${hours.close}`}
                                                 </p>
                                             ))}
                                         </div>
@@ -389,21 +389,21 @@ export function Footer({ data }: { data: IPublicLandingData }) {
                     </div>
                     {footer.showQuickLinks && (
                         <div>
-                            <h4 className="font-bold text-base mb-4">Quick Links</h4>
+                            <h4 className="font-bold text-base mb-4">Szybkie linki</h4>
                             <ul className="space-y-2 text-slate-400 text-sm">
-                                <li><a href="#services" className="hover:text-white transition-colors">Services</a></li>
-                                <li><a href="#about" className="hover:text-white transition-colors">About Us</a></li>
+                                <li><a href="#services" className="hover:text-white transition-colors">Usługi</a></li>
+                                <li><a href="#about" className="hover:text-white transition-colors">O nas</a></li>
                                 {tipsSection.isVisible && (
-                                    <li><a href="#tips" className="hover:text-white transition-colors">Auto Tips</a></li>
+                                    <li><a href="#tips" className="hover:text-white transition-colors">Porady motoryzacyjne</a></li>
                                 )}
-                                <li><a href="#contact" className="hover:text-white transition-colors">Contact</a></li>
-                                <li><Link href="/auth/login" className="hover:text-white transition-colors">Mechanic Portal</Link></li>
+                                <li><a href="#contact" className="hover:text-white transition-colors">Kontakt</a></li>
+                                <li><Link href="/auth/login" className="hover:text-white transition-colors">Portal mechanika</Link></li>
                             </ul>
                         </div>
                     )}
                     {footer.showContactInfo && (
                         <div>
-                            <h4 className="font-bold text-base mb-4">Contact Info</h4>
+                            <h4 className="font-bold text-base mb-4">Dane kontaktowe</h4>
                             <ul className="space-y-2 text-slate-400 text-sm">
                                 {companyInfo.address && (
                                     <li className="flex items-start gap-2">
@@ -424,7 +424,7 @@ export function Footer({ data }: { data: IPublicLandingData }) {
                     )}
                 </div>
                 <div className="border-t border-slate-800 py-6 text-center text-slate-500 text-sm">
-                    <p>{footer.copyrightText || `© ${new Date().getFullYear()} ${hero.companyName}. All rights reserved.`}</p>
+                    <p>{footer.copyrightText || `© ${new Date().getFullYear()} ${hero.companyName}. Wszelkie prawa zastrzeżone.`}</p>
                 </div>
             </Container>
         </footer>

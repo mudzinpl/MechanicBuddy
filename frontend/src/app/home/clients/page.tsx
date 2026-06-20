@@ -18,6 +18,7 @@ export default async function Page(
       resourceName="clients"
       columns={[{
         dataField: "name",
+        headerText: "Nazwa",
         dataFormatter: ({ id, name }) => {
           return (
             <Link href={'/home/clients/' + id}>
@@ -27,10 +28,13 @@ export default async function Page(
         }
       }, {
         dataField: "phone",
+        headerText: "Telefon",
       }, {
         dataField: "email",
+        headerText: "E-mail",
       }, {
         dataField: "address",
+        headerText: "Adres",
       }]}>
 
       <SimpleSearchBar searchParams={searchParams} placeholder="nazwa, adres lub telefon ..."></SimpleSearchBar>

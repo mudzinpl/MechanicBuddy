@@ -37,11 +37,11 @@ export function ServiceRequestForm({ services }: ServiceRequestFormProps) {
                 setFormData({ customerName: "", phone: "", email: "", vehicleInfo: "", serviceType: "", message: "" })
             } else {
                 const data = await response.json()
-                setErrorMessage(data.message || "Something went wrong. Please try again.")
+                setErrorMessage(data.message || "Coś poszło nie tak. Spróbuj ponownie.")
                 setStatus("error")
             }
         } catch {
-            setErrorMessage("Unable to submit. Please call us instead.")
+            setErrorMessage("Nie udało się wysłać formularza. Skontaktuj się z nami telefonicznie.")
             setStatus("error")
         }
     }
@@ -52,13 +52,13 @@ export function ServiceRequestForm({ services }: ServiceRequestFormProps) {
                 <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 bg-landing-secondary">
                     <CheckCircleIcon className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-slate-900 mb-2">Request Submitted!</h3>
-                <p className="text-slate-600">Thank you! We&apos;ll contact you soon to schedule your service.</p>
+                <h3 className="text-xl font-bold text-slate-900 mb-2">Zgłoszenie zostało wysłane!</h3>
+                <p className="text-slate-600">Dziękujemy! Wkrótce skontaktujemy się, aby ustalić termin usługi.</p>
                 <button
                     onClick={() => setStatus("idle")}
                     className="mt-6 px-6 py-2 rounded-lg text-white font-semibold hover:opacity-90 transition-all bg-landing-primary"
                 >
-                    Submit Another Request
+                    Wyślij kolejne zgłoszenie
                 </button>
             </div>
         )
@@ -68,24 +68,24 @@ export function ServiceRequestForm({ services }: ServiceRequestFormProps) {
 
     return (
         <form onSubmit={handleSubmit} className="bg-white rounded-2xl p-8 shadow-xl">
-            <h3 className="text-xl font-bold text-slate-900 mb-6">Request Service</h3>
+            <h3 className="text-xl font-bold text-slate-900 mb-6">Zgłoś usługę</h3>
 
             <div className="space-y-4">
                 <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Your Name *</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Imię i nazwisko *</label>
                     <input
                         type="text"
                         required
                         value={formData.customerName}
                         onChange={(e) => setFormData({ ...formData, customerName: e.target.value })}
                         className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
-                        placeholder="John Doe"
+                        placeholder="Jan Kowalski"
                     />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Phone</label>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Telefon</label>
                         <input
                             type="tel"
                             value={formData.phone}
@@ -101,45 +101,45 @@ export function ServiceRequestForm({ services }: ServiceRequestFormProps) {
                             value={formData.email}
                             onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                             className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
-                            placeholder="john@example.com"
+                            placeholder="jan@example.com"
                         />
                     </div>
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Vehicle Info</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Dane pojazdu</label>
                     <input
                         type="text"
                         value={formData.vehicleInfo}
                         onChange={(e) => setFormData({ ...formData, vehicleInfo: e.target.value })}
                         className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
-                        placeholder="2020 Honda Accord"
+                        placeholder="2020 Toyota Corolla"
                     />
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Service Needed</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Potrzebna usługa</label>
                     <select
                         value={formData.serviceType}
                         onChange={(e) => setFormData({ ...formData, serviceType: e.target.value })}
                         className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
                     >
-                        <option value="">Select a service...</option>
+                        <option value="">Wybierz usługę...</option>
                         {activeServices.map((service) => (
                             <option key={service.id} value={service.title}>{service.title}</option>
                         ))}
-                        <option value="Other">Other</option>
+                        <option value="Other">Inna</option>
                     </select>
                 </div>
 
                 <div>
-                    <label className="block text-sm font-medium text-slate-700 mb-1">Message</label>
+                    <label className="block text-sm font-medium text-slate-700 mb-1">Wiadomość</label>
                     <textarea
                         value={formData.message}
                         onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                         rows={3}
                         className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all resize-none"
-                        placeholder="Tell us more about what you need..."
+                        placeholder="Opisz, czego potrzebujesz..."
                     />
                 </div>
 
@@ -154,7 +154,7 @@ export function ServiceRequestForm({ services }: ServiceRequestFormProps) {
                     disabled={status === "loading"}
                     className="w-full py-3 rounded-lg text-white font-semibold hover:opacity-90 transition-all disabled:opacity-50 bg-landing-primary"
                 >
-                    {status === "loading" ? "Submitting..." : "Submit Request"}
+                    {status === "loading" ? "Wysyłanie..." : "Wyślij zgłoszenie"}
                 </button>
             </div>
         </form>

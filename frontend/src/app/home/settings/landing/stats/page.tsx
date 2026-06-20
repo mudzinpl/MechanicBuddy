@@ -20,15 +20,15 @@ export default async function Page() {
                     href="/home/settings/landing"
                     className="text-sm text-indigo-600 hover:text-indigo-500"
                 >
-                    ← Back to Landing Page Settings
+                    ← Wróć do ustawień strony publicznej
                 </Link>
             </div>
 
             <div className="flex items-center justify-between my-4">
                 <div>
-                    <h2 className="text-base/7 font-semibold text-gray-900">Statistics</h2>
+                    <h2 className="text-base/7 font-semibold text-gray-900">Statystyki</h2>
                     <p className="mt-1 text-sm text-gray-500">
-                        Manage the statistics displayed on your landing page.
+                        Zarządzaj statystykami wyświetlanymi na stronie startowej.
                     </p>
                 </div>
                 <Link
@@ -36,14 +36,14 @@ export default async function Page() {
                     className="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 >
                     <PlusIcon className="h-5 w-5" />
-                    Add Stat
+                    Dodaj statystykę
                 </Link>
             </div>
 
             <div className="mt-6 bg-white rounded-lg border border-gray-200 shadow-sm">
                 {stats.length === 0 ? (
                     <div className="p-8 text-center">
-                        <p className="text-sm text-gray-500">No statistics yet. Add your first stat to get started.</p>
+                        <p className="text-sm text-gray-500">Brak statystyk. Dodaj pierwszą statystykę, aby rozpocząć.</p>
                     </div>
                 ) : (
                     <div className="divide-y divide-gray-100">

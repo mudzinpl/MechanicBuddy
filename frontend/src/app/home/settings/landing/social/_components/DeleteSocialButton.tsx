@@ -8,7 +8,7 @@ export default function DeleteSocialButton() {
             type="submit"
             className="p-2 text-gray-400 hover:text-red-600"
             onClick={(e) => {
-                if (!confirm('Are you sure you want to delete this social link?')) {
+                if (!confirm('Czy na pewno chcesz usunąć ten link społecznościowy?')) {
                     e.preventDefault();
                 }
             }}

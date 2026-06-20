@@ -56,7 +56,7 @@ export default function ProfileImage({
                     }}
                     className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50"
                 >
-                    Change avatar
+                    Zmień awatar
                 </button>
                 <p className="mt-2 text-xs/5 text-gray-400">JPG, GIF lub PNG. Maksymalnie 5 MB.</p>
             </div>

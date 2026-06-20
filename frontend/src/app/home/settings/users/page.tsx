@@ -18,20 +18,20 @@ export default async function Page(
   // If user cannot manage users, show upgrade prompt
   if (!canManageUsers) {
     return <Main header={
-      <SearchCardHeader title="Users" pageName="settings/users">
+      <SearchCardHeader title="Użytkownicy" pageName="settings/users">
       </SearchCardHeader>
     } narrow={false}>
       <div className="text-center py-12">
-        <h3 className="mt-2 text-sm font-semibold text-gray-900">User Management Unavailable</h3>
+        <h3 className="mt-2 text-sm font-semibold text-gray-900">Zarządzanie użytkownikami jest niedostępne</h3>
         <p className="mt-1 text-sm text-gray-500">
-          Please upgrade your plan to manage multiple users.
+          Zmień plan na wyższy, aby zarządzać wieloma użytkownikami.
         </p>
       </div>
     </Main>
   }
 
   return <Main header={
-    <SearchCardHeader title="Find Users" pageName="settings/users">
+    <SearchCardHeader title="Znajdź użytkowników" pageName="settings/users">
     </SearchCardHeader>
   } narrow={false}>
     <form method="GET">
@@ -41,6 +41,7 @@ export default async function Page(
         pageName="settings/users"
         columns={[{
           dataField: "name",
+          headerText: "Imię i nazwisko",
           dataFormatter: ({ id, firstName, lastName }) => {
             return (
               <Link href={'/home/settings/users/' + id}>
@@ -50,21 +51,24 @@ export default async function Page(
           }
         }, {
           dataField: "userName",
+          headerText: "Nazwa użytkownika",
           dataFormatter: ({ userName, isDefaultAdmin }) => {
             return (
               <div className="flex items-center gap-2">
                 {userName}
-                {isDefaultAdmin && <BlueBadge text="Default Admin" />}
+                {isDefaultAdmin && <BlueBadge text="Główny administrator" />}
               </div>
             );
           }
         }, {
           dataField: "email",
+          headerText: "E-mail",
         }, {
           dataField: "phone",
+          headerText: "Telefon",
         }]}>
 
-        <SimpleSearchBar searchParams={searchParams} placeholder="name, username or email ..."></SimpleSearchBar>
+        <SimpleSearchBar searchParams={searchParams} placeholder="imię, nazwa użytkownika lub e-mail ..."></SimpleSearchBar>
       </Search>
     </form>
 

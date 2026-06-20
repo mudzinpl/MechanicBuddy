@@ -8,7 +8,7 @@ import { CardHeader } from '@/_components/Card';
 export default async function Page() {
   
     return (
-        <Main header={<CardHeader title='Create new vehicle' description='Enter details' ></CardHeader>}>
+        <Main header={<CardHeader title='Dodaj pojazd' description='Wprowadź dane' ></CardHeader>}>
                 <form action={createOrUpdate}>
                     <input type="hidden" name='id'  ></input>
                     <VehicleInput  ></VehicleInput>

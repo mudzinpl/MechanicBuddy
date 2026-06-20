@@ -16,9 +16,9 @@ export default async function Page() {
                 <div className="space-y-12">
                     {/* Logo Section */}
                     <div className="border-b border-gray-900/10 pb-12">
-                        <h2 className="text-base/7 font-semibold text-gray-900 my-4">Company Logo</h2>
+                        <h2 className="text-base/7 font-semibold text-gray-900 my-4">Logo firmy</h2>
                         <p className="mt-1 text-sm text-gray-500">
-                            Upload your company logo. Recommended size: 200x60 pixels.
+                            Prześlij logo firmy. Zalecany rozmiar: 200 × 60 pikseli.
                         </p>
 
                         <div className="mt-6">
@@ -31,7 +31,7 @@ export default async function Page() {
                                     />
                                 ) : (
                                     <div className="flex h-16 w-32 items-center justify-center rounded border border-dashed border-gray-300 bg-gray-50">
-                                        <span className="text-xs text-gray-400">No logo</span>
+                                        <span className="text-xs text-gray-400">Brak logo</span>
                                     </div>
                                 )}
                                 <div>
@@ -39,7 +39,7 @@ export default async function Page() {
                                         htmlFor="logo"
                                         className="cursor-pointer rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
                                     >
-                                        Change Logo
+                                        Zmień logo
                                     </label>
                                     <input
                                         type="file"
@@ -48,7 +48,7 @@ export default async function Page() {
                                         accept="image/*"
                                         className="sr-only"
                                     />
-                                    <p className="mt-2 text-xs text-gray-500">PNG, JPG, or SVG up to 2MB</p>
+                                    <p className="mt-2 text-xs text-gray-500">PNG, JPG lub SVG do 2 MB</p>
                                 </div>
                             </div>
                         </div>
@@ -56,76 +56,76 @@ export default async function Page() {
 
                     {/* Portal Colors Section */}
                     <div className="border-b border-gray-900/10 pb-12">
-                        <h2 className="text-base/7 font-semibold text-gray-900">Admin Portal Colors</h2>
+                        <h2 className="text-base/7 font-semibold text-gray-900">Kolory panelu administracyjnego</h2>
                         <p className="mt-1 text-sm text-gray-500">
-                            Customize the colors used in the admin dashboard sidebar and accent elements.
+                            Dostosuj kolory paska bocznego i elementów akcentowych panelu administracyjnego.
                         </p>
 
                         <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-3">
                             <ColorInput
                                 name="portalSidebarBg"
-                                label="Sidebar Background"
+                                label="Tło paska bocznego"
                                 defaultValue={branding.portalColors.sidebarBg}
                             />
                             <ColorInput
                                 name="portalSidebarText"
-                                label="Sidebar Text"
+                                label="Tekst paska bocznego"
                                 defaultValue={branding.portalColors.sidebarText}
                             />
                             <ColorInput
                                 name="portalSidebarActiveBg"
-                                label="Active Item Background"
+                                label="Tło aktywnej pozycji"
                                 defaultValue={branding.portalColors.sidebarActiveBg}
                             />
                             <ColorInput
                                 name="portalSidebarActiveText"
-                                label="Active Item Text"
+                                label="Tekst aktywnej pozycji"
                                 defaultValue={branding.portalColors.sidebarActiveText}
                             />
                             <ColorInput
                                 name="portalAccentColor"
-                                label="Accent Color"
+                                label="Kolor akcentu"
                                 defaultValue={branding.portalColors.accentColor}
                             />
                             <ColorInput
                                 name="portalContentBg"
-                                label="Content Background"
+                                label="Tło zawartości"
                                 defaultValue={branding.portalColors.contentBg}
                             />
                         </div>
                     </div>
 
-                    {/* Landing Page Colors Section */}
+                    {/* Kolory strony publicznej Section */}
                     <div className="border-b border-gray-900/10 pb-12">
-                        <h2 className="text-base/7 font-semibold text-gray-900">Landing Page Colors</h2>
+                        <h2 className="text-base/7 font-semibold text-gray-900">Kolory strony publicznej</h2>
                         <p className="mt-1 text-sm text-gray-500">
-                            Customize the colors used on your public landing page.
+                            Dostosuj kolory publicznej strony startowej.
                         </p>
 
                         <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-8 sm:grid-cols-3">
                             <ColorInput
                                 name="landingPrimaryColor"
-                                label="Primary Color"
+                                label="Kolor podstawowy"
                                 defaultValue={branding.landingColors.primaryColor}
                             />
                             <ColorInput
                                 name="landingSecondaryColor"
-                                label="Secondary Color"
+                                label="Kolor dodatkowy"
                                 defaultValue={branding.landingColors.secondaryColor}
                             />
                             <ColorInput
                                 name="landingAccentColor"
-                                label="Accent Color"
+                                label="Kolor akcentu"
                                 defaultValue={branding.landingColors.accentColor}
                             />
                             <ColorInput
                                 name="landingHeaderBg"
-                                label="Header Background"
+                                label="Tło nagłówka"
                                 defaultValue={branding.landingColors.headerBg}
                             />
                             <ColorInput
                                 name="landingFooterBg"
-                                label="Footer Background"
+                                label="Tło stopki"
                                 defaultValue={branding.landingColors.footerBg}
                             />
                         </div>
@@ -137,13 +137,13 @@ export default async function Page() {
                         href="/home/settings/branding"
                         className="text-sm font-semibold text-gray-900"
                     >
-                        Cancel
+                        Anuluj
                     </Link>
                     <button
                         type="submit"
                         className="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                     >
-                        Save Changes
+                        Zapisz zmiany
                     </button>
                 </div>
             </form>

@@ -18,38 +18,38 @@ export default async function Page() {
         } narrow={true}>
               
             <div className="  px-0">
-                <h3 className="text-base/7 font-semibold text-gray-900  my-4">Company information</h3> 
+                <h3 className="text-base/7 font-semibold text-gray-900  my-4">Dane firmy</h3> 
             </div>
             <div className="mt-6 border-t border-gray-100">
                 <dl className="divide-y divide-gray-100">
-                    <DescriptionItem label='Name' value={options.requisites.name}></DescriptionItem>
-                    <DescriptionItem label='Phone' value={options.requisites.phone}></DescriptionItem>
-                    <DescriptionItem label='Address' value={options.requisites.address}></DescriptionItem>
+                    <DescriptionItem label='Nazwa' value={options.requisites.name}></DescriptionItem>
+                    <DescriptionItem label='Telefon' value={options.requisites.phone}></DescriptionItem>
+                    <DescriptionItem label='Adres' value={options.requisites.address}></DescriptionItem>
                     <DescriptionItem label='Email' value={options.requisites.email}></DescriptionItem>
-                    <DescriptionItem label='Bank account' value={options.requisites.bankAccount}></DescriptionItem>
-                    <DescriptionItem label='RegNr' value={options.requisites.regNr}></DescriptionItem>
-                    <DescriptionItem label='Tax ID' value={options.requisites.kmkr}></DescriptionItem>
+                    <DescriptionItem label='Konto bankowe' value={options.requisites.bankAccount}></DescriptionItem>
+                    <DescriptionItem label='Numer rejestrowy' value={options.requisites.regNr}></DescriptionItem>
+                    <DescriptionItem label='NIP' value={options.requisites.kmkr}></DescriptionItem>
                 </dl>
             </div>
             <div className=" pt-8   px-0">
-                <h3 className="text-base/7 font-semibold text-gray-900">Invoice options</h3> 
+                <h3 className="text-base/7 font-semibold text-gray-900">Ustawienia faktury</h3> 
             </div>
             <div className="mt-6 border-t border-gray-100">
                 <dl className="divide-y divide-gray-100">
-                    <DescriptionItem label='VAT Rate' value={options.pricing.invoice.vatRate}></DescriptionItem>
-                    <DescriptionItem label='Surcharge' value={options.pricing.invoice.surCharge}></DescriptionItem>
-                    <DescriptionItem label='Disclaimer' className="whitespace-pre-line" value={options.pricing.invoice.disclaimer}></DescriptionItem>
-                    <DescriptionItem label='Signature line' value={(options.pricing.invoice.signatureLine?'Yes':'No')}></DescriptionItem>
-                    <DescriptionItem label='Email content'  className="whitespace-pre-line" value={options.pricing.invoice.emailContent}></DescriptionItem> 
+                    <DescriptionItem label='Stawka VAT' value={options.pricing.invoice.vatRate}></DescriptionItem>
+                    <DescriptionItem label='Dopłata' value={options.pricing.invoice.surCharge}></DescriptionItem>
+                    <DescriptionItem label='Zastrzeżenie' className="whitespace-pre-line" value={options.pricing.invoice.disclaimer}></DescriptionItem>
+                    <DescriptionItem label='Miejsce na podpis' value={(options.pricing.invoice.signatureLine?'Tak':'Nie')}></DescriptionItem>
+                    <DescriptionItem label='Treść wiadomości e-mail'  className="whitespace-pre-line" value={options.pricing.invoice.emailContent}></DescriptionItem> 
                 </dl>
             </div>
             <div className=" pt-8   px-0">
-                <h3 className="text-base/7 font-semibold text-gray-900">Offer options</h3>
-                <p className="mt-1 max-w-2xl text-sm/6 text-gray-500">Offer options</p>
+                <h3 className="text-base/7 font-semibold text-gray-900">Ustawienia oferty</h3>
+                <p className="mt-1 max-w-2xl text-sm/6 text-gray-500">Ustawienia oferty</p>
             </div>
             <div className="mt-6 border-t border-gray-100">
                 <dl className="divide-y divide-gray-100"> 
-                    <DescriptionItem label='Email content' className="whitespace-pre-line" value={options.pricing.estimate.emailContent}></DescriptionItem> 
+                    <DescriptionItem label='Treść wiadomości e-mail' className="whitespace-pre-line" value={options.pricing.estimate.emailContent}></DescriptionItem> 
                 </dl>
             </div>
              <div className="mt-6 flex items-center justify-end gap-x-6">
@@ -57,7 +57,7 @@ export default async function Page() {
                     type="button"
                     className="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
                 >
-                    Edit
+                    Edytuj
                 </Link>
             </div>
         </Main>

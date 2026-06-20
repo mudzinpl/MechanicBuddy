@@ -14,27 +14,27 @@ import screenshotVatReturns from '@/_images/screenshots/vat-returns.png'
 
 const features = [
   {
-    title: 'Work orders',
+    title: 'Zlecenia',
     description:
-      "Stay on top of every job in progress",
+      "Kontroluj wszystkie realizowane zlecenia",
     image: screenshotPayroll,
   },
   {
-    title: 'Offers and invoices',
+    title: 'Oferty i faktury',
     description:
-      "Create professional offers and invoices in seconds",
+      "Twórz profesjonalne oferty i faktury w kilka sekund",
     image: screenshotExpenses,
   },
   {
-    title: 'Clients and vehicles',
+    title: 'Klienci i pojazdy',
     description:
-      "Keep all your vehicles and customer information neatly organized",
+      "Przechowuj informacje o klientach i pojazdach w uporządkowany sposób",
     image: screenshotVatReturns,
   },
   {
-    title: 'Services and products',
+    title: 'Usługi i produkty',
     description:
-      'Manage and use services and products to create jobs',
+      'Zarządzaj usługami i produktami używanymi w zleceniach',
     image: screenshotReporting,
   },
 ]
@@ -62,7 +62,7 @@ export function PrimaryFeatures() {
   return (
     <section
       id="features"
-      aria-label="Features for running your books"
+      aria-label="Funkcje zarządzania warsztatem"
       className="relative overflow-hidden bg-blue-600 pt-20 pb-28 sm:py-32"
     >
       <Image

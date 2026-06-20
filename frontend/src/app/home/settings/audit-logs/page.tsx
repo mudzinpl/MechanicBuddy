@@ -73,16 +73,16 @@ export default async function Page({
 
   return (
     <Main header={
-      <SearchCardHeader title="Audit Logs" pageName="settings/audit-logs" />
+      <SearchCardHeader title="Dziennik audytu" pageName="settings/audit-logs" />
     } narrow={false}>
 
       {/* Stats Summary */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-        <StatCard label="Total Requests (7d)" value={stats.totalRequests} />
-        <StatCard label="Unique Users" value={stats.uniqueUsers} />
-        <StatCard label="CRUD Operations" value={stats.crudOperations} />
-        <StatCard label="Auth Events" value={stats.authEvents} />
-        <StatCard label="Failed Requests" value={stats.failedRequests} className="text-red-600" />
+        <StatCard label="Łączna liczba żądań (7 dni)" value={stats.totalRequests} />
+        <StatCard label="Unikalni użytkownicy" value={stats.uniqueUsers} />
+        <StatCard label="Operacje CRUD" value={stats.crudOperations} />
+        <StatCard label="Zdarzenia logowania" value={stats.authEvents} />
+        <StatCard label="Nieudane żądania" value={stats.failedRequests} className="text-red-600" />
       </div>
 
       {/* Filters */}
