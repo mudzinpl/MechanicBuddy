@@ -24,9 +24,9 @@ export default async function Page({
 
         <Main header={
         <CardHeader  > 
-              <h3 className="px-1 lg:px-0 text-base font-semibold text-gray-900">Client Information{' '}
-                        <BlueBadge text={!client.isPrivate ? ' Company' : ' Private person'}  ></BlueBadge>{' '}
-                        {client.isAsshole && <YellowBadge text='complicated' ></YellowBadge>}</h3> 
+              <h3 className="px-1 lg:px-0 text-base font-semibold text-gray-900">Informacje o kliencie{' '}
+                        <BlueBadge text={!client.isPrivate ? ' Firma' : ' Osoba prywatna'}  ></BlueBadge>{' '}
+                        {client.isAsshole && <YellowBadge text='problematyczny' ></YellowBadge>}</h3> 
           
                 <DisplayOptionsMenu id={id} pageName='clients'></DisplayOptionsMenu>
         </CardHeader>}> 
@@ -34,13 +34,13 @@ export default async function Page({
                         <dl className="divide-y divide-gray-100">
 
                             {!client.isPrivate ?
-                                <DescriptionItem label='Company name' value={client.name}></DescriptionItem>
-                                : <DescriptionItem label='Full name' value={client.firstName + ' ' + client.lastName}></DescriptionItem>}
-                            <DescriptionItem label='Phone' value={client.phone}></DescriptionItem>
+                                <DescriptionItem label='Nazwa firmy' value={client.name}></DescriptionItem>
+                                : <DescriptionItem label='Imię i nazwisko' value={client.firstName + ' ' + client.lastName}></DescriptionItem>}
+                            <DescriptionItem label='Telefon' value={client.phone}></DescriptionItem>
                             {client.emailAddresses.length < 2 ?
-                                <DescriptionItem label='Email address' value={client.currentEmail}></DescriptionItem>
+                                <DescriptionItem label='Adres e-mail' value={client.currentEmail}></DescriptionItem>
                                 : <div className="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-                                    <dt className="text-sm/6 font-medium text-gray-900">Email addresses</dt>
+                                    <dt className="text-sm/6 font-medium text-gray-900">Adresy e-mail</dt>
                                     <FormList
                                         items={client.emailAddresses}
                                         renderItem={(item) => {
@@ -50,12 +50,12 @@ export default async function Page({
                                 </div>
                             }
                             {!client.isPrivate ?
-                                <DescriptionItem label='Registry code' value={client.regNr}></DescriptionItem>
-                                : <DescriptionItem label='Personal code' value={client.personalCode}></DescriptionItem>}
+                                <DescriptionItem label='Kod rejestrowy' value={client.regNr}></DescriptionItem>
+                                : <DescriptionItem label='Numer identyfikacyjny' value={client.personalCode}></DescriptionItem>}
 
-                            <DescriptionItem label='Address' value={[client.address.country, client.address.region, client.address.city, client.address.street, client.address.postalCode].filter(item => item).join(', ')}></DescriptionItem>
-                            <DescriptionItem label='About' value={client.description}></DescriptionItem>
-                            <DescriptionItem label='Added' value={client.introducedAt}></DescriptionItem>
+                            <DescriptionItem label='Adres' value={[client.address.country, client.address.region, client.address.city, client.address.street, client.address.postalCode].filter(item => item).join(', ')}></DescriptionItem>
+                            <DescriptionItem label='Uwagi' value={client.description}></DescriptionItem>
+                            <DescriptionItem label='Dodano' value={client.introducedAt}></DescriptionItem>
                         </dl>
                     </div>
 
