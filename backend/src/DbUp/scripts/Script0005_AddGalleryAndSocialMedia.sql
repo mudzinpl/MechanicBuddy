@@ -18,8 +18,8 @@ CREATE TABLE IF NOT EXISTS tenant_config.landing_section_visibility (
 -- Gallery section settings
 CREATE TABLE IF NOT EXISTS tenant_config.landing_gallery_section (
     id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    section_label VARCHAR(50) DEFAULT 'Our Work',
-    headline VARCHAR(200) DEFAULT 'Photo Gallery',
+    section_label VARCHAR(50) DEFAULT 'Nasze realizacje',
+    headline VARCHAR(200) DEFAULT 'Galeria zdjęć',
     description VARCHAR(500),
     created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -68,5 +68,5 @@ VALUES ('a1234567-89ab-cdef-0123-456789abcde1');
 INSERT INTO tenant_config.landing_gallery_section (id, description)
 VALUES (
     'b1234567-89ab-cdef-0123-456789abcde2',
-    'Take a look at some of our recent work and satisfied customers.'
+    'Zobacz nasze ostatnie realizacje i samochody zadowolonych klientów.'
 );

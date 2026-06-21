@@ -14,16 +14,16 @@ namespace MechanicBuddy.Core.Domain
         protected LandingTipsSection() { }
 
         public LandingTipsSection(
-            string headline = "Auto Care Tips",
-            string sectionLabel = "Expert Advice",
+            string headline = "Porady motoryzacyjne",
+            string sectionLabel = "Porady ekspertów",
             string description = null,
             bool isVisible = true,
             Guid? id = null)
         {
             Id = id ?? Guid.NewGuid();
             IsVisible = isVisible;
-            SectionLabel = sectionLabel ?? "Expert Advice";
-            Headline = headline ?? "Auto Care Tips";
+            SectionLabel = sectionLabel ?? "Porady ekspertów";
+            Headline = headline ?? "Porady motoryzacyjne";
             Description = description;
             CreatedAt = DateTime.UtcNow;
             UpdatedAt = DateTime.UtcNow;

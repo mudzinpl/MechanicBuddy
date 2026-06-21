@@ -11,18 +11,26 @@ import FormLabel from "@/_components/FormLabel";
 import { updateContact } from "../../branding/actions";
 import Link from "next/link";
 
-const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+const DAYS = [
+    { key: 'Monday', label: 'Poniedziałek' },
+    { key: 'Tuesday', label: 'Wtorek' },
+    { key: 'Wednesday', label: 'Środa' },
+    { key: 'Thursday', label: 'Czwartek' },
+    { key: 'Friday', label: 'Piątek' },
+    { key: 'Saturday', label: 'Sobota' },
+    { key: 'Sunday', label: 'Niedziela' },
+];
 
-function BusinessHoursRow({ day, open, close }: { day: string; open: string; close: string }) {
+function BusinessHoursRow({ fieldName, day, open, close }: { fieldName: string; day: string; open: string; close: string }) {
     return (
         <div className="grid grid-cols-4 gap-4 items-center py-2">
             <div className="text-sm font-medium text-gray-900">{day}</div>
             <div>
                 <input
                     type="text"
-                    name={`hours_${day}_open`}
+                    name={`hours_${fieldName}_open`}
                     defaultValue={open}
-                    placeholder="9:00 AM"
+                    placeholder="9:00"
                     className="block w-full rounded-md bg-white px-3 py-1.5 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
                 />
             </div>
@@ -30,9 +38,9 @@ function BusinessHoursRow({ day, open, close }: { day: string; open: string; clo
             <div>
                 <input
                     type="text"
-                    name={`hours_${day}_close`}
+                    name={`hours_${fieldName}_close`}
                     defaultValue={close}
-                    placeholder="5:00 PM"
+                    placeholder="17:00"
                     className="block w-full rounded-md bg-white px-3 py-1.5 text-sm text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600"
                 />
             </div>
@@ -125,7 +133,7 @@ export default async function Page() {
                     <div className="border-b border-gray-900/10 pb-12">
                         <h2 className="text-base/7 font-semibold text-gray-900">Godziny otwarcia</h2>
                         <p className="mt-1 text-sm text-gray-500">
-                            Set your business hours. Use &quot;Closed&quot; for days you&apos;re not open.
+                            Ustaw godziny pracy. Dla dni wolnych wpisz „Zamknięte”.
                         </p>
 
                         <div className="mt-10 max-w-xl">
@@ -135,14 +143,15 @@ export default async function Page() {
                                 <div></div>
                                 <div className="text-xs font-medium text-gray-500 uppercase">Zamknięcie</div>
                             </div>
-                            {DAYS.map(day => {
-                                const hours = hoursMap.get(day);
+                            {DAYS.map(({ key, label }) => {
+                                const hours = hoursMap.get(label) || hoursMap.get(key);
                                 return (
                                     <BusinessHoursRow
-                                        key={day}
-                                        day={day}
-                                        open={hours?.open || 'Closed'}
-                                        close={hours?.close || 'Closed'}
+                                        key={key}
+                                        fieldName={key}
+                                        day={label}
+                                        open={hours?.open || 'Zamknięte'}
+                                        close={hours?.close || 'Zamknięte'}
                                     />
                                 );
                             })}

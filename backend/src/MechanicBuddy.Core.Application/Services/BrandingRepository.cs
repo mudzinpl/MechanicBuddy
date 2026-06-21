@@ -50,7 +50,7 @@ namespace MechanicBuddy.Core.Persistence.Postgres.Repositories
 
             if (hero == null)
             {
-                hero = new LandingHero("Your Auto Shop", "Professional Auto Repair & Maintenance");
+                hero = new LandingHero("Twój Warsztat Samochodowy", "Profesjonalna naprawa i serwis samochodów");
                 await session.SaveAsync(hero);
                 await session.FlushAsync();
             }
@@ -106,7 +106,7 @@ namespace MechanicBuddy.Core.Persistence.Postgres.Repositories
 
             if (about == null)
             {
-                about = new LandingAbout("Your Trusted Auto Repair Experts");
+                about = new LandingAbout("Zaufani specjaliści od napraw samochodowych");
                 await session.SaveAsync(about);
                 await session.FlushAsync();
             }

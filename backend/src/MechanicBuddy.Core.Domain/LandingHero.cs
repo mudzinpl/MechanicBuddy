@@ -31,9 +31,9 @@ namespace MechanicBuddy.Core.Domain
             Tagline = tagline;
             Subtitle = subtitle;
             SpecialtyText = specialtyText;
-            CtaPrimaryText = "Our Services";
+            CtaPrimaryText = "Nasze usługi";
             CtaPrimaryLink = "#services";
-            CtaSecondaryText = "Contact Us";
+            CtaSecondaryText = "Skontaktuj się";
             CtaSecondaryLink = "#contact";
             CreatedAt = DateTime.UtcNow;
             UpdatedAt = DateTime.UtcNow;

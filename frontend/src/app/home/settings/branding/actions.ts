@@ -60,9 +60,9 @@ export async function updateHero(formData: FormData) {
         tagline: formData.get('tagline')?.toString() || null,
         subtitle: formData.get('subtitle')?.toString() || null,
         specialtyText: formData.get('specialtyText')?.toString() || null,
-        ctaPrimaryText: formData.get('ctaPrimaryText')?.toString() || 'Our Services',
+        ctaPrimaryText: formData.get('ctaPrimaryText')?.toString() || 'Nasze usługi',
         ctaPrimaryLink: formData.get('ctaPrimaryLink')?.toString() || '#services',
-        ctaSecondaryText: formData.get('ctaSecondaryText')?.toString() || 'Contact Us',
+        ctaSecondaryText: formData.get('ctaSecondaryText')?.toString() || 'Skontaktuj się',
         ctaSecondaryLink: formData.get('ctaSecondaryLink')?.toString() || '#contact',
         backgroundImageBase64,
         backgroundImageMimeType,
@@ -76,7 +76,7 @@ export async function updateHero(formData: FormData) {
 
 export async function updateAbout(formData: FormData) {
     const body = {
-        sectionLabel: formData.get('sectionLabel')?.toString() || 'About Us',
+        sectionLabel: formData.get('sectionLabel')?.toString() || 'O nas',
         headline: formData.get('headline')?.toString() || '',
         description: formData.get('description')?.toString() || null,
         secondaryDescription: formData.get('secondaryDescription')?.toString() || null,
@@ -91,8 +91,8 @@ export async function updateAbout(formData: FormData) {
 export async function updateTipsSection(formData: FormData) {
     const body = {
         isVisible: formData.get('isVisible') === 'on',
-        sectionLabel: formData.get('sectionLabel')?.toString() || 'Expert Advice',
-        headline: formData.get('headline')?.toString() || 'Auto Care Tips',
+        sectionLabel: formData.get('sectionLabel')?.toString() || 'Porady ekspertów',
+        headline: formData.get('headline')?.toString() || 'Porady motoryzacyjne',
         description: formData.get('description')?.toString() || null,
     };
 
@@ -119,20 +119,28 @@ export async function updateFooter(formData: FormData) {
 export async function updateContact(formData: FormData) {
     // Parse business hours from form
     const businessHours = [];
-    const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    const days = [
+        { key: 'Monday', label: 'Poniedziałek' },
+        { key: 'Tuesday', label: 'Wtorek' },
+        { key: 'Wednesday', label: 'Środa' },
+        { key: 'Thursday', label: 'Czwartek' },
+        { key: 'Friday', label: 'Piątek' },
+        { key: 'Saturday', label: 'Sobota' },
+        { key: 'Sunday', label: 'Niedziela' },
+    ];
 
-    for (const day of days) {
-        const open = formData.get(`hours_${day}_open`)?.toString() || 'Closed';
-        const close = formData.get(`hours_${day}_close`)?.toString() || 'Closed';
-        businessHours.push({ day, open, close });
+    for (const { key, label } of days) {
+        const open = formData.get(`hours_${key}_open`)?.toString() || 'Zamknięte';
+        const close = formData.get(`hours_${key}_close`)?.toString() || 'Zamknięte';
+        businessHours.push({ day: label, open, close });
     }
 
     const body = {
-        sectionLabel: formData.get('sectionLabel')?.toString() || 'Get In Touch',
-        headline: formData.get('headline')?.toString() || 'Contact Us',
+        sectionLabel: formData.get('sectionLabel')?.toString() || 'Skontaktuj się z nami',
+        headline: formData.get('headline')?.toString() || 'Kontakt',
         description: formData.get('description')?.toString() || null,
         showTowing: formData.get('showTowing') === 'on',
-        towingText: formData.get('towingText')?.toString() || 'Towing service available — call us!',
+        towingText: formData.get('towingText')?.toString() || 'Dostępna pomoc drogowa — zadzwoń do nas!',
         businessHours,
     };
 
@@ -345,8 +353,8 @@ export async function updateSectionVisibility(formData: FormData) {
 // Gallery Section
 export async function updateGallerySection(formData: FormData) {
     const body: IGallerySectionOptions = {
-        sectionLabel: formData.get('sectionLabel')?.toString() || 'Our Work',
-        headline: formData.get('headline')?.toString() || 'Photo Gallery',
+        sectionLabel: formData.get('sectionLabel')?.toString() || 'Nasze realizacje',
+        headline: formData.get('headline')?.toString() || 'Galeria zdjęć',
         description: formData.get('description')?.toString() || null,
     };
 

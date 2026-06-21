@@ -35,7 +35,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
             <div className="mb-6">
                 <h2 className="text-base/7 font-semibold text-gray-900">Edytuj zdjęcie</h2>
                 <p className="mt-1 text-sm text-gray-500">
-                    Update this photo&apos;s caption and settings.
+                    Zmień podpis i ustawienia tego zdjęcia.
                 </p>
             </div>
 
@@ -51,7 +51,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                         <div className="h-48 w-full max-w-md rounded-lg overflow-hidden bg-gray-100">
                             <img
                                 src={imageUrl}
-                                alt={photo.caption || 'Gallery photo'}
+                                alt={photo.caption || 'Zdjęcie z galerii'}
                                 className="h-full w-full object-contain"
                             />
                         </div>

@@ -34,7 +34,7 @@ export default async function Page() {
                                     placeholder="np. 15+"
                                 />
                                 <p className="mt-1 text-xs text-gray-500">
-                                    The number or value to display (e.g., &quot;15+&quot;, &quot;5000+&quot;, &quot;98%&quot;)
+                                    Liczba lub wartość do wyświetlenia (np. „15+”, „5000+”, „98%”)
                                 </p>
                             </div>
 

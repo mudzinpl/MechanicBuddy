@@ -350,7 +350,7 @@ export function ContactSection({ data }: { data: IPublicLandingData }) {
                                         <div className="text-slate-300 text-sm space-y-0.5">
                                             {contact.businessHours.map((hours) => (
                                                 <p key={hours.day}>
-                                                    {hours.day}: {hours.open === 'Closed' ? 'Zamknięte' : `${hours.open} - ${hours.close}`}
+                                                    {hours.day}: {hours.open === 'Closed' || hours.open === 'Zamknięte' ? 'Zamknięte' : `${hours.open} - ${hours.close}`}
                                                 </p>
                                             ))}
                                         </div>
