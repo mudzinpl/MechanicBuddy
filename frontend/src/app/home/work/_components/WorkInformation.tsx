@@ -2,7 +2,7 @@
 
 'use client'
 import {  IWorkData } from '../model';
-import { DocumentTextIcon,   TruckIcon, UserCircleIcon, WrenchScrewdriverIcon } from '@heroicons/react/20/solid';
+import { DocumentTextIcon, ShieldCheckIcon, TruckIcon, UserCircleIcon, WrenchScrewdriverIcon } from '@heroicons/react/20/solid';
 import moment from 'moment';
 import React from 'react';
 import { startAnActivity } from '../actions/startAnActivity';
@@ -36,6 +36,25 @@ export function WorkInformation({
  
     const vehicleSummary = [work.vehicleProducer, work.vehicleModel, work.vehicleVin, work.vehicleRegNr].filter(x => x).join(', ');
     const clientSummary = [work.clientName, work.clientPhone, work.clientEmail].filter(x => x).join(', ');
+    const hasClaimDetails = Boolean(
+        work.claimNumber ||
+        work.insurer ||
+        work.damageType ||
+        work.damageStatus ||
+        work.assignmentOfClaimSigned ||
+        work.clientPaysVat ||
+        work.audatexEstimateNumber ||
+        work.insurerNotes
+    );
+    const claimDetails = [
+        ['Numer szkody', work.claimNumber],
+        ['Ubezpieczyciel', work.insurer],
+        ['Rodzaj szkody', work.damageType],
+        ['Status szkody', work.damageStatus],
+        ['Cesja podpisana', work.assignmentOfClaimSigned ? 'Tak' : 'Nie'],
+        ['Klient dopłaca VAT', work.clientPaysVat ? 'Tak' : 'Nie'],
+        ['Kosztorys Audanet / Audatex', work.audatexEstimateNumber],
+    ].filter(([, value]) => value);
 
     const deleteInvoiceRef = React.useRef<BaseDialogHandle>(null);
     const createInvoiceRef = React.useRef<BaseDialogHandle>(null);
@@ -167,6 +186,24 @@ export function WorkInformation({
                             <DocumentTextIcon aria-hidden="true" className="h-6 w-5 text-gray-400" />
                         </dt>
                         <dd className="text-sm/6 text-gray-500 whitespace-pre-line">{work.notes}</dd>
+                    </div>}
+                    {hasClaimDetails && <div className="mt-4 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-4">
+                        <dt className="flex-none">
+                            <span className="sr-only">Likwidacja szkody</span>
+                            <ShieldCheckIcon aria-hidden="true" className="h-6 w-5 text-gray-400" />
+                        </dt>
+                        <dd className="text-sm/6 text-gray-500">
+                            <p className="font-semibold text-gray-900">Likwidacja szkody</p>
+                            {claimDetails.map(([label, value]) => (
+                                <p key={label}>
+                                    <span className="font-medium text-gray-700">{label}:</span> {value}
+                                </p>
+                            ))}
+                            {work.insurerNotes && <p className="mt-2 whitespace-pre-line">
+                                <span className="font-medium text-gray-700">Uwagi do ubezpieczyciela:</span>{' '}
+                                {work.insurerNotes}
+                            </p>}
+                        </dd>
                     </div>}
                     <div className="mt-6 flex gap-x-2 xl:px-6   ">  
                         {work.issuance && <>

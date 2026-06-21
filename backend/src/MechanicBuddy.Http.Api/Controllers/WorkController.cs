@@ -82,6 +82,14 @@ namespace MechanicBuddy.Http.Api.Controllers
                 VehicleRegNr = work.Vehicle?.RegNr,
                 work.Notes,
                 work.Odo,
+                work.ClaimNumber,
+                work.Insurer,
+                work.DamageType,
+                work.DamageStatus,
+                work.AssignmentOfClaimSigned,
+                work.ClientPaysVat,
+                work.AudatexEstimateNumber,
+                work.InsurerNotes,
                 Mechanics = work.Mechanics.ToList().Select(x => new { x.Id, x.Name }).ToArray(),
                 Status= status,
                 Issuance = work.Invoice is not null ? 
@@ -177,6 +185,16 @@ namespace MechanicBuddy.Http.Api.Controllers
                  model.StartWithOffer ? null : model.Description,
                  model.Odo);
 
+            work.UpdateClaimDetails(
+                model.ClaimNumber,
+                model.Insurer,
+                model.DamageType,
+                model.DamageStatus,
+                model.AssignmentOfClaimSigned,
+                model.ClientPaysVat,
+                model.AudatexEstimateNumber,
+                model.InsurerNotes);
+
             if (model.AssignedTo != null) work.Assign(model.AssignedTo.Select(x => repository.Get<Employee>(x)).ToArray());
              
             var offer = default(Offer);
@@ -227,6 +245,15 @@ namespace MechanicBuddy.Http.Api.Controllers
                 work.WithoutVehicle();
             }
             work.WithNotes(model.Description);
+            work.UpdateClaimDetails(
+                model.ClaimNumber,
+                model.Insurer,
+                model.DamageType,
+                model.DamageStatus,
+                model.AssignmentOfClaimSigned,
+                model.ClientPaysVat,
+                model.AudatexEstimateNumber,
+                model.InsurerNotes);
             work.Assign(model.AssignedTo == null ? Enumerable.Empty<Employee>().ToArray() : model.AssignedTo.Select(x => repository.Get<Employee>(x)).ToArray());
 
             work.Changed();//well, can i use dry here

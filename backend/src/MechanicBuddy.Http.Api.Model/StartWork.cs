@@ -16,7 +16,21 @@ namespace MechanicBuddy.Http.Api.Models
         public decimal Price { get; set; }
         public short? Discount { get; set; }
     }
-    public record PostOrPutWork(Guid? ClientId, string Description, Guid? VehicleId, Guid[] AssignedTo, int? Odo, bool StartWithOffer);
+    public record PostOrPutWork(
+        Guid? ClientId,
+        string Description,
+        Guid? VehicleId,
+        Guid[] AssignedTo,
+        int? Odo,
+        bool StartWithOffer,
+        string ClaimNumber,
+        string Insurer,
+        string DamageType,
+        string DamageStatus,
+        bool AssignmentOfClaimSigned,
+        bool ClientPaysVat,
+        string AudatexEstimateNumber,
+        string InsurerNotes);
 
     
     public record WorkPage(

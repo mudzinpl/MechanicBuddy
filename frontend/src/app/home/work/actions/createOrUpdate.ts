@@ -29,7 +29,15 @@ export async function createOrUpdate(
        vehicleId: vehicleId == '' ? null : vehicleId ?? null,
        assignedTo: formData.getAll('mechanics'),
        odo: +(formData.get('odo')?.toString() ?? '0'),
-       startWithOffer: formData.get('isOffer') == 'on'
+       startWithOffer: formData.get('isOffer') == 'on',
+       claimNumber: formData.get('claimNumber')?.toString() || null,
+       insurer: formData.get('insurer')?.toString() || null,
+       damageType: formData.get('damageType')?.toString() || null,
+       damageStatus: formData.get('damageStatus')?.toString() || null,
+       assignmentOfClaimSigned: formData.get('assignmentOfClaimSigned') == 'on',
+       clientPaysVat: formData.get('clientPaysVat') == 'on',
+       audatexEstimateNumber: formData.get('audatexEstimateNumber')?.toString() || null,
+       insurerNotes: formData.get('insurerNotes')?.toString() || null
     }; 
     const url = "work"; 
     

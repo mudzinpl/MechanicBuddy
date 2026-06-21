@@ -136,6 +136,16 @@ CREATE TABLE IF NOT EXISTS "tenant_testt".work (
     completerid uuid references "tenant_testt".employee
 );
 
+ALTER TABLE "tenant_testt".work
+    ADD COLUMN IF NOT EXISTS claimnumber varchar(100),
+    ADD COLUMN IF NOT EXISTS insurer varchar(200),
+    ADD COLUMN IF NOT EXISTS damagetype varchar(30),
+    ADD COLUMN IF NOT EXISTS damagestatus varchar(100),
+    ADD COLUMN IF NOT EXISTS assignmentofclaimsigned boolean NOT NULL DEFAULT false,
+    ADD COLUMN IF NOT EXISTS clientpaysvat boolean NOT NULL DEFAULT false,
+    ADD COLUMN IF NOT EXISTS audatexestimatenumber varchar(100),
+    ADD COLUMN IF NOT EXISTS insurernotes text;
+
 -- Offer table
 CREATE TABLE IF NOT EXISTS "tenant_testt".offer (
     id uuid primary key,
@@ -281,6 +291,7 @@ CREATE INDEX IF NOT EXISTS idx_pricing_issuerid ON "tenant_testt".pricing(issuer
 CREATE INDEX IF NOT EXISTS idx_work_clientid ON "tenant_testt".work(clientid);
 CREATE INDEX IF NOT EXISTS idx_work_starterid ON "tenant_testt".work(starterid);
 CREATE INDEX IF NOT EXISTS idx_work_vehicleid ON "tenant_testt".work(vehicleid);
+CREATE INDEX IF NOT EXISTS idx_work_claimnumber ON "tenant_testt".work(claimnumber);
 CREATE INDEX IF NOT EXISTS idx_offer_workid_ordernr ON "tenant_testt".offer(workid, ordernr);
 CREATE INDEX IF NOT EXISTS idx_repairjob_workid_ordernr ON "tenant_testt".repairjob(workid, ordernr);
 CREATE INDEX IF NOT EXISTS idx_offer_estimateid ON "tenant_testt".offer(estimateid);

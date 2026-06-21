@@ -64,6 +64,15 @@ namespace MechanicBuddy.Core.Domain
         public virtual Work CreateCopy( int newNumber,Employee starter)
         {
             var work = new Work(newNumber,DateTime.Now,starter,Client,Vehicle,null,notes:Notes,odo:Odo);
+            work.UpdateClaimDetails(
+                ClaimNumber,
+                Insurer,
+                DamageType,
+                DamageStatus,
+                AssignmentOfClaimSigned,
+                ClientPaysVat,
+                AudatexEstimateNumber,
+                InsurerNotes);
             foreach (var job in jobs)
             {
                 work.jobs.Add(job.MakeCopy(work, starter));
@@ -115,6 +124,26 @@ namespace MechanicBuddy.Core.Domain
         {
             this.Notes = description;
         }
+
+        public virtual void UpdateClaimDetails(
+            string claimNumber,
+            string insurer,
+            string damageType,
+            string damageStatus,
+            bool assignmentOfClaimSigned,
+            bool clientPaysVat,
+            string audatexEstimateNumber,
+            string insurerNotes)
+        {
+            ClaimNumber = claimNumber;
+            Insurer = insurer;
+            DamageType = damageType;
+            DamageStatus = damageStatus;
+            AssignmentOfClaimSigned = assignmentOfClaimSigned;
+            ClientPaysVat = clientPaysVat;
+            AudatexEstimateNumber = audatexEstimateNumber;
+            InsurerNotes = insurerNotes;
+        }
          
         public virtual void WithoutVehicle()
         {
@@ -136,6 +165,14 @@ namespace MechanicBuddy.Core.Domain
         public virtual DateTime? CompletedOn { get; protected set; }
         public virtual Employee Completer { get; protected set; } 
         public virtual string Notes { get; protected set; }
+        public virtual string ClaimNumber { get; protected set; }
+        public virtual string Insurer { get; protected set; }
+        public virtual string DamageType { get; protected set; }
+        public virtual string DamageStatus { get; protected set; }
+        public virtual bool AssignmentOfClaimSigned { get; protected set; }
+        public virtual bool ClientPaysVat { get; protected set; }
+        public virtual string AudatexEstimateNumber { get; protected set; }
+        public virtual string InsurerNotes { get; protected set; }
         public virtual DateTime StartedOn { get; protected set; }
 
         public virtual DateTime ChangedOn { get; protected set; } //todo protected and user id too?
