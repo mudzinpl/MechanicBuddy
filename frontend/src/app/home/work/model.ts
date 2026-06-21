@@ -14,6 +14,14 @@ export interface IWorkData extends IActivity{
     vehicleRegNr:    string;
     notes:           string;
     odo:             number;
+    claimNumber:     string;
+    insurer:         string;
+    damageType:      string;
+    damageStatus:    string;
+    assignmentOfClaimSigned: boolean;
+    clientPaysVat:   boolean;
+    audatexEstimateNumber: string;
+    insurerNotes:    string;
     mechanics:       IMechanic[];
     status:          string;
     issuance:       IWorkIssuance;  
