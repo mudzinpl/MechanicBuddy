@@ -316,13 +316,13 @@ CREATE TABLE IF NOT EXISTS tenant_config.pricing (
 
 -- Insert default values if they don't exist
 INSERT INTO tenant_config.requisites (id, name, phone, address, email, bank_account, reg_nr, tax_id)
-SELECT '6dd57256-2774-424f-a61b-887bf8327329', 'Default Company', '+1234567890', '123 Main St', 'info@example.com', 'EE123456789012', 'REG12345', 'VAT123456'
+SELECT '6dd57256-2774-424f-a61b-887bf8327329', 'Nazwa firmy', '+48123456789', 'ul. Przykładowa 1, 00-001 Warszawa', 'kontakt@example.pl', 'PL00123456789012345678901234', 'REGON123456789', 'PL1234567890'
 WHERE NOT EXISTS (SELECT 1 FROM tenant_config.requisites WHERE id = '6dd57256-2774-424f-a61b-887bf8327329');
 
 INSERT INTO tenant_config.pricing (id, vat_rate, surcharge, disclaimer, signature_line, invoice_email_content, estimate_email_content)
-SELECT '3b9806b3-287b-46cc-bc17-a2d40500327b', 20, 'Default Surcharge', 'Default Disclaimer', true,
-       'Thank you for your business. Please find your invoice attached.',
-       'Thank you for your interest. Please find your estimate attached.'
+SELECT '3b9806b3-287b-46cc-bc17-a2d40500327b', 20, 'Dopłata', 'Zastrzeżenie', true,
+       'Dziękujemy za skorzystanie z naszych usług. W załączeniu przesyłamy fakturę.',
+       'Dziękujemy za zainteresowanie ofertą. W załączeniu przesyłamy wycenę.'
 WHERE NOT EXISTS (SELECT 1 FROM tenant_config.pricing WHERE id = '3b9806b3-287b-46cc-bc17-a2d40500327b');
 
 -- Create indexes
@@ -367,7 +367,7 @@ BEGIN
 
         -- Create employee record
         INSERT INTO domain.employee (id, firstname, lastname, email, phone, proffession, description, introducedat)
-        VALUES (v_employee_id, 'System', 'Administrator', 'admin@example.com', '', 'Administrator', 'Default system administrator', CURRENT_TIMESTAMP);
+        VALUES (v_employee_id, 'Administrator', 'Systemowy', 'admin@example.com', '', 'Administrator', 'Domyślny administrator systemu', CURRENT_TIMESTAMP);
 
         -- Create admin user (password: carcare)
         INSERT INTO public."user" (username, password, tenantname, email, validated, profile_image, employeeid)
