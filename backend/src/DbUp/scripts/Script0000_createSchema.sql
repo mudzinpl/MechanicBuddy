@@ -310,15 +310,15 @@ CREATE TABLE tenant_config.pricing (
 
 -- Add default values
 INSERT INTO tenant_config.requisites (id,name, phone, address, email, bank_account, reg_nr, tax_id)
-VALUES ('6dd57256-2774-424f-a61b-887bf8327329','Default Company', '+1234567890', '123 Main St', 'info@example.com', 'EE123456789012', 'REG12345', 'VAT123456');
+VALUES ('6dd57256-2774-424f-a61b-887bf8327329','Nazwa firmy', '+48123456789', 'ul. Przykładowa 1, 00-001 Warszawa', 'kontakt@example.pl', 'PL00123456789012345678901234', 'REGON123456789', 'PL1234567890');
 
 INSERT INTO tenant_config.pricing (id,vat_rate, surcharge, disclaimer, signature_line, invoice_email_content, estimate_email_content)
 VALUES (
     '3b9806b3-287b-46cc-bc17-a2d40500327b',
     20, 
-    'Default Surcharge', 
-    'Default Disclaimer', 
-    true, 
-    'Thank you for your business. Please find your invoice attached.', 
-    'Thank you for your interest. Please find your estimate attached.'
+    'Dopłata',
+    'Zastrzeżenie',
+    true,
+    'Dziękujemy za skorzystanie z naszych usług. W załączeniu przesyłamy fakturę.',
+    'Dziękujemy za zainteresowanie ofertą. W załączeniu przesyłamy wycenę.'
 );

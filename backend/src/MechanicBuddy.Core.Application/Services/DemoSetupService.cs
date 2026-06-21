@@ -96,12 +96,12 @@ namespace MechanicBuddy.Core.Application.Services
 
                 await connection.ExecuteAsync(@"
                     INSERT INTO domain.legalclient(id, name, regnr)
-                    VALUES (@Id, @Name, 'REG12345')",
+                    VALUES (@Id, @Name, 'REGON123456789')",
                     new { Id = companyClientId, Name = companyName });
 
                 await connection.ExecuteAsync(@"
                     INSERT INTO domain.clientemail(clientid, address, isactive)
-                    VALUES (@ClientId, 'company@mechanicbuddy.app', true)",
+                    VALUES (@ClientId, 'firma@mechanicbuddy.app', true)",
                     new { ClientId = companyClientId });
 
                 var privateClientId = Guid.NewGuid();
@@ -117,7 +117,7 @@ namespace MechanicBuddy.Core.Application.Services
 
                 await connection.ExecuteAsync(@"
                     INSERT INTO domain.clientemail(clientid, address, isactive)
-                    VALUES (@ClientId, 'john.doe@mechanicbuddy.app', true)",
+                    VALUES (@ClientId, 'jan.kowalski@mechanicbuddy.app', true)",
                     new { ClientId = privateClientId });
 
                 // Create vehicles

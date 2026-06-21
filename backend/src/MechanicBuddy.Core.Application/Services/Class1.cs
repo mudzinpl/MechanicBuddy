@@ -27,13 +27,13 @@ namespace MechanicBuddy.Core.Persistence.Postgres.Repositories
             {
                 // Create default if none exists
                 requisites = new TenantRequisites(
-                    "Default Company",
-                    "+1234567890",
-                    "123 Main St",
-                    "noreply@mechanicbuddy.app",
-                    "EE123456789012",
-                    "REG12345",
-                    "KMKR123456"
+                    "Nazwa firmy",
+                    "+48123456789",
+                    "ul. Przykładowa 1, 00-001 Warszawa",
+                    "kontakt@example.pl",
+                    "PL00123456789012345678901234",
+                    "REGON123456789",
+                    "PL1234567890"
                 );
                 await session.SaveAsync(requisites);
                 await session.FlushAsync();
@@ -53,11 +53,11 @@ namespace MechanicBuddy.Core.Persistence.Postgres.Repositories
                 // Create default if none exists
                 pricing = new TenantPricing(
                     20,
-                    "Default Surcharge",
-                    "Default Disclaimer",
+                    "Dopłata",
+                    "Zastrzeżenie",
                     true,
-                    "Thank you for your business. Please find your invoice attached.",
-                    "Thank you for your interest. Please find your estimate attached."
+                    "Dziękujemy za skorzystanie z naszych usług. W załączeniu przesyłamy fakturę.",
+                    "Dziękujemy za zainteresowanie ofertą. W załączeniu przesyłamy wycenę."
                 );
                 await session.SaveAsync(pricing);
                 await session.FlushAsync();
