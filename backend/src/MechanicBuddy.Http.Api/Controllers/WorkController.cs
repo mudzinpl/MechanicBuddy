@@ -294,6 +294,7 @@ namespace MechanicBuddy.Http.Api.Controllers
             string status,
             string issued,
             string saleable,
+            string damageStatus,
              DateTime? workForm,
             DateTime? workTo,
             DateTime? invoiceFrom, 
@@ -383,6 +384,11 @@ $@" exists (select * from domain.productoffered p
                 query.Where(restriction);
             }
 
+            if (!string.IsNullOrWhiteSpace(damageStatus))
+            {
+                query.Where($"w.damagestatus = '{damageStatus.Replace("'", "''")}'");
+            }
+
 
             var issuanceSql =
 $@"json_build_object(
@@ -444,6 +450,7 @@ from (
    w.invoiceid, 
    w.id,
    w.userstatus,
+   w.damagestatus,
    w.number as worknr,   
    w.startedon ,  
 	{(onlyIssued?issuanceSql: "(select count(*) from domain.offer o where o.workid = w.id)  as numberOfOffers")}, 

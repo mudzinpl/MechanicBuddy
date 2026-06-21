@@ -1,6 +1,6 @@
 import Search from "../_components/Search";
 import moment from "moment";
-import { IOfferIssuance, IWorkIssuance } from "./model";
+import { damageStatuses, IOfferIssuance, IWorkIssuance } from "./model";
 import PricingDownloadLink from "./_components/activity/PricingDownloadLink";
 import { ArrowDownTrayIcon } from "@heroicons/react/20/solid";
 import Spinner from "@/_components/Spinner";
@@ -15,6 +15,9 @@ import PrimaryButton from "@/_components/PrimaryButton";
 import SearchInput from "../_components/SearchInput";
 import FormInput from "@/_components/FormInput";
 import Link from "next/link";
+import Select from "@/_components/Select";
+import FormLabel from "@/_components/FormLabel";
+import DamageStatusBadge from "./_components/activity/badges/DamageStatusBadge";
 
 export default async function Page(
   { searchParams }: { searchParams: Promise<Record<string, string>> }) {
@@ -97,6 +100,13 @@ export default async function Page(
     },
     secondColumn,
     {
+      dataField: 'damageStatus',
+      headerText: 'Status procesu',
+      dataFormatter: ({ damageStatus }: { damageStatus: string }) => {
+        return <DamageStatusBadge status={damageStatus}></DamageStatusBadge>;
+      }
+    },
+    {
       dataField: 'startedOn',
       headerText: 'Rozpoczęto',//  {moment(activity?.startedOn, true).format('LLL')}
       dataFormatter: ({ startedOn }: { startedOn: Date }) => {
@@ -176,7 +186,18 @@ export default async function Page(
                       <div className="3xl:col-span-4  md:col-span-5 ">
                          <FormInput name="saleable" label="Produkt lub usługa" placeholder="kod lub nazwa ..." defaultValue={options.saleable}  ></FormInput>
                       </div>
-                      <div  className="3xl:col-span-14  md:col-span-12  " >
+                      <div className="3xl:col-span-6 md:col-span-5">
+                        <FormLabel name="damageStatus" label="Status procesu"></FormLabel>
+                        <div className="mt-2 grid grid-cols-1">
+                          <Select name="damageStatus" defaultValue={options.damageStatus || ''}>
+                            <option value="">Wszystkie statusy</option>
+                            {damageStatuses.map(status => (
+                              <option key={status.value} value={status.value}>{status.label}</option>
+                            ))}
+                          </Select>
+                        </div>
+                      </div>
+                      <div  className="3xl:col-span-8 md:col-span-12" >
                       <SearchParams options={options}></SearchParams>
                       </div>
                       

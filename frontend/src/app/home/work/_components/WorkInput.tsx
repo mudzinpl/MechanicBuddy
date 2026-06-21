@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import FormTextArea from '@/_components/FormTextArea';
 import PrimaryButton from '@/_components/PrimaryButton';
 import SecondaryButton from '@/_components/SecondaryButton';
-import { IWorkData, IMechanic } from '../model';
+import { damageStatuses, getDamageStatusLabel, IWorkData, IMechanic } from '../model';
 import FormLabel from '@/_components/FormLabel';
 import { ClientsCombobox, VehiclesCombobox } from '../../_components/SearchCombobox';
 import { useState } from 'react';
@@ -37,6 +37,8 @@ export default function WorkInput({
     const [clientVehicles, setClientVehicles] = useState<IVehicleData[]>([]);
     const [selectedClientVehicleId, setSelectedClientVehicleId] = useState(work?.vehicleId ?? '');
     const [clientUndisclosed, setClientUndisclosed] = useState(!work ? false : !work.clientId);
+    const currentDamageStatus = work?.damageStatus || 'new';
+    const hasKnownDamageStatus = damageStatuses.some(status => status.value === currentDamageStatus);
     const populateClientVehicles = (clientId: string) => {
         query({
             url: 'vehicles/client/' + clientId,
@@ -186,12 +188,19 @@ export default function WorkInput({
                                     </div>
                                 </div>
 
-                                <FormInput
-                                    name='damageStatus'
-                                    label='Status szkody'
-                                    defaultValue={work?.damageStatus ?? ''}
-                                    placeholder='np. zaakceptowana do naprawy'>
-                                </FormInput>
+                                <div>
+                                    <FormLabel name='damageStatus' label='Status procesu'></FormLabel>
+                                    <div className="mt-2 grid grid-cols-1">
+                                        <Select name='damageStatus' defaultValue={currentDamageStatus}>
+                                            {!hasKnownDamageStatus && <option value={currentDamageStatus}>
+                                                {getDamageStatusLabel(currentDamageStatus)}
+                                            </option>}
+                                            {damageStatuses.map(status => (
+                                                <option key={status.value} value={status.value}>{status.label}</option>
+                                            ))}
+                                        </Select>
+                                    </div>
+                                </div>
 
                                 <FormInput
                                     name='audatexEstimateNumber'

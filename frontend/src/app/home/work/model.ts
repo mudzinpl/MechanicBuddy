@@ -28,6 +28,33 @@ export interface IWorkData extends IActivity{
     
 }
 
+export const damageStatuses = [
+  { value: 'new', label: 'Nowe zgłoszenie' },
+  { value: 'inspection_pending', label: 'Oczekuje na oględziny' },
+  { value: 'inspected', label: 'Oględziny wykonane' },
+  { value: 'estimate_preparing', label: 'Kosztorys w przygotowaniu' },
+  { value: 'estimate_sent', label: 'Kosztorys wysłany do ubezpieczyciela' },
+  { value: 'approval_pending', label: 'Oczekuje na akceptację' },
+  { value: 'accepted', label: 'Zaakceptowane' },
+  { value: 'parts_pending', label: 'Czeka na części' },
+  { value: 'repair', label: 'W naprawie' },
+  { value: 'paint_shop', label: 'Lakiernia' },
+  { value: 'quality_control', label: 'Kontrola jakości' },
+  { value: 'ready_for_pickup', label: 'Gotowe do odbioru' },
+  { value: 'released', label: 'Wydane' },
+  { value: 'settled', label: 'Rozliczone' },
+  { value: 'on_hold', label: 'Wstrzymane' },
+  { value: 'rejected', label: 'Odmowa / brak akceptacji' },
+] as const;
+
+export function getDamageStatusLabel(status?: string | null): string {
+  if (!status) return '';
+
+  return damageStatuses.find(item =>
+    item.value === status || item.label.toLocaleLowerCase('pl') === status.toLocaleLowerCase('pl')
+  )?.label ?? status;
+}
+
 export interface ICurrentActivity{
     id:        string;
     notes:     string;

@@ -39,6 +39,7 @@ namespace MechanicBuddy.Http.Api.Models
         DateTime StartedOn,
         DateTime? SentOn,
         string Status,
+        string DamageStatus,
         string Issued, 
         Guid ClientId, 
         string ClientName, 
@@ -51,7 +52,7 @@ namespace MechanicBuddy.Http.Api.Models
         JsonNode OfferIssuance, 
         JsonNode Issuance) 
     {
-        public WorkPage() : this(default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default) { }
+        public WorkPage() : this(default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default) { }
     }
 
 }
