@@ -34,7 +34,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
             <div className="mb-6">
                 <h2 className="text-base/7 font-semibold text-gray-900">Edytuj link społecznościowy</h2>
                 <p className="mt-1 text-sm text-gray-500">
-                    Update this social link&apos;s settings.
+                    Zmień ustawienia tego linku społecznościowego.
                 </p>
             </div>
 
@@ -59,7 +59,7 @@ export default async function Page({ params }: { params: Promise<{ id: string }>
                             name="url"
                             required
                             defaultValue={link.url}
-                            placeholder="https://facebook.com/yourpage"
+                            placeholder="https://facebook.com/twoja-strona"
                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         />
                     </div>

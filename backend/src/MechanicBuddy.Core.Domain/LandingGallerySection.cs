@@ -13,14 +13,14 @@ namespace MechanicBuddy.Core.Domain
         protected LandingGallerySection() { }
 
         public LandingGallerySection(
-            string headline = "Photo Gallery",
-            string sectionLabel = "Our Work",
+            string headline = "Galeria zdjęć",
+            string sectionLabel = "Nasze realizacje",
             string description = null,
             Guid? id = null)
         {
             Id = id ?? Guid.NewGuid();
-            SectionLabel = sectionLabel ?? "Our Work";
-            Headline = headline ?? "Photo Gallery";
+            SectionLabel = sectionLabel ?? "Nasze realizacje";
+            Headline = headline ?? "Galeria zdjęć";
             Description = description;
             CreatedAt = DateTime.UtcNow;
             UpdatedAt = DateTime.UtcNow;

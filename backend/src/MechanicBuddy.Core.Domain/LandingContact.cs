@@ -16,20 +16,20 @@ namespace MechanicBuddy.Core.Domain
         protected LandingContact() { }
 
         public LandingContact(
-            string headline = "Contact Us",
-            string sectionLabel = "Get In Touch",
+            string headline = "Kontakt",
+            string sectionLabel = "Skontaktuj się z nami",
             string description = null,
             bool showTowing = false,
-            string towingText = "Towing service available — call us!",
+            string towingText = "Dostępna pomoc drogowa — zadzwoń do nas!",
             string businessHours = null,
             Guid? id = null)
         {
             Id = id ?? Guid.NewGuid();
-            SectionLabel = sectionLabel ?? "Get In Touch";
-            Headline = headline ?? "Contact Us";
+            SectionLabel = sectionLabel ?? "Skontaktuj się z nami";
+            Headline = headline ?? "Kontakt";
             Description = description;
             ShowTowing = showTowing;
-            TowingText = towingText ?? "Towing service available — call us!";
+            TowingText = towingText ?? "Dostępna pomoc drogowa — zadzwoń do nas!";
             BusinessHours = businessHours;
             CreatedAt = DateTime.UtcNow;
             UpdatedAt = DateTime.UtcNow;

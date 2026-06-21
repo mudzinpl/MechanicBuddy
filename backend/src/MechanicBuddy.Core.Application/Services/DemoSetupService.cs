@@ -54,7 +54,7 @@ namespace MechanicBuddy.Core.Application.Services
             await _repository.CreateTenantUser(tenantName, username, hashedPassword, adminEmployeeId);
 
             // Populate demo data
-            await PopulateDemoData(tenantName, companyName ?? "Demo Company", adminEmployeeId);
+            await PopulateDemoData(tenantName, companyName ?? "Warsztat demonstracyjny", adminEmployeeId);
 
             return (username, password, tenantName);
         }
@@ -67,7 +67,7 @@ namespace MechanicBuddy.Core.Application.Services
                 // Create admin employee
                 await connection.ExecuteAsync(@"
                 INSERT INTO domain.employee(id, firstname, lastname, email, phone, proffession, description, introducedat)
-                VALUES (@Id, 'Demo', 'Admin', 'admin@mechanicbuddy.app', '+1234567890', 'Administrator', 'Demo Admin Account', CURRENT_TIMESTAMP)",
+                VALUES (@Id, 'Demo', 'Administrator', 'admin@mechanicbuddy.app', '+48123456789', 'Administrator', 'Konto administratora wersji demonstracyjnej', CURRENT_TIMESTAMP)",
                     new { Id = adminEmployeeId });
 
                 // Update the user with the employee ID
@@ -78,20 +78,20 @@ namespace MechanicBuddy.Core.Application.Services
                     SET 
                         name = @CompanyName, 
                         updated_at = CURRENT_TIMESTAMP",
-                  new { CompanyName = companyName ?? "Demo Company" });
+                  new { CompanyName = companyName ?? "Warsztat demonstracyjny" });
 
                 // Create storage
                 var storageId = Guid.NewGuid();
                 await connection.ExecuteAsync(@"
                     INSERT INTO domain.storage(id, name, address, description, introducedat)
-                    VALUES (@Id, 'Main Storage', 'Storage Address', 'Main storage facility', CURRENT_TIMESTAMP)",
+                    VALUES (@Id, 'Magazyn główny', 'ul. Magazynowa 1', 'Główny magazyn części', CURRENT_TIMESTAMP)",
                     new { Id = storageId });
 
                 // Create clients - one company and one individual
                 var companyClientId = Guid.NewGuid();
                 await connection.ExecuteAsync(@"
                     INSERT INTO domain.client(id, address, country, region, city, postalcode, phone, isasshole, description, introducedat)
-                    VALUES (@Id, 'Main Street 123', 'USA', 'CA', 'San Francisco', '94105', '+1987654321', false, 'Demo Company Client', CURRENT_TIMESTAMP)",
+                    VALUES (@Id, 'ul. Główna 123', 'Polska', 'mazowieckie', 'Warszawa', '00-001', '+48221234567', false, 'Przykładowy klient firmowy', CURRENT_TIMESTAMP)",
                     new { Id = companyClientId });
 
                 await connection.ExecuteAsync(@"
@@ -107,12 +107,12 @@ namespace MechanicBuddy.Core.Application.Services
                 var privateClientId = Guid.NewGuid();
                 await connection.ExecuteAsync(@"
                     INSERT INTO domain.client(id, address, country, region, city, postalcode, phone, isasshole, description, introducedat)
-                    VALUES (@Id, 'Side Street 456', 'USA', 'CA', 'San Francisco', '94107', '+1567890123', false, 'Demo Private Client', CURRENT_TIMESTAMP)",
+                    VALUES (@Id, 'ul. Boczna 45', 'Polska', 'mazowieckie', 'Warszawa', '00-002', '+48500100200', false, 'Przykładowy klient indywidualny', CURRENT_TIMESTAMP)",
                     new { Id = privateClientId });
 
                 await connection.ExecuteAsync(@"
                     INSERT INTO domain.privateclient(id, firstname, lastname, personalcode)
-                    VALUES (@Id, 'John', 'Doe', 'ID12345')",
+                    VALUES (@Id, 'Jan', 'Kowalski', 'ID12345')",
                     new { Id = privateClientId });
 
                 await connection.ExecuteAsync(@"
@@ -145,8 +145,8 @@ namespace MechanicBuddy.Core.Application.Services
 
                 // Create spare parts
                 string[] partNames = {
-                    "Oil Filter", "Air Filter", "Fuel Filter", "Brake Pads", "Spark Plugs",
-                    "Wiper Blades", "Timing Belt", "Battery", "Radiator", "Alternator"
+                    "Filtr oleju", "Filtr powietrza", "Filtr paliwa", "Klocki hamulcowe", "Świece zapłonowe",
+                    "Pióra wycieraczek", "Pasek rozrządu", "Akumulator", "Chłodnica", "Alternator"
                 };
 
                 for (int i = 0; i < partNames.Length; i++)
@@ -163,7 +163,7 @@ namespace MechanicBuddy.Core.Application.Services
                             Price = 10.0m + (i * 5.0m),
                             Quantity = 10 + i,
                             StorageId = storageId,
-                            Description = $"Demo {partNames[i]}"
+                            Description = $"Przykładowa część: {partNames[i]}"
                         });
                 }
 
@@ -171,13 +171,13 @@ namespace MechanicBuddy.Core.Application.Services
                 var mechanic1Id = Guid.NewGuid();
                 await connection.ExecuteAsync(@"
                     INSERT INTO domain.employee(id, firstname, lastname, email, phone, proffession, description, introducedat)
-                    VALUES (@Id, 'Mike', 'Smith', 'mike.smith@mechanicbuddy.app', '+1111222333', 'Senior Mechanic', 'Experienced mechanic', CURRENT_TIMESTAMP)",
+                    VALUES (@Id, 'Marek', 'Nowak', 'marek.nowak@mechanicbuddy.app', '+48500111222', 'Starszy mechanik', 'Doświadczony mechanik', CURRENT_TIMESTAMP)",
                     new { Id = mechanic1Id });
 
                 var mechanic2Id = Guid.NewGuid();
                 await connection.ExecuteAsync(@"
                     INSERT INTO domain.employee(id, firstname, lastname, email, phone, proffession, description, introducedat)
-                    VALUES (@Id, 'Emily', 'Johnson', 'emily.johnson@mechanicbuddy.app', '+1444555666', 'Junior Mechanic', 'New mechanic', CURRENT_TIMESTAMP)",
+                    VALUES (@Id, 'Anna', 'Wiśniewska', 'anna.wisniewska@mechanicbuddy.app', '+48500333444', 'Młodszy mechanik', 'Mechanik rozpoczynający pracę', CURRENT_TIMESTAMP)",
                     new { Id = mechanic2Id });
 
                 // Create works with offers and jobs
@@ -202,7 +202,7 @@ namespace MechanicBuddy.Core.Application.Services
 
             await connection.ExecuteAsync(@"
         INSERT INTO domain.work(id, number, startedon, starterid, clientid, vehicleid, notes, odo, userstatus, changedon)
-        VALUES (@Id, @Number, CURRENT_TIMESTAMP, @StarterId, @ClientId, @VehicleId, 'Demo work record', 55000, 0, CURRENT_TIMESTAMP)",
+        VALUES (@Id, @Number, CURRENT_TIMESTAMP, @StarterId, @ClientId, @VehicleId, 'Przykładowe zlecenie serwisowe', 55000, 0, CURRENT_TIMESTAMP)",
                 new
                 {
                     Id = workId,
@@ -233,7 +233,7 @@ namespace MechanicBuddy.Core.Application.Services
             var offerId = Guid.NewGuid();
             await connection.ExecuteAsync(@"
         INSERT INTO domain.offer(id, workid, ordernr, notes, isvehilelinesonestimate, startedon, starterid)
-        VALUES (@Id, @WorkId, 1, 'Demo offer', true, CURRENT_TIMESTAMP, @StarterId)",
+        VALUES (@Id, @WorkId, 1, 'Przykładowa oferta', true, CURRENT_TIMESTAMP, @StarterId)",
                 new { Id = offerId, WorkId = workId, StarterId = adminEmployeeId });
 
             // Add products to the offer
@@ -244,9 +244,9 @@ namespace MechanicBuddy.Core.Application.Services
                 new
                 {
                     Id = product1Id,
-                    Name = "Oil Change Service",
+                    Name = "Usługa wymiany oleju",
                     Quantity = 1.0,
-                    Unit = "pcs",
+                    Unit = "szt.",
                     Price = 49.99,
                     Discount = (short)0
                 });
@@ -269,9 +269,9 @@ namespace MechanicBuddy.Core.Application.Services
                 new
                 {
                     Id = product2Id,
-                    Name = "Brake Inspection",
+                    Name = "Kontrola układu hamulcowego",
                     Quantity = 1.0,
-                    Unit = "pcs",
+                    Unit = "szt.",
                     Price = 29.99,
                     Discount = (short)0
                 });
@@ -297,7 +297,7 @@ namespace MechanicBuddy.Core.Application.Services
                     Id = jobId,
                     WorkId = workId,
                     OrderNr = (short)1,
-                    Notes = "Demo repair job",
+                    Notes = "Przykładowa naprawa",
                     StarterId = adminEmployeeId
                 });
 
@@ -309,9 +309,9 @@ namespace MechanicBuddy.Core.Application.Services
                 new
                 {
                     Id = installed1Id,
-                    Name = "Oil Filter Replacement",
+                    Name = "Wymiana filtra oleju",
                     Quantity = 1.0,
-                    Unit = "pcs",
+                    Unit = "szt.",
                     Price = 19.99,
                     Discount = (short)0
                 });
@@ -326,7 +326,7 @@ namespace MechanicBuddy.Core.Application.Services
                     Jnr = (short)1,
                     Code = "PART001",
                     Status = (short)3,
-                    Notes = "Installed new oil filter"
+                    Notes = "Zamontowano nowy filtr oleju"
                 });
 
             var installed2Id = Guid.NewGuid();
@@ -336,7 +336,7 @@ namespace MechanicBuddy.Core.Application.Services
                 new
                 {
                     Id = installed2Id,
-                    Name = "Engine Oil 5W-30",
+                    Name = "Olej silnikowy 5W-30",
                     Quantity = 5.0,
                     Unit = "L",
                     Price = 9.99,
@@ -353,7 +353,7 @@ namespace MechanicBuddy.Core.Application.Services
                     Jnr = (short)2,
                     Code = "PART002",
                     Status = (short)3,
-                    Notes = "Used 5 liters of oil"
+                    Notes = "Zużyto 5 litrów oleju"
                 });
 
             // Create an estimate
@@ -367,9 +367,9 @@ namespace MechanicBuddy.Core.Application.Services
                 {
                     Id = estimateId,
                     IssuerId = adminEmployeeId,
-                    PartyName = "Demo Client",
-                    VehicleLine1 = "Vehicle: Demo Vehicle",
-                    VehicleLine2 = "Reg nr: ABC123"
+                    PartyName = "Klient demonstracyjny",
+                    VehicleLine1 = "Pojazd: samochód demonstracyjny",
+                    VehicleLine2 = "Nr rej.: ABC123"
                 });
 
             await connection.ExecuteAsync(@"
@@ -390,10 +390,10 @@ namespace MechanicBuddy.Core.Application.Services
                 {
                     PricingId = estimateId,
                     Nr = (short)1,
-                    Description = "Oil Change Service",
+                    Description = "Usługa wymiany oleju",
                     Quantity = 1.0,
                     UnitPrice = 49.99,
-                    Unit = "pcs",
+                    Unit = "szt.",
                     Discount = (short)0,
                     Total = 49.99,
                     TotalWithVat = 59.99
@@ -406,10 +406,10 @@ namespace MechanicBuddy.Core.Application.Services
                 {
                     PricingId = estimateId,
                     Nr = (short)2,
-                    Description = "Brake Inspection",
+                    Description = "Kontrola układu hamulcowego",
                     Quantity = 1.0,
                     UnitPrice = 29.99,
-                    Unit = "pcs",
+                    Unit = "szt.",
                     Discount = (short)0,
                     Total = 29.99,
                     TotalWithVat = 35.99

@@ -44,7 +44,7 @@ export default async function Page() {
                             id="url"
                             name="url"
                             required
-                            placeholder="https://facebook.com/yourpage"
+                            placeholder="https://facebook.com/twoja-strona"
                             className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
                         />
                     </div>

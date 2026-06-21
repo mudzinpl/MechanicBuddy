@@ -123,7 +123,7 @@ export default async function Page() {
                                 {hero.backgroundImageBase64 ? (
                                     <img
                                         src={`data:${hero.backgroundImageMimeType};base64,${hero.backgroundImageBase64}`}
-                                        alt="Current Background"
+                                        alt="Aktualne tło"
                                         className="h-24 w-auto rounded border border-gray-200"
                                     />
                                 ) : (

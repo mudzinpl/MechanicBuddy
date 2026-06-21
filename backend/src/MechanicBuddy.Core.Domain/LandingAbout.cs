@@ -23,14 +23,14 @@ namespace MechanicBuddy.Core.Domain
             string headline,
             string description = null,
             string secondaryDescription = null,
-            string sectionLabel = "About Us",
+            string sectionLabel = "O nas",
             Guid? id = null)
         {
             Id = id ?? Guid.NewGuid();
             Headline = headline ?? throw new ArgumentNullException(nameof(headline));
             Description = description;
             SecondaryDescription = secondaryDescription;
-            SectionLabel = sectionLabel ?? "About Us";
+            SectionLabel = sectionLabel ?? "O nas";
             Features = new List<LandingAboutFeature>();
             CreatedAt = DateTime.UtcNow;
             UpdatedAt = DateTime.UtcNow;

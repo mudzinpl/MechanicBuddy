@@ -91,7 +91,7 @@ export function ServiceRequestForm({ services }: ServiceRequestFormProps) {
                             value={formData.phone}
                             onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                             className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent outline-none transition-all"
-                            placeholder="(555) 555-0123"
+                            placeholder="+48 500 100 200"
                         />
                     </div>
                     <div>
