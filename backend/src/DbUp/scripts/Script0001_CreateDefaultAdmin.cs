@@ -40,7 +40,7 @@ namespace DbUp.Scripts
             command.CommandText = @"INSERT INTO domain.employee (
                         id, firstname, lastname, email, phone, proffession, description, introducedat
                     ) VALUES (
-                        @Id, 'System', 'Administrator', 'admin@example.com', '', 'Administrator', 'Default system administrator', CURRENT_TIMESTAMP
+                        @Id, 'Administrator', 'Systemowy', 'admin@example.com', '', 'Administrator', 'Domyślny administrator systemu', CURRENT_TIMESTAMP
                     )";
 
             using (command)
