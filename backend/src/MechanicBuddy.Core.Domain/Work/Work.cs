@@ -138,7 +138,7 @@ namespace MechanicBuddy.Core.Domain
             ClaimNumber = claimNumber;
             Insurer = insurer;
             DamageType = damageType;
-            DamageStatus = damageStatus;
+            DamageStatus = string.IsNullOrWhiteSpace(damageStatus) ? DamageStatus ?? "new" : damageStatus;
             AssignmentOfClaimSigned = assignmentOfClaimSigned;
             ClientPaysVat = clientPaysVat;
             AudatexEstimateNumber = audatexEstimateNumber;

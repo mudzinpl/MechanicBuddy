@@ -1,7 +1,7 @@
 
 
 'use client'
-import {  IWorkData } from '../model';
+import { getDamageStatusLabel, IWorkData } from '../model';
 import { DocumentTextIcon, ShieldCheckIcon, TruckIcon, UserCircleIcon, WrenchScrewdriverIcon } from '@heroicons/react/20/solid';
 import moment from 'moment';
 import React from 'react';
@@ -50,7 +50,7 @@ export function WorkInformation({
         ['Numer szkody', work.claimNumber],
         ['Ubezpieczyciel', work.insurer],
         ['Rodzaj szkody', work.damageType],
-        ['Status szkody', work.damageStatus],
+        ['Status procesu', getDamageStatusLabel(work.damageStatus)],
         ['Cesja podpisana', work.assignmentOfClaimSigned ? 'Tak' : 'Nie'],
         ['Klient dopłaca VAT', work.clientPaysVat ? 'Tak' : 'Nie'],
         ['Kosztorys Audanet / Audatex', work.audatexEstimateNumber],
