@@ -1,7 +1,7 @@
 'use server'
 
 import { httpGet } from '@/_lib/server/query-api'
-import { IWorkData, IActivities, IOfferIssuance } from '../model';
+import { IWorkData, IActivities, IOfferIssuance, IWorkDocument } from '../model';
 import { Card, CardHeader } from '@/_components/Card';
 import NoProducts from '../_components/NoProducts';
 import { createOrUpdateProducts } from '../actions/createOrUpdateProducts';
@@ -41,13 +41,16 @@ export default async function Page({
     data = await httpGet('pricings/offers/' + work.id);
     const issueances = await data.json() as IOfferIssuance[]; 
     const issuance = issueances.find(x => x.id === activity?.id)
+
+    data = await httpGet(`work/${work.id}/documents`);
+    const documents = await data.json() as IWorkDocument[];
  
     const activityDisplayName = getActivityDisplayName(activityName,activityNumber,issuance?.number);
 
 
     return (
         <div  >
-              <Activities work={work} issueances={issueances} activities={activities}></Activities>
+              <Activities work={work} issueances={issueances} activities={activities} documents={documents}></Activities>
             <main className='pl-0 lg:pl-62  2xl:pr-108  '>
                 <div>
                     <div className="  px-4  xl:py-10 xl:px-8 xl:py-6 ">

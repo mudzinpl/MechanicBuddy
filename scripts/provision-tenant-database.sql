@@ -152,6 +152,22 @@ ALTER TABLE "tenant_testt".work
 ALTER TABLE "tenant_testt".work ALTER COLUMN damagestatus SET DEFAULT 'new';
 UPDATE "tenant_testt".work SET damagestatus = 'new' WHERE damagestatus IS NULL OR TRIM(damagestatus) = '';
 
+CREATE TABLE IF NOT EXISTS "tenant_testt".workdocument (
+    id uuid PRIMARY KEY,
+    workid uuid NOT NULL REFERENCES "tenant_testt".work(id) ON DELETE CASCADE,
+    category varchar(40) NOT NULL,
+    filename varchar(255) NOT NULL,
+    contenttype varchar(150) NOT NULL,
+    filesize bigint NOT NULL CHECK (filesize > 0 AND filesize <= 26214400),
+    content bytea NOT NULL,
+    uploadedon timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    uploadedbyemployeeid uuid REFERENCES "tenant_testt".employee(id) ON DELETE SET NULL,
+    uploadedbyname varchar(200) NOT NULL,
+    CHECK (category IN ('vehicle_photos', 'audatex_estimates', 'insurer_decisions', 'claim_assignments', 'authorizations', 'invoices', 'client_documents', 'other'))
+);
+CREATE INDEX IF NOT EXISTS idx_workdocument_workid ON "tenant_testt".workdocument(workid);
+CREATE INDEX IF NOT EXISTS idx_workdocument_workid_category ON "tenant_testt".workdocument(workid, category);
+
 -- Offer table
 CREATE TABLE IF NOT EXISTS "tenant_testt".offer (
     id uuid primary key,
