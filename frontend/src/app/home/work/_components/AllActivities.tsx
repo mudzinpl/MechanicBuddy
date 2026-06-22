@@ -1,6 +1,6 @@
 'use client'
 
-import {IActivities, IActivity, IOfferIssuance,IWorkData } from '../model'
+import {IActivities, IActivity, IOfferIssuance, IWorkData, IWorkDocument } from '../model'
 import clsx from 'clsx'
 import Link from 'next/link'
 import { WorkInformation } from './WorkInformation'
@@ -13,16 +13,19 @@ import { ActivityCreatedBy } from './activity/ActivityCreatedBy'
 import { getActivityDisplayName } from './activity/getActivityDisplayName' 
 import { IssuanceBadges } from './activity/badges/IssuanceBadges' 
 import PricingDownloadLink from './activity/PricingDownloadLink' 
+import WorkDocuments from './WorkDocuments'
 
  
 export default function Activities({
   work,
   activities,
   issueances,
+  documents,
 }: {
   work: IWorkData,
   activities: IActivities,
   issueances: IOfferIssuance[]
+  documents: IWorkDocument[]
 }) {
  
   const confirmRemoveActivityRef = React.useRef<ConfirmDialogHandle>(null);
@@ -36,6 +39,9 @@ export default function Activities({
           <div className="p-5 pb-10">
             <WorkInformation hasRepairJobWithProductsOrServices={containsRepairJobWithProductsOrServices} work={ work} ></WorkInformation>
           </div>
+        </li>
+        <li>
+          <WorkDocuments workId={work.id} documents={documents}></WorkDocuments>
         </li>
       </ul>
       
@@ -92,4 +98,4 @@ export default function Activities({
  
     </aside>
   )
-} 
+}

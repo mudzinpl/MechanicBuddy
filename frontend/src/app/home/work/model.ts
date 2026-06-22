@@ -31,6 +31,16 @@ export interface IWorkData extends IActivity{
     
 }
 
+export interface IWorkDocument {
+    id: string;
+    category: string;
+    fileName: string;
+    contentType: string;
+    fileSize: number;
+    uploadedOn: string;
+    uploadedByName: string;
+}
+
 export const damageStatuses = [
   { value: 'new', label: 'Nowe zgłoszenie' },
   { value: 'inspection_pending', label: 'Oczekuje na oględziny' },

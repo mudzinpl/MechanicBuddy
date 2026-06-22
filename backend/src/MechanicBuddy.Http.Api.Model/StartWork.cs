@@ -61,12 +61,13 @@ namespace MechanicBuddy.Http.Api.Models
         string RegNr, 
         string MechanicNames, 
         string Notes,  
+        int DocumentCount,
         bool hasRepairs,
         int numberOfOffers,
         JsonNode OfferIssuance, 
         JsonNode Issuance) 
     {
-        public WorkPage() : this(default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default) { }
+        public WorkPage() : this(default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default) { }
     }
 
 }

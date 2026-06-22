@@ -547,7 +547,8 @@ from (
 	   from domain.assignment a 
 		inner join domain.employee m on  a.mechanicid = m.id and a.workid = w.id
 		) as mechanicnames,
-	w.notes  
+	w.notes,
+    (select count(*) from domain.workdocument wd where wd.workid = w.id)::int as documentcount
      from domain.work w
          {extraJoins}
 	  left join domain.legalclient l on l.id =  w.clientid

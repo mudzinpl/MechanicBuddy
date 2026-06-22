@@ -2,7 +2,7 @@ import Search from "../_components/Search";
 import moment from "moment";
 import { damageStatuses, IOfferIssuance, IWorkIssuance } from "./model";
 import PricingDownloadLink from "./_components/activity/PricingDownloadLink";
-import { ArrowDownTrayIcon } from "@heroicons/react/20/solid";
+import { ArrowDownTrayIcon, PaperClipIcon } from "@heroicons/react/20/solid";
 import Spinner from "@/_components/Spinner";
 import BlueBadge from "@/_components/BlueBadge";
 import WorkStatusBadge from "./_components/activity/badges/WorkStatusBadge";
@@ -105,6 +105,16 @@ export default async function Page(
       dataFormatter: ({ damageStatus }: { damageStatus: string }) => {
         return <DamageStatusBadge status={damageStatus}></DamageStatusBadge>;
       }
+    },
+    {
+      dataField: 'documentCount',
+      headerText: 'Dokumenty',
+      dataFormatter: ({ documentCount }: { documentCount: number }) => (
+        <span className="inline-flex items-center gap-1.5" title={`Liczba dokumentów: ${documentCount}`}>
+          <PaperClipIcon className="size-4 text-gray-400" aria-hidden="true" />
+          <span>{documentCount}</span>
+        </span>
+      )
     },
     {
       dataField: 'startedOn',
