@@ -41,7 +41,7 @@ export default function LoginPage() {
         <div className="flex flex-1 flex-col justify-center px-4 py-12 sm:px-6 lg:flex-none lg:px-20 xl:px-24">
           <div className="mx-auto w-full max-w-sm lg:w-96">
             <div>
-              <h2 className="mt-8 text-2xl/9 font-bold tracking-tight text-white">Portal mechanika</h2>
+              <h2 className="mt-8 text-2xl/9 font-bold tracking-tight text-white">Witaj ponownie!</h2>
               <p className="mt-2 text-sm/6 text-slate-400">
                 Zaloguj się, aby uzyskać dostęp do systemu zarządzania
               </p>
@@ -131,8 +131,8 @@ export default function LoginPage() {
         <div className="relative hidden w-0 flex-1 lg:block bg-slate-800">
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center">
-              <div className="text-6xl font-bold text-slate-700">MB</div>
-              <div className="text-slate-600 mt-2">MechanicBuddy</div>
+              <div className="text-6xl font-bold text-slate-700">SA</div>
+              <div className="text-slate-600 mt-2">SerwisAPPRA</div>
             </div>
           </div>
         </div>
