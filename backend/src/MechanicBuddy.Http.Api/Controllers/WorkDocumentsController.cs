@@ -5,7 +5,7 @@ using MechanicBuddy.Core.Domain;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using NHibernate;
+using NHibernateSession = NHibernate.ISession;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -50,9 +50,9 @@ namespace MechanicBuddy.Http.Api.Controllers
             [".txt"] = "text/plain"
         };
 
-        private readonly ISession session;
+        private readonly NHibernateSession session;
 
-        public WorkDocumentsController(ISession session)
+        public WorkDocumentsController(NHibernateSession session)
         {
             this.session = session;
         }
