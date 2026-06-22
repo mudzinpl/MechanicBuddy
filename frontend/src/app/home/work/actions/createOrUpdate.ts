@@ -37,7 +37,10 @@ export async function createOrUpdate(
        assignmentOfClaimSigned: formData.get('assignmentOfClaimSigned') == 'on',
        clientPaysVat: formData.get('clientPaysVat') == 'on',
        audatexEstimateNumber: formData.get('audatexEstimateNumber')?.toString() || null,
-       insurerNotes: formData.get('insurerNotes')?.toString() || null
+       insurerNotes: formData.get('insurerNotes')?.toString() || null,
+       plannedIntakeOn: formData.get('plannedIntakeOn')?.toString() || null,
+       plannedReleaseOn: formData.get('plannedReleaseOn')?.toString() || null,
+       plannedInspectionOn: formData.get('plannedInspectionOn')?.toString() || null
     }; 
     const url = "work"; 
     

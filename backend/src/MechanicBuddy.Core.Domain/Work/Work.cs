@@ -144,6 +144,16 @@ namespace MechanicBuddy.Core.Domain
             AudatexEstimateNumber = audatexEstimateNumber;
             InsurerNotes = insurerNotes;
         }
+
+        public virtual void UpdateSchedule(
+            DateTime? plannedIntakeOn,
+            DateTime? plannedReleaseOn,
+            DateTime? plannedInspectionOn)
+        {
+            PlannedIntakeOn = plannedIntakeOn;
+            PlannedReleaseOn = plannedReleaseOn;
+            PlannedInspectionOn = plannedInspectionOn;
+        }
          
         public virtual void WithoutVehicle()
         {
@@ -173,6 +183,9 @@ namespace MechanicBuddy.Core.Domain
         public virtual bool ClientPaysVat { get; protected set; }
         public virtual string AudatexEstimateNumber { get; protected set; }
         public virtual string InsurerNotes { get; protected set; }
+        public virtual DateTime? PlannedIntakeOn { get; protected set; }
+        public virtual DateTime? PlannedReleaseOn { get; protected set; }
+        public virtual DateTime? PlannedInspectionOn { get; protected set; }
         public virtual DateTime StartedOn { get; protected set; }
 
         public virtual DateTime ChangedOn { get; protected set; } //todo protected and user id too?

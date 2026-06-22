@@ -90,12 +90,94 @@ namespace MechanicBuddy.Http.Api.Controllers
                 work.ClientPaysVat,
                 work.AudatexEstimateNumber,
                 work.InsurerNotes,
+                work.PlannedIntakeOn,
+                work.PlannedReleaseOn,
+                work.PlannedInspectionOn,
                 Mechanics = work.Mechanics.ToList().Select(x => new { x.Id, x.Name }).ToArray(),
                 Status= status,
                 Issuance = work.Invoice is not null ? 
                   new WorkIssuanceDto( work.Invoice.SentOn,work.Invoice.IssuedOn,work.Invoice.Issuer.Name,work.Invoice.Email,work.Invoice.Number,work.Invoice.DueDays,work.Invoice.IsPaid)
                   : null
             };
+        }
+
+        [HttpGet("dashboard")]
+        public dynamic Dashboard()
+        {
+            const string baseWorkCte = @"
+                WITH work_data AS (
+                    SELECT
+                        w.id,
+                        w.number::text AS worknr,
+                        COALESCE(NULLIF(TRIM(w.damagestatus), ''), 'new') AS damagestatus,
+                        w.claimnumber,
+                        w.insurer,
+                        w.audatexestimatenumber,
+                        w.assignmentofclaimsigned,
+                        w.clientpaysvat,
+                        w.changedon,
+                        w.plannedintakeon,
+                        w.plannedreleaseon,
+                        w.plannedinspectionon,
+                        CONCAT_WS(' ', p.firstname, p.lastname, l.name) AS clientname,
+                        v.regnr
+                    FROM domain.work w
+                    LEFT JOIN domain.legalclient l ON l.id = w.clientid
+                    LEFT JOIN domain.privateclient p ON p.id = w.clientid
+                    LEFT JOIN domain.vehicle v ON v.id = w.vehicleid
+                )";
+
+            var tiles = session.Connection.Query<DashboardTileDto>(baseWorkCte + @"
+                SELECT 'new' AS key, COUNT(*)::int AS count FROM work_data WHERE damagestatus = 'new'
+                UNION ALL SELECT 'inspection_pending', COUNT(*)::int FROM work_data WHERE damagestatus = 'inspection_pending'
+                UNION ALL SELECT 'approval_pending', COUNT(*)::int FROM work_data WHERE damagestatus = 'approval_pending'
+                UNION ALL SELECT 'parts_pending', COUNT(*)::int FROM work_data WHERE damagestatus = 'parts_pending'
+                UNION ALL SELECT 'repair', COUNT(*)::int FROM work_data WHERE damagestatus = 'repair'
+                UNION ALL SELECT 'ready_for_pickup', COUNT(*)::int FROM work_data WHERE damagestatus = 'ready_for_pickup'
+                UNION ALL SELECT 'on_hold', COUNT(*)::int FROM work_data WHERE damagestatus = 'on_hold'
+                UNION ALL SELECT 'settled_this_month', COUNT(*)::int FROM work_data
+                    WHERE damagestatus = 'settled'
+                      AND changedon >= (DATE_TRUNC('month', CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw') AT TIME ZONE 'Europe/Warsaw')").ToArray();
+
+            var attention = session.Connection.Query<DashboardWorkItemDto>(baseWorkCte + @"
+                SELECT id, worknr, clientname, regnr, damagestatus, 'missing_claim_number' AS kind, NULL::timestamptz AS scheduledon
+                FROM work_data WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND COALESCE(TRIM(claimnumber), '') = ''
+                UNION ALL
+                SELECT id, worknr, clientname, regnr, damagestatus, 'missing_insurer', NULL::timestamptz
+                FROM work_data WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND COALESCE(TRIM(insurer), '') = ''
+                UNION ALL
+                SELECT id, worknr, clientname, regnr, damagestatus, 'missing_estimate', NULL::timestamptz
+                FROM work_data WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND COALESCE(TRIM(audatexestimatenumber), '') = ''
+                UNION ALL
+                SELECT id, worknr, clientname, regnr, damagestatus, 'approval_overdue', NULL::timestamptz
+                FROM work_data WHERE damagestatus = 'approval_pending' AND changedon < CURRENT_TIMESTAMP - INTERVAL '3 days'
+                UNION ALL
+                SELECT id, worknr, clientname, regnr, damagestatus, 'repair_overdue', NULL::timestamptz
+                FROM work_data WHERE damagestatus IN ('repair', 'paint_shop') AND changedon < CURRENT_TIMESTAMP - INTERVAL '7 days'
+                UNION ALL
+                SELECT id, worknr, clientname, regnr, damagestatus, 'vat_payment', NULL::timestamptz
+                FROM work_data WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND clientpaysvat = TRUE
+                UNION ALL
+                SELECT id, worknr, clientname, regnr, damagestatus, 'missing_assignment', NULL::timestamptz
+                FROM work_data WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND assignmentofclaimsigned = FALSE
+                ORDER BY worknr DESC
+                LIMIT 100").ToArray();
+
+            var today = session.Connection.Query<DashboardWorkItemDto>(baseWorkCte + @"
+                SELECT id, worknr, clientname, regnr, damagestatus, 'intake' AS kind, plannedintakeon AS scheduledon
+                FROM work_data
+                WHERE (plannedintakeon AT TIME ZONE 'Europe/Warsaw')::date = (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
+                UNION ALL
+                SELECT id, worknr, clientname, regnr, damagestatus, 'release', plannedreleaseon
+                FROM work_data
+                WHERE (plannedreleaseon AT TIME ZONE 'Europe/Warsaw')::date = (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
+                UNION ALL
+                SELECT id, worknr, clientname, regnr, damagestatus, 'inspection', plannedinspectionon
+                FROM work_data
+                WHERE (plannedinspectionon AT TIME ZONE 'Europe/Warsaw')::date = (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
+                ORDER BY scheduledon, worknr").ToArray();
+
+            return new { Tiles = tiles, Attention = attention, Today = today };
         }
 
         [HttpGet("{id}/activities/{currentId?}")]
@@ -194,6 +276,7 @@ namespace MechanicBuddy.Http.Api.Controllers
                 model.ClientPaysVat,
                 model.AudatexEstimateNumber,
                 model.InsurerNotes);
+            work.UpdateSchedule(model.PlannedIntakeOn, model.PlannedReleaseOn, model.PlannedInspectionOn);
 
             if (model.AssignedTo != null) work.Assign(model.AssignedTo.Select(x => repository.Get<Employee>(x)).ToArray());
              
@@ -254,6 +337,7 @@ namespace MechanicBuddy.Http.Api.Controllers
                 model.ClientPaysVat,
                 model.AudatexEstimateNumber,
                 model.InsurerNotes);
+            work.UpdateSchedule(model.PlannedIntakeOn, model.PlannedReleaseOn, model.PlannedInspectionOn);
             work.Assign(model.AssignedTo == null ? Enumerable.Empty<Employee>().ToArray() : model.AssignedTo.Select(x => repository.Get<Employee>(x)).ToArray());
 
             work.Changed();//well, can i use dry here

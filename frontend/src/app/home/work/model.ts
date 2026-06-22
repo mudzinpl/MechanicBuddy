@@ -22,6 +22,9 @@ export interface IWorkData extends IActivity{
     clientPaysVat:   boolean;
     audatexEstimateNumber: string;
     insurerNotes:    string;
+    plannedIntakeOn: string;
+    plannedReleaseOn: string;
+    plannedInspectionOn: string;
     mechanics:       IMechanic[];
     status:          string;
     issuance:       IWorkIssuance;  

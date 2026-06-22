@@ -30,7 +30,21 @@ namespace MechanicBuddy.Http.Api.Models
         bool AssignmentOfClaimSigned,
         bool ClientPaysVat,
         string AudatexEstimateNumber,
-        string InsurerNotes);
+        string InsurerNotes,
+        DateTime? PlannedIntakeOn,
+        DateTime? PlannedReleaseOn,
+        DateTime? PlannedInspectionOn);
+
+    public record DashboardTileDto(string Key, int Count);
+
+    public record DashboardWorkItemDto(
+        Guid Id,
+        string WorkNr,
+        string ClientName,
+        string RegNr,
+        string DamageStatus,
+        string Kind,
+        DateTime? ScheduledOn);
 
     
     public record WorkPage(

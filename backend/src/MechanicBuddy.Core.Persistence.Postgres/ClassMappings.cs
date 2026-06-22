@@ -332,6 +332,9 @@ namespace MechanicBuddy.Core.Persistence.Postgres.Repositories
             Map(x => x.ClientPaysVat).Column("clientpaysvat").Access.BackingField();
             Map(x => x.AudatexEstimateNumber).Column("audatexestimatenumber").Access.BackingField();
             Map(x => x.InsurerNotes).Column("insurernotes").Access.BackingField();
+            Map(x => x.PlannedIntakeOn).Column("plannedintakeon").Access.BackingField().CustomType<UtcDateType>();
+            Map(x => x.PlannedReleaseOn).Column("plannedreleaseon").Access.BackingField().CustomType<UtcDateType>();
+            Map(x => x.PlannedInspectionOn).Column("plannedinspectionon").Access.BackingField().CustomType<UtcDateType>();
             Map(x => x.CompletedOn).Column("completedon").CustomType<UtcDateType>().Access.BackingField(); ;//.HasConversion<DateTimeUtcConverter>();
             Map(x => x.ChangedOn).Column("changedon").CustomType<UtcDateType>().Access.BackingField();
             Map(x => x.Odo).Column("odo").Access.BackingField();
