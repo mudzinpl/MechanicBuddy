@@ -413,8 +413,8 @@ namespace MechanicBuddy.Http.Api.Controllers
 
             }
           
-            if (clientId  != null) query.Where($"w.clientid = '{clientId }'");
-            if (vehicleId != null ) query.Where($"w.vehicleid = '{vehicleId}' ");
+            if (!string.IsNullOrWhiteSpace(clientId)) query.Where($"w.clientid = '{clientId}'");
+            if (!string.IsNullOrWhiteSpace(vehicleId)) query.Where($"w.vehicleid = '{vehicleId}'");
             if (workForm is not null || workForm is not null)
             { 
                 var dateRestriction = @" work.startedon {0})";
