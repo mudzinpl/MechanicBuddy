@@ -39,6 +39,7 @@ export default function WorkInput({
     const [clientUndisclosed, setClientUndisclosed] = useState(!work ? false : !work.clientId);
     const currentDamageStatus = work?.damageStatus || 'new';
     const hasKnownDamageStatus = damageStatuses.some(status => status.value === currentDamageStatus);
+    const toDateInputValue = (value?: string) => value ? value.slice(0, 10) : '';
     const populateClientVehicles = (clientId: string) => {
         query({
             url: 'vehicles/client/' + clientId,
@@ -207,6 +208,27 @@ export default function WorkInput({
                                     label='Numer kosztorysu Audanet / Audatex'
                                     defaultValue={work?.audatexEstimateNumber ?? ''}
                                     placeholder='Numer kosztorysu'>
+                                </FormInput>
+
+                                <FormInput
+                                    name='plannedIntakeOn'
+                                    type='date'
+                                    label='Planowane przyjęcie pojazdu'
+                                    defaultValue={toDateInputValue(work?.plannedIntakeOn)}>
+                                </FormInput>
+
+                                <FormInput
+                                    name='plannedReleaseOn'
+                                    type='date'
+                                    label='Planowane wydanie pojazdu'
+                                    defaultValue={toDateInputValue(work?.plannedReleaseOn)}>
+                                </FormInput>
+
+                                <FormInput
+                                    name='plannedInspectionOn'
+                                    type='date'
+                                    label='Termin oględzin'
+                                    defaultValue={toDateInputValue(work?.plannedInspectionOn)}>
                                 </FormInput>
 
                                 <div className="space-y-4 pt-1">

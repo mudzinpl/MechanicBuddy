@@ -145,7 +145,10 @@ ALTER TABLE domain.work
     ADD COLUMN IF NOT EXISTS assignmentofclaimsigned boolean NOT NULL DEFAULT false,
     ADD COLUMN IF NOT EXISTS clientpaysvat boolean NOT NULL DEFAULT false,
     ADD COLUMN IF NOT EXISTS audatexestimatenumber varchar(100),
-    ADD COLUMN IF NOT EXISTS insurernotes text;
+    ADD COLUMN IF NOT EXISTS insurernotes text,
+    ADD COLUMN IF NOT EXISTS plannedintakeon timestamp with time zone,
+    ADD COLUMN IF NOT EXISTS plannedreleaseon timestamp with time zone,
+    ADD COLUMN IF NOT EXISTS plannedinspectionon timestamp with time zone;
 
 ALTER TABLE domain.work ALTER COLUMN damagestatus SET DEFAULT 'new';
 UPDATE domain.work SET damagestatus = 'new' WHERE damagestatus IS NULL OR TRIM(damagestatus) = '';
@@ -349,6 +352,9 @@ CREATE INDEX IF NOT EXISTS idx_work_starterid ON domain.work(starterid);
 CREATE INDEX IF NOT EXISTS idx_work_vehicleid ON domain.work(vehicleid);
 CREATE INDEX IF NOT EXISTS idx_work_claimnumber ON domain.work(claimnumber);
 CREATE INDEX IF NOT EXISTS idx_work_damagestatus ON domain.work(damagestatus);
+CREATE INDEX IF NOT EXISTS idx_work_plannedintakeon ON domain.work(plannedintakeon);
+CREATE INDEX IF NOT EXISTS idx_work_plannedreleaseon ON domain.work(plannedreleaseon);
+CREATE INDEX IF NOT EXISTS idx_work_plannedinspectionon ON domain.work(plannedinspectionon);
 CREATE INDEX IF NOT EXISTS idx_offer_workid_ordernr ON domain.offer(workid, ordernr);
 CREATE INDEX IF NOT EXISTS idx_repairjob_workid_ordernr ON domain.repairjob(workid, ordernr);
 CREATE INDEX IF NOT EXISTS idx_offer_estimateid ON domain.offer(estimateid);

@@ -44,7 +44,10 @@ export function WorkInformation({
         work.assignmentOfClaimSigned ||
         work.clientPaysVat ||
         work.audatexEstimateNumber ||
-        work.insurerNotes
+        work.insurerNotes ||
+        work.plannedIntakeOn ||
+        work.plannedReleaseOn ||
+        work.plannedInspectionOn
     );
     const claimDetails = [
         ['Numer szkody', work.claimNumber],
@@ -54,6 +57,9 @@ export function WorkInformation({
         ['Cesja podpisana', work.assignmentOfClaimSigned ? 'Tak' : 'Nie'],
         ['Klient dopłaca VAT', work.clientPaysVat ? 'Tak' : 'Nie'],
         ['Kosztorys Audanet / Audatex', work.audatexEstimateNumber],
+        ['Planowane przyjęcie', work.plannedIntakeOn ? moment(work.plannedIntakeOn).locale('pl').format('LL') : ''],
+        ['Planowane wydanie', work.plannedReleaseOn ? moment(work.plannedReleaseOn).locale('pl').format('LL') : ''],
+        ['Termin oględzin', work.plannedInspectionOn ? moment(work.plannedInspectionOn).locale('pl').format('LL') : ''],
     ].filter(([, value]) => value);
 
     const deleteInvoiceRef = React.useRef<BaseDialogHandle>(null);
