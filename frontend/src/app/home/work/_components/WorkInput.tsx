@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import FormTextArea from '@/_components/FormTextArea';
 import PrimaryButton from '@/_components/PrimaryButton';
 import SecondaryButton from '@/_components/SecondaryButton';
-import { damageStatuses, damageTypes, getDamageStatusLabel, insurers, IWorkData, IMechanic } from '../model';
+import { damageStatuses, damageTypes, getDamageStatusLabel, insurers, IWorkData, IMechanic, settlementStatuses } from '../model';
 import FormLabel from '@/_components/FormLabel';
 import { ClientsCombobox, VehiclesCombobox } from '../../_components/SearchCombobox';
 import { useState } from 'react';
@@ -291,6 +291,23 @@ export default function WorkInput({
                                     defaultValue={toDateInputValue(work?.supplementPaidOn)}>
                                 </FormInput>
 
+                                <div className="sm:col-span-2">
+                                    <FormTextArea
+                                        name='insurerNotes'
+                                        rows={4}
+                                        label='Uwagi do ubezpieczyciela'
+                                        defaultValue={work?.insurerNotes ?? ''}>
+                                    </FormTextArea>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="mt-4 border-t border-gray-900/10 pt-8">
+                            <h3 className="text-base font-semibold text-gray-900">Cesja i rozliczenia</h3>
+                            <p className="mt-1 text-sm text-gray-500">
+                                Dokumenty formalne, dopłaty klienta i status rozliczenia.
+                            </p>
+
+                            <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
                                 <div className="space-y-4 pt-1">
                                     <Field className="flex items-center">
                                         <FormSwitch
@@ -298,7 +315,16 @@ export default function WorkInput({
                                             defaultChecked={work?.assignmentOfClaimSigned ?? false}>
                                         </FormSwitch>
                                         <Label as="span" className="ml-3 text-sm text-gray-700">
-                                            Klient podpisał cesję
+                                            Cesja podpisana
+                                        </Label>
+                                    </Field>
+                                    <Field className="flex items-center">
+                                        <FormSwitch
+                                            name='powerOfAttorneySigned'
+                                            defaultChecked={work?.powerOfAttorneySigned ?? false}>
+                                        </FormSwitch>
+                                        <Label as="span" className="ml-3 text-sm text-gray-700">
+                                            Pełnomocnictwo podpisane
                                         </Label>
                                     </Field>
                                     <Field className="flex items-center">
@@ -312,12 +338,76 @@ export default function WorkInput({
                                     </Field>
                                 </div>
 
+                                <div className="grid grid-cols-1 gap-4">
+                                    <FormInput
+                                        name='assignmentOfClaimSignedOn'
+                                        type='date'
+                                        label='Data podpisania cesji'
+                                        defaultValue={toDateInputValue(work?.assignmentOfClaimSignedOn)}>
+                                    </FormInput>
+                                    <FormInput
+                                        name='powerOfAttorneySignedOn'
+                                        type='date'
+                                        label='Data podpisania pełnomocnictwa'
+                                        defaultValue={toDateInputValue(work?.powerOfAttorneySignedOn)}>
+                                    </FormInput>
+                                </div>
+
+                                <div>
+                                    <FormLabel name='clientVatPercent' label='Procent VAT po stronie klienta'></FormLabel>
+                                    <div className="mt-2 grid grid-cols-1">
+                                        <Select name='clientVatPercent' defaultValue={(work?.clientVatPercent ?? (work?.clientPaysVat ? 100 : 0)).toString()}>
+                                            <option value='0'>0%</option>
+                                            <option value='50'>50%</option>
+                                            <option value='100'>100%</option>
+                                        </Select>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <FormLabel name='settlementStatus' label='Status rozliczenia'></FormLabel>
+                                    <div className="mt-2 grid grid-cols-1">
+                                        <Select name='settlementStatus' defaultValue={work?.settlementStatus || 'unsettled'}>
+                                            {settlementStatuses.map(status => (
+                                                <option key={status.value} value={status.value}>{status.label}</option>
+                                            ))}
+                                        </Select>
+                                    </div>
+                                </div>
+
+                                <FormInput
+                                    name='clientVatAmount'
+                                    type='number'
+                                    step='0.01'
+                                    label='Kwota dopłaty VAT'
+                                    defaultValue={work?.clientVatAmount ?? ''}>
+                                </FormInput>
+                                <FormInput
+                                    name='underpaymentAmount'
+                                    type='number'
+                                    step='0.01'
+                                    label='Kwota niedopłaty'
+                                    defaultValue={work?.underpaymentAmount ?? ''}>
+                                </FormInput>
+                                <FormInput
+                                    name='paymentDemandOn'
+                                    type='date'
+                                    label='Data wezwania do dopłaty'
+                                    defaultValue={toDateInputValue(work?.paymentDemandOn)}>
+                                </FormInput>
+                                <FormInput
+                                    name='paymentReceivedOn'
+                                    type='date'
+                                    label='Data zapłaty'
+                                    defaultValue={toDateInputValue(work?.paymentReceivedOn)}>
+                                </FormInput>
+
                                 <div className="sm:col-span-2">
                                     <FormTextArea
-                                        name='insurerNotes'
+                                        name='settlementNotes'
                                         rows={4}
-                                        label='Uwagi do ubezpieczyciela'
-                                        defaultValue={work?.insurerNotes ?? ''}>
+                                        label='Uwagi do rozliczenia'
+                                        defaultValue={work?.settlementNotes ?? ''}>
                                     </FormTextArea>
                                 </div>
                             </div>

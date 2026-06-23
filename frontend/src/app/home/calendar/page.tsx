@@ -42,6 +42,11 @@ const kindLabels: Record<string, string> = {
   repair_overdue: 'Pojazd w naprawie ponad 7 dni',
   replacement_without_return_date: 'Pojazd zastępczy wydany bez terminu zwrotu',
   planned_release_overdue: 'Przekroczony planowany termin wydania',
+  missing_assignment: 'Brak podpisanej cesji',
+  missing_power_of_attorney: 'Brak podpisanego pełnomocnictwa',
+  vat_payment: 'Dopłata VAT klienta',
+  unsettled_case: 'Sprawa nierozliczona',
+  client_vat_without_payment_date: 'Dopłata VAT bez daty zapłaty',
 };
 
 function formatDate(value?: string | null) {

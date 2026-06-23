@@ -79,7 +79,17 @@ namespace MechanicBuddy.Core.Domain
                 ClaimReportedOn,
                 EstimateSentOn,
                 InsurerDecisionOn,
-                SupplementPaidOn);
+                SupplementPaidOn,
+                AssignmentOfClaimSignedOn,
+                PowerOfAttorneySigned,
+                PowerOfAttorneySignedOn,
+                ClientVatPercent,
+                ClientVatAmount,
+                UnderpaymentAmount,
+                SettlementStatus,
+                PaymentDemandOn,
+                PaymentReceivedOn,
+                SettlementNotes);
             foreach (var job in jobs)
             {
                 work.jobs.Add(job.MakeCopy(work, starter));
@@ -147,7 +157,17 @@ namespace MechanicBuddy.Core.Domain
             DateTime? claimReportedOn = null,
             DateTime? estimateSentOn = null,
             DateTime? insurerDecisionOn = null,
-            DateTime? supplementPaidOn = null)
+            DateTime? supplementPaidOn = null,
+            DateTime? assignmentOfClaimSignedOn = null,
+            bool powerOfAttorneySigned = false,
+            DateTime? powerOfAttorneySignedOn = null,
+            int? clientVatPercent = null,
+            decimal? clientVatAmount = null,
+            decimal? underpaymentAmount = null,
+            string settlementStatus = null,
+            DateTime? paymentDemandOn = null,
+            DateTime? paymentReceivedOn = null,
+            string settlementNotes = null)
         {
             ClaimNumber = claimNumber;
             Insurer = insurer;
@@ -164,6 +184,16 @@ namespace MechanicBuddy.Core.Domain
             EstimateSentOn = estimateSentOn;
             InsurerDecisionOn = insurerDecisionOn;
             SupplementPaidOn = supplementPaidOn;
+            AssignmentOfClaimSignedOn = assignmentOfClaimSignedOn;
+            PowerOfAttorneySigned = powerOfAttorneySigned;
+            PowerOfAttorneySignedOn = powerOfAttorneySignedOn;
+            ClientVatPercent = clientVatPercent;
+            ClientVatAmount = clientVatAmount;
+            UnderpaymentAmount = underpaymentAmount;
+            SettlementStatus = string.IsNullOrWhiteSpace(settlementStatus) ? SettlementStatus ?? "unsettled" : settlementStatus;
+            PaymentDemandOn = paymentDemandOn;
+            PaymentReceivedOn = paymentReceivedOn;
+            SettlementNotes = settlementNotes;
         }
 
         public virtual void UpdateSchedule(
@@ -211,6 +241,16 @@ namespace MechanicBuddy.Core.Domain
         public virtual DateTime? EstimateSentOn { get; protected set; }
         public virtual DateTime? InsurerDecisionOn { get; protected set; }
         public virtual DateTime? SupplementPaidOn { get; protected set; }
+        public virtual DateTime? AssignmentOfClaimSignedOn { get; protected set; }
+        public virtual bool PowerOfAttorneySigned { get; protected set; }
+        public virtual DateTime? PowerOfAttorneySignedOn { get; protected set; }
+        public virtual int? ClientVatPercent { get; protected set; }
+        public virtual decimal? ClientVatAmount { get; protected set; }
+        public virtual decimal? UnderpaymentAmount { get; protected set; }
+        public virtual string SettlementStatus { get; protected set; }
+        public virtual DateTime? PaymentDemandOn { get; protected set; }
+        public virtual DateTime? PaymentReceivedOn { get; protected set; }
+        public virtual string SettlementNotes { get; protected set; }
         public virtual DateTime? PlannedIntakeOn { get; protected set; }
         public virtual DateTime? PlannedReleaseOn { get; protected set; }
         public virtual DateTime? PlannedInspectionOn { get; protected set; }

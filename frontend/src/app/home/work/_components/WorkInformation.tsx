@@ -1,8 +1,8 @@
 
 
 'use client'
-import { damageStatuses, getDamageStatusLabel, IWorkData, statusNames } from '../model';
-import { ClockIcon, DocumentTextIcon, ShieldCheckIcon, TruckIcon, UserCircleIcon, WrenchScrewdriverIcon } from '@heroicons/react/20/solid';
+import { damageStatuses, getDamageStatusLabel, getSettlementStatusLabel, IWorkData, statusNames } from '../model';
+import { BanknotesIcon, ClockIcon, DocumentTextIcon, ShieldCheckIcon, TruckIcon, UserCircleIcon, WrenchScrewdriverIcon } from '@heroicons/react/20/solid';
 import moment from 'moment';
 import React from 'react';
 import { startAnActivity } from '../actions/startAnActivity';
@@ -37,6 +37,10 @@ export function WorkInformation({
  
     const vehicleSummary = [work.vehicleProducer, work.vehicleModel, work.vehicleVin, work.vehicleRegNr].filter(x => x).join(', ');
     const clientSummary = [work.clientName, work.clientPhone, work.clientEmail].filter(x => x).join(', ');
+    const formatDate = (value?: string | null) => value ? moment(value).locale('pl').format('DD.MM.YYYY') : '';
+    const formatCurrency = (value?: number | null) => typeof value === 'number'
+        ? new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(value)
+        : '';
     const hasClaimDetails = Boolean(
         work.claimNumber ||
         work.insurer ||
@@ -46,8 +50,6 @@ export function WorkInformation({
         work.claimHandlerEmail ||
         work.claimHandlerPhone ||
         work.claimReportedOn ||
-        work.assignmentOfClaimSigned ||
-        work.clientPaysVat ||
         work.audatexEstimateNumber ||
         work.estimateSentOn ||
         work.insurerDecisionOn ||
@@ -65,16 +67,27 @@ export function WorkInformation({
         ['Telefon opiekuna', work.claimHandlerPhone],
         ['Rodzaj szkody', work.damageType],
         ['Status procesu', getDamageStatusLabel(work.damageStatus)],
-        ['Data zgłoszenia szkody', work.claimReportedOn ? moment(work.claimReportedOn).locale('pl').format('DD.MM.YYYY') : ''],
-        ['Cesja podpisana', work.assignmentOfClaimSigned ? 'Tak' : 'Nie'],
-        ['Klient dopłaca VAT', work.clientPaysVat ? 'Tak' : 'Nie'],
+        ['Data zgłoszenia szkody', formatDate(work.claimReportedOn)],
         ['Kosztorys Audanet / Audatex', work.audatexEstimateNumber],
-        ['Data wysłania kosztorysu', work.estimateSentOn ? moment(work.estimateSentOn).locale('pl').format('DD.MM.YYYY') : ''],
-        ['Data decyzji ubezpieczyciela', work.insurerDecisionOn ? moment(work.insurerDecisionOn).locale('pl').format('DD.MM.YYYY') : ''],
-        ['Data dopłaty', work.supplementPaidOn ? moment(work.supplementPaidOn).locale('pl').format('DD.MM.YYYY') : ''],
-        ['Planowane przyjęcie', work.plannedIntakeOn ? moment(work.plannedIntakeOn).locale('pl').format('DD.MM.YYYY') : ''],
-        ['Planowane wydanie', work.plannedReleaseOn ? moment(work.plannedReleaseOn).locale('pl').format('DD.MM.YYYY') : ''],
-        ['Data oględzin', work.plannedInspectionOn ? moment(work.plannedInspectionOn).locale('pl').format('DD.MM.YYYY') : ''],
+        ['Data wysłania kosztorysu', formatDate(work.estimateSentOn)],
+        ['Data decyzji ubezpieczyciela', formatDate(work.insurerDecisionOn)],
+        ['Data dopłaty', formatDate(work.supplementPaidOn)],
+        ['Planowane przyjęcie', formatDate(work.plannedIntakeOn)],
+        ['Planowane wydanie', formatDate(work.plannedReleaseOn)],
+        ['Data oględzin', formatDate(work.plannedInspectionOn)],
+    ].filter(([, value]) => value);
+    const settlementDetails = [
+        ['Cesja podpisana', work.assignmentOfClaimSigned ? 'Tak' : 'Nie'],
+        ['Data podpisania cesji', formatDate(work.assignmentOfClaimSignedOn)],
+        ['Pełnomocnictwo podpisane', work.powerOfAttorneySigned ? 'Tak' : 'Nie'],
+        ['Data podpisania pełnomocnictwa', formatDate(work.powerOfAttorneySignedOn)],
+        ['Klient dopłaca VAT', work.clientPaysVat ? 'Tak' : 'Nie'],
+        ['Procent VAT po stronie klienta', `${work.clientVatPercent ?? (work.clientPaysVat ? 100 : 0)}%`],
+        ['Kwota dopłaty VAT', formatCurrency(work.clientVatAmount)],
+        ['Kwota niedopłaty', formatCurrency(work.underpaymentAmount)],
+        ['Status rozliczenia', getSettlementStatusLabel(work.settlementStatus)],
+        ['Data wezwania do dopłaty', formatDate(work.paymentDemandOn)],
+        ['Data zapłaty', formatDate(work.paymentReceivedOn)],
     ].filter(([, value]) => value);
 
     const deleteInvoiceRef = React.useRef<BaseDialogHandle>(null);
@@ -283,6 +296,24 @@ export function WorkInformation({
                             </div>}
                         </dd>
                     </div>}
+                    <div className="mt-4 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-4">
+                        <dt className="flex-none">
+                            <span className="sr-only">Cesja i rozliczenia</span>
+                            <BanknotesIcon aria-hidden="true" className="h-6 w-5 text-gray-400" />
+                        </dt>
+                        <dd className="text-sm/6 text-gray-500">
+                            <p className="font-semibold text-gray-900">Cesja i rozliczenia</p>
+                            {settlementDetails.map(([label, value]) => (
+                                <p key={label}>
+                                    <span className="font-medium text-gray-700">{label}:</span> {value}
+                                </p>
+                            ))}
+                            {work.settlementNotes && <p className="mt-2 whitespace-pre-line">
+                                <span className="font-medium text-gray-700">Uwagi do rozliczenia:</span>{' '}
+                                {work.settlementNotes}
+                            </p>}
+                        </dd>
+                    </div>
                     <div className="mt-4 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-4">
                         <dt className="flex-none">
                             <span className="sr-only">Historia statusów</span>

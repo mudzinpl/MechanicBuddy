@@ -339,6 +339,16 @@ namespace MechanicBuddy.Core.Persistence.Postgres.Repositories
             Map(x => x.EstimateSentOn).Column("estimatesenton").Access.BackingField().CustomType<UtcDateType>();
             Map(x => x.InsurerDecisionOn).Column("insurerdecisionon").Access.BackingField().CustomType<UtcDateType>();
             Map(x => x.SupplementPaidOn).Column("supplementpaidon").Access.BackingField().CustomType<UtcDateType>();
+            Map(x => x.AssignmentOfClaimSignedOn).Column("assignmentofclaimsignedon").Access.BackingField().CustomType<UtcDateType>();
+            Map(x => x.PowerOfAttorneySigned).Column("powerofattorneysigned").Access.BackingField();
+            Map(x => x.PowerOfAttorneySignedOn).Column("powerofattorneysignedon").Access.BackingField().CustomType<UtcDateType>();
+            Map(x => x.ClientVatPercent).Column("clientvatpercent").Access.BackingField();
+            Map(x => x.ClientVatAmount).Column("clientvatamount").Access.BackingField();
+            Map(x => x.UnderpaymentAmount).Column("underpaymentamount").Access.BackingField();
+            Map(x => x.SettlementStatus).Column("settlementstatus").Access.BackingField();
+            Map(x => x.PaymentDemandOn).Column("paymentdemandon").Access.BackingField().CustomType<UtcDateType>();
+            Map(x => x.PaymentReceivedOn).Column("paymentreceivedon").Access.BackingField().CustomType<UtcDateType>();
+            Map(x => x.SettlementNotes).Column("settlementnotes").Access.BackingField();
             Map(x => x.PlannedIntakeOn).Column("plannedintakeon").Access.BackingField().CustomType<UtcDateType>();
             Map(x => x.PlannedReleaseOn).Column("plannedreleaseon").Access.BackingField().CustomType<UtcDateType>();
             Map(x => x.PlannedInspectionOn).Column("plannedinspectionon").Access.BackingField().CustomType<UtcDateType>();
