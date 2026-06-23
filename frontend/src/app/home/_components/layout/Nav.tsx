@@ -9,17 +9,16 @@ import { InboxIcon,
   } from '@heroicons/react/24/outline'
 import clsx from "clsx";
 import { usePathname } from "next/navigation"
+import { canAccessMainSection } from "@/_lib/appRoles";
 
 const navigationIconClass = "size-6 shrink-0";
 const navigation = [
-    // { name: 'Dashboard', href: '/home', icon: <HomeIcon aria-hidden="true" className={navigationIconClass}></HomeIcon>},
-    { name: 'Zlecenia', href: '/home/work', icon: <QueueListIcon aria-hidden="true" className={navigationIconClass}></QueueListIcon> },
-    { name: 'Terminy', href: '/home/calendar', icon: <CalendarDaysIcon aria-hidden="true" className={navigationIconClass}></CalendarDaysIcon> },
-    { name: 'Klienci', href: '/home/clients', icon: <UsersIcon aria-hidden="true" className={navigationIconClass}></UsersIcon>  },
-    { name: 'Pojazdy', href: '/home/vehicles', icon: <TruckIcon aria-hidden="true" className={navigationIconClass}></TruckIcon>  },
-    { name: 'Magazyn', href: '/home/inventory', icon: <Cog6ToothIcon aria-hidden="true" className={navigationIconClass}></Cog6ToothIcon>  },
-    { name: 'Zapytania', href: '/home/requests', icon: <InboxIcon aria-hidden="true" className={navigationIconClass}></InboxIcon>  },
-    // { name: 'Services', href: '/home/services', icon: <WrenchScrewdriverIcon aria-hidden="true" className={navigationIconClass}></WrenchScrewdriverIcon>  },
+    { name: 'Zlecenia', href: '/home/work', section: 'work', icon: <QueueListIcon aria-hidden="true" className={navigationIconClass}></QueueListIcon> },
+    { name: 'Terminy', href: '/home/calendar', section: 'calendar', icon: <CalendarDaysIcon aria-hidden="true" className={navigationIconClass}></CalendarDaysIcon> },
+    { name: 'Klienci', href: '/home/clients', section: 'clients', icon: <UsersIcon aria-hidden="true" className={navigationIconClass}></UsersIcon>  },
+    { name: 'Pojazdy', href: '/home/vehicles', section: 'vehicles', icon: <TruckIcon aria-hidden="true" className={navigationIconClass}></TruckIcon>  },
+    { name: 'Magazyn', href: '/home/inventory', section: 'inventory', icon: <Cog6ToothIcon aria-hidden="true" className={navigationIconClass}></Cog6ToothIcon>  },
+    { name: 'Zapytania', href: '/home/requests', section: 'requests', icon: <InboxIcon aria-hidden="true" className={navigationIconClass}></InboxIcon>  },
 ]
 
 
@@ -27,12 +26,16 @@ export default function Nav({
     onSmallScreen,
     fullName,
     imageUrl,
+    appRole,
 }:{
     onSmallScreen: boolean,
     fullName: string,
     imageUrl: string,
+    appRole: string,
 }) {
     const currentPath = usePathname();
+    const visibleNavigation = navigation.filter((item) => canAccessMainSection(appRole, item.section as Parameters<typeof canAccessMainSection>[1]));
+    const canOpenSettings = canAccessMainSection(appRole, 'settings');
 
     return (
         <>
@@ -41,7 +44,7 @@ export default function Nav({
                 <ul role="list" className="flex flex-1 flex-col gap-y-7">
                     <li>
                         <ul role="list" className="-mx-2 space-y-1">
-                            {navigation.map((item) => (
+                            {visibleNavigation.map((item) => (
                                 <li key={item.name}>
                                     <a
                                         href={item.href}
@@ -68,7 +71,7 @@ export default function Nav({
                         </ul>
                     </li>
                     {!onSmallScreen && <li className="mt-auto flex flex-col mb-5">
-                        <a
+                        {canOpenSettings && <a
                             href="/home/settings"
                             className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold hover:text-white"
                             style={{
@@ -77,7 +80,7 @@ export default function Nav({
                         >
                             <Cog6ToothIcon aria-hidden="true" className="size-6 shrink-0" />
                             Ustawienia
-                        </a>
+                        </a>}
                         <ProfileMenu fullName={fullName} imageUrl={imageUrl} onSmallScreen={false}></ProfileMenu>
                         <p className="mt-4 text-xs opacity-50" style={{ color: 'var(--portal-sidebar-text, #9ca3af)' }}>
                             v{process.env.NEXT_PUBLIC_APP_VERSION || "dev"}
