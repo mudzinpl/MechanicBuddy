@@ -332,6 +332,13 @@ namespace MechanicBuddy.Core.Persistence.Postgres.Repositories
             Map(x => x.ClientPaysVat).Column("clientpaysvat").Access.BackingField();
             Map(x => x.AudatexEstimateNumber).Column("audatexestimatenumber").Access.BackingField();
             Map(x => x.InsurerNotes).Column("insurernotes").Access.BackingField();
+            Map(x => x.ClaimHandlerName).Column("claimhandlername").Access.BackingField();
+            Map(x => x.ClaimHandlerEmail).Column("claimhandleremail").Access.BackingField();
+            Map(x => x.ClaimHandlerPhone).Column("claimhandlerphone").Access.BackingField();
+            Map(x => x.ClaimReportedOn).Column("claimreportedon").Access.BackingField().CustomType<UtcDateType>();
+            Map(x => x.EstimateSentOn).Column("estimatesenton").Access.BackingField().CustomType<UtcDateType>();
+            Map(x => x.InsurerDecisionOn).Column("insurerdecisionon").Access.BackingField().CustomType<UtcDateType>();
+            Map(x => x.SupplementPaidOn).Column("supplementpaidon").Access.BackingField().CustomType<UtcDateType>();
             Map(x => x.PlannedIntakeOn).Column("plannedintakeon").Access.BackingField().CustomType<UtcDateType>();
             Map(x => x.PlannedReleaseOn).Column("plannedreleaseon").Access.BackingField().CustomType<UtcDateType>();
             Map(x => x.PlannedInspectionOn).Column("plannedinspectionon").Access.BackingField().CustomType<UtcDateType>();
@@ -350,6 +357,26 @@ namespace MechanicBuddy.Core.Persistence.Postgres.Repositories
                 .Access
                 .LowerCaseField(); 
 
+        }
+    }
+    public class WorkStatusHistoryMapping : ClassMap<WorkStatusHistory>
+    {
+        public WorkStatusHistoryMapping()
+        {
+            Schema("domain");
+            Table("work_status_history");
+
+            Id(x => x.Id)
+                .Column("id")
+                .GeneratedBy
+                .DefaultGeneratedBy();
+
+            References(x => x.Work).Column("workid").Access.BackingField();
+            Map(x => x.OldStatus).Column("oldstatus").Access.BackingField();
+            Map(x => x.NewStatus).Column("newstatus").Access.BackingField();
+            Map(x => x.Comment).Column("comment").Access.BackingField();
+            References(x => x.ChangedBy).Column("changedbyemployeeid").Access.BackingField();
+            Map(x => x.ChangedOn).Column("changedon").Access.BackingField().CustomType<UtcDateType>();
         }
     }
     public class PricingLineMapping : ClassMap<PricingLine>

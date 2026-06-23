@@ -22,6 +22,13 @@ export interface IWorkData extends IActivity{
     clientPaysVat:   boolean;
     audatexEstimateNumber: string;
     insurerNotes:    string;
+    claimHandlerName: string;
+    claimHandlerEmail: string;
+    claimHandlerPhone: string;
+    claimReportedOn: string;
+    estimateSentOn: string;
+    insurerDecisionOn: string;
+    supplementPaidOn: string;
     plannedIntakeOn: string;
     plannedReleaseOn: string;
     plannedInspectionOn: string;
@@ -91,6 +98,30 @@ export const damageStatuses = [
   { value: 'settled', label: 'Rozliczone' },
   { value: 'on_hold', label: 'Wstrzymane' },
   { value: 'rejected', label: 'Odmowa / brak akceptacji' },
+] as const;
+
+export const insurers = [
+  'PZU',
+  'Warta',
+  'ERGO Hestia',
+  'UNIQA',
+  'InterRisk',
+  'Compensa',
+  'Allianz',
+  'Generali',
+  'Link4',
+  'Trasti',
+  'Wiener',
+  'HDI',
+  'Inny',
+] as const;
+
+export const damageTypes = [
+  'OC',
+  'AC',
+  'Gotówka',
+  'Flota',
+  'Assistance',
 ] as const;
 
 export function getDamageStatusLabel(status?: string | null): string {
