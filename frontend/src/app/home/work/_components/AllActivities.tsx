@@ -21,6 +21,7 @@ import InvoiceSettlement from './InvoiceSettlement'
 import PartOrders from './PartOrders'
 import WorkTasks from './WorkTasks'
 import QualityChecklist from './QualityChecklist'
+import VehicleRelease from './VehicleRelease'
 
  
 export default function Activities({
@@ -54,6 +55,9 @@ export default function Activities({
         </li>
         <li>
           <QualityChecklist workId={work.id}></QualityChecklist>
+        </li>
+        <li>
+          <VehicleRelease workId={work.id}></VehicleRelease>
         </li>
         <li>
           <InvoiceSettlement workId={work.id}></InvoiceSettlement>
