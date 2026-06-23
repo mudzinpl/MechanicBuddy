@@ -15,7 +15,7 @@ namespace MechanicBuddy.Core.Application
     public class User
     { 
         protected User() { }
-        public User(string userName, string password, string email, bool validated, byte[] profileImage,  UserIdentifier id = null)
+        public User(string userName, string password, string email, bool validated, byte[] profileImage,  UserIdentifier id = null, string appRole = null)
         {
             if (string.IsNullOrWhiteSpace(userName))
             {
@@ -32,6 +32,7 @@ namespace MechanicBuddy.Core.Application
             Validated = validated;
             ProfileImage = profileImage;
             Id = id;
+            AppRole = Authorization.AppRoles.Normalize(appRole);
         }
 
         public virtual byte[] ProfileImage { get; protected set; }
@@ -40,6 +41,7 @@ namespace MechanicBuddy.Core.Application
         public virtual bool Validated { get;protected set; }
         public virtual string UserName { get; protected set; }
         public virtual string Password { get;protected set; }
+        public virtual string AppRole { get; protected set; }
         public virtual UserIdentifier Id { get; protected internal set; }
 
         public override bool Equals(object obj)
@@ -80,6 +82,11 @@ namespace MechanicBuddy.Core.Application
         public virtual void ChangeUserName(string userName)
         {
             this.UserName = userName;
+        }
+
+        public virtual void ChangeAppRole(string appRole)
+        {
+            this.AppRole = Authorization.AppRoles.Normalize(appRole);
         }
     }
 }
