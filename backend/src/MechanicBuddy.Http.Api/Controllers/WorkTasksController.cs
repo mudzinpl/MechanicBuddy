@@ -139,7 +139,7 @@ namespace MechanicBuddy.Http.Api.Controllers
 
             if (affected == 0) return NotFound();
             TouchWork(workId);
-            return Ok();
+            return Ok(new { Success = true });
         }
 
         [HttpDelete("{taskId:guid}")]
@@ -155,7 +155,7 @@ namespace MechanicBuddy.Http.Api.Controllers
 
             if (affected == 0) return NotFound();
             TouchWork(workId);
-            return NoContent();
+            return Ok(new { Success = true });
         }
 
         private bool WorkExists(Guid workId)
