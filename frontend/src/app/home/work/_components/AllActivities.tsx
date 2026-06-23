@@ -18,6 +18,7 @@ import WorkDocuments from './WorkDocuments'
 import ReplacementVehicle from './ReplacementVehicle'
 import WorkCommunication from './WorkCommunication'
 import InvoiceSettlement from './InvoiceSettlement'
+import PartOrders from './PartOrders'
 
  
 export default function Activities({
@@ -48,6 +49,9 @@ export default function Activities({
         </li>
         <li>
           <InvoiceSettlement workId={work.id}></InvoiceSettlement>
+        </li>
+        <li>
+          <PartOrders workId={work.id}></PartOrders>
         </li>
         <li>
           <ReplacementVehicle workId={work.id} rental={work.replacementVehicle}></ReplacementVehicle>
