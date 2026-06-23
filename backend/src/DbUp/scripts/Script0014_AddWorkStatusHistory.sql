@@ -1,5 +1,5 @@
 CREATE TABLE IF NOT EXISTS domain.work_status_history (
-    id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     workid uuid NOT NULL REFERENCES domain.work(id) ON DELETE CASCADE,
     oldstatus varchar NOT NULL,
     newstatus varchar NOT NULL,
