@@ -1,6 +1,6 @@
 'use client';
 import { ChevronDownIcon } from '@heroicons/react/16/solid'
-import { BuildingOfficeIcon, UserIcon, PaintBrushIcon, GlobeAltIcon, UsersIcon, ClipboardDocumentListIcon } from '@heroicons/react/20/solid'
+import { BuildingOfficeIcon, UserIcon, PaintBrushIcon, GlobeAltIcon, UsersIcon, ClipboardDocumentListIcon, PuzzlePieceIcon } from '@heroicons/react/20/solid'
 import clsx from 'clsx'
 import { usePathname, useRouter } from 'next/navigation';
 import { useState, useEffect } from 'react';
@@ -19,6 +19,7 @@ interface Tab {
 const allTabs: Tab[] = [
   { name: 'Moje konto', href: '/home/profile', icon: UserIcon, exact: true },
   { name: 'Ustawienia faktur', href: '/home/settings', icon: BuildingOfficeIcon, exact: true },
+  { name: 'Integracje', href: '/home/settings/integrations', icon: PuzzlePieceIcon, exact: false },
   { name: 'Identyfikacja wizualna', href: '/home/settings/branding', icon: PaintBrushIcon, exact: false },
   { name: 'Strona startowa', href: '/home/settings/landing', icon: GlobeAltIcon, exact: false },
   { name: 'Użytkownicy', href: '/home/settings/users', icon: UsersIcon, exact: false, requiresUserManagement: true },
