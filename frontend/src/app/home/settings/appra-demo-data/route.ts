@@ -15,7 +15,7 @@ export async function POST(request: NextRequest) {
       return redirectWithToast(redirectUrl, 'Sesja wygasła. Zaloguj się ponownie i spróbuj utworzyć dane demonstracyjne APPRA.', true);
     }
 
-    const headers: HeadersInit = {
+    const headers: Record<string, string> = {
       'Authorization': `Bearer ${jwt}`,
       'Content-Type': 'application/json',
     };
