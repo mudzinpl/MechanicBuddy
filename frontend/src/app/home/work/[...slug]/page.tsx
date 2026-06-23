@@ -45,7 +45,7 @@ export default async function Page({
     data = await httpGet(`work/${work.id}/documents`);
     const documents = await data.json() as IWorkDocument[];
 
-    data = await httpGet(`work/${work.id}/status-history`);
+    data = await httpGet(`workstatushistory/${work.id}`);
     work.statusHistory = await data.json() as IWorkStatusHistory[];
  
     const activityDisplayName = getActivityDisplayName(activityName,activityNumber,issuance?.number);
