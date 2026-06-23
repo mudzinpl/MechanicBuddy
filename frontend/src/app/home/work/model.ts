@@ -19,7 +19,17 @@ export interface IWorkData extends IActivity{
     damageType:      string;
     damageStatus:    string;
     assignmentOfClaimSigned: boolean;
+    assignmentOfClaimSignedOn: string;
+    powerOfAttorneySigned: boolean;
+    powerOfAttorneySignedOn: string;
     clientPaysVat:   boolean;
+    clientVatPercent: number | null;
+    clientVatAmount: number | null;
+    underpaymentAmount: number | null;
+    settlementStatus: string;
+    paymentDemandOn: string;
+    paymentReceivedOn: string;
+    settlementNotes: string;
     audatexEstimateNumber: string;
     insurerNotes:    string;
     claimHandlerName: string;
@@ -124,12 +134,24 @@ export const damageTypes = [
   'Assistance',
 ] as const;
 
+export const settlementStatuses = [
+  { value: 'unsettled', label: 'Nierozliczone' },
+  { value: 'partially_settled', label: 'Częściowo rozliczone' },
+  { value: 'settled', label: 'Rozliczone' },
+] as const;
+
 export function getDamageStatusLabel(status?: string | null): string {
   if (!status) return '';
 
   return damageStatuses.find(item =>
     item.value === status || item.label.toLocaleLowerCase('pl') === status.toLocaleLowerCase('pl')
   )?.label ?? status;
+}
+
+export function getSettlementStatusLabel(status?: string | null): string {
+  if (!status) return 'Nierozliczone';
+
+  return settlementStatuses.find(item => item.value === status)?.label ?? status;
 }
 
 export interface ICurrentActivity{

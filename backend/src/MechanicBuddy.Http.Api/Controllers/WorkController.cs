@@ -114,7 +114,17 @@ namespace MechanicBuddy.Http.Api.Controllers
                 work.DamageType,
                 work.DamageStatus,
                 work.AssignmentOfClaimSigned,
+                work.AssignmentOfClaimSignedOn,
+                work.PowerOfAttorneySigned,
+                work.PowerOfAttorneySignedOn,
                 work.ClientPaysVat,
+                work.ClientVatPercent,
+                work.ClientVatAmount,
+                work.UnderpaymentAmount,
+                work.SettlementStatus,
+                work.PaymentDemandOn,
+                work.PaymentReceivedOn,
+                work.SettlementNotes,
                 work.AudatexEstimateNumber,
                 work.InsurerNotes,
                 work.ClaimHandlerName,
@@ -153,7 +163,10 @@ namespace MechanicBuddy.Http.Api.Controllers
                         w.insurerdecisionon,
                         w.audatexestimatenumber,
                         w.assignmentofclaimsigned,
+                        w.powerofattorneysigned,
                         w.clientpaysvat,
+                        w.settlementstatus,
+                        w.paymentreceivedon,
                         w.startedon,
                         w.changedon,
                         w.plannedintakeon,
@@ -209,6 +222,14 @@ namespace MechanicBuddy.Http.Api.Controllers
                     WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND COALESCE(TRIM(claimnumber), '') = ''
                 UNION ALL SELECT 'missing_insurer', COUNT(*)::int FROM work_data
                     WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND COALESCE(TRIM(insurer), '') = ''
+                UNION ALL SELECT 'missing_assignment', COUNT(*)::int FROM work_data
+                    WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND assignmentofclaimsigned = FALSE
+                UNION ALL SELECT 'missing_power_of_attorney', COUNT(*)::int FROM work_data
+                    WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND powerofattorneysigned = FALSE
+                UNION ALL SELECT 'client_vat_payment', COUNT(*)::int FROM work_data
+                    WHERE clientpaysvat = TRUE
+                UNION ALL SELECT 'unsettled_cases', COUNT(*)::int FROM work_data
+                    WHERE COALESCE(settlementstatus, 'unsettled') <> 'settled'
                 UNION ALL SELECT 'today_schedule', COUNT(*)::int FROM (
                     SELECT id FROM work_data WHERE (plannedintakeon AT TIME ZONE 'Europe/Warsaw')::date = (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
                     UNION ALL SELECT id FROM work_data WHERE (plannedinspectionon AT TIME ZONE 'Europe/Warsaw')::date = (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
@@ -232,6 +253,11 @@ namespace MechanicBuddy.Http.Api.Controllers
                     UNION ALL SELECT id FROM work_data WHERE plannedreleaseon IS NOT NULL AND (plannedreleaseon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date AND damagestatus NOT IN ('released', 'settled', 'rejected')
                     UNION ALL SELECT id FROM work_data WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND COALESCE(TRIM(claimhandlername), '') = ''
                     UNION ALL SELECT id FROM work_data WHERE estimatesenton IS NOT NULL AND insurerdecisionon IS NULL AND estimatesenton < CURRENT_TIMESTAMP - INTERVAL '3 days'
+                    UNION ALL SELECT id FROM work_data WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND assignmentofclaimsigned = FALSE
+                    UNION ALL SELECT id FROM work_data WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND powerofattorneysigned = FALSE
+                    UNION ALL SELECT id FROM work_data WHERE clientpaysvat = TRUE
+                    UNION ALL SELECT id FROM work_data WHERE COALESCE(settlementstatus, 'unsettled') <> 'settled'
+                    UNION ALL SELECT id FROM work_data WHERE clientpaysvat = TRUE AND paymentreceivedon IS NULL
                 ) manager_attention").ToArray();
 
             var insurers = session.Connection.Query<DashboardTileDto>(baseWorkCte + @"
@@ -277,6 +303,14 @@ namespace MechanicBuddy.Http.Api.Controllers
                 UNION ALL
                 SELECT id, worknr, clientname, regnr, damagestatus, 'missing_assignment', NULL::timestamptz
                 FROM work_data WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND assignmentofclaimsigned = FALSE
+                UNION ALL
+                SELECT id, worknr, clientname, regnr, damagestatus, 'missing_power_of_attorney', NULL::timestamptz
+                FROM work_data WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND powerofattorneysigned = FALSE
+                SELECT id, worknr, clientname, regnr, damagestatus, 'unsettled_case', NULL::timestamptz
+                FROM work_data WHERE COALESCE(settlementstatus, 'unsettled') <> 'settled'
+                UNION ALL
+                SELECT id, worknr, clientname, regnr, damagestatus, 'client_vat_without_payment_date', NULL::timestamptz
+                FROM work_data WHERE clientpaysvat = TRUE AND paymentreceivedon IS NULL
                 ORDER BY worknr DESC
                 LIMIT 100").ToArray();
 
@@ -315,6 +349,11 @@ namespace MechanicBuddy.Http.Api.Controllers
                         w.claimhandlername,
                         w.estimatesenton,
                         w.insurerdecisionon,
+                        w.assignmentofclaimsigned,
+                        w.powerofattorneysigned,
+                        w.clientpaysvat,
+                        w.settlementstatus,
+                        w.paymentreceivedon,
                         w.startedon,
                         w.changedon,
                         w.plannedintakeon,
@@ -378,6 +417,21 @@ namespace MechanicBuddy.Http.Api.Controllers
                     UNION ALL
                     SELECT id, worknr, clientname, regnr, damagestatus, 'planned_release_overdue', plannedreleaseon
                     FROM work_data WHERE plannedreleaseon IS NOT NULL AND (plannedreleaseon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date AND damagestatus NOT IN ('released', 'settled', 'rejected')
+                    UNION ALL
+                    SELECT id, worknr, clientname, regnr, damagestatus, 'missing_assignment', NULL::timestamptz
+                    FROM work_data WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND assignmentofclaimsigned = FALSE
+                    UNION ALL
+                    SELECT id, worknr, clientname, regnr, damagestatus, 'missing_power_of_attorney', NULL::timestamptz
+                    FROM work_data WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND powerofattorneysigned = FALSE
+                    UNION ALL
+                    SELECT id, worknr, clientname, regnr, damagestatus, 'vat_payment', NULL::timestamptz
+                    FROM work_data WHERE clientpaysvat = TRUE
+                    UNION ALL
+                    SELECT id, worknr, clientname, regnr, damagestatus, 'unsettled_case', NULL::timestamptz
+                    FROM work_data WHERE COALESCE(settlementstatus, 'unsettled') <> 'settled'
+                    UNION ALL
+                    SELECT id, worknr, clientname, regnr, damagestatus, 'client_vat_without_payment_date', NULL::timestamptz
+                    FROM work_data WHERE clientpaysvat = TRUE AND paymentreceivedon IS NULL
                 )";
 
             var today = session.Connection.Query<DashboardWorkItemDto>(baseCalendarCte + @"
@@ -506,7 +560,17 @@ namespace MechanicBuddy.Http.Api.Controllers
                 model.ClaimReportedOn,
                 model.EstimateSentOn,
                 model.InsurerDecisionOn,
-                model.SupplementPaidOn);
+                model.SupplementPaidOn,
+                model.AssignmentOfClaimSignedOn,
+                model.PowerOfAttorneySigned,
+                model.PowerOfAttorneySignedOn,
+                model.ClientVatPercent,
+                model.ClientVatAmount,
+                model.UnderpaymentAmount,
+                model.SettlementStatus,
+                model.PaymentDemandOn,
+                model.PaymentReceivedOn,
+                model.SettlementNotes);
             work.UpdateSchedule(model.PlannedIntakeOn, model.PlannedReleaseOn, model.PlannedInspectionOn);
 
             if (model.AssignedTo != null) work.Assign(model.AssignedTo.Select(x => repository.Get<Employee>(x)).ToArray());
@@ -589,7 +653,17 @@ namespace MechanicBuddy.Http.Api.Controllers
                 model.ClaimReportedOn,
                 model.EstimateSentOn,
                 model.InsurerDecisionOn,
-                model.SupplementPaidOn);
+                model.SupplementPaidOn,
+                model.AssignmentOfClaimSignedOn,
+                model.PowerOfAttorneySigned,
+                model.PowerOfAttorneySignedOn,
+                model.ClientVatPercent,
+                model.ClientVatAmount,
+                model.UnderpaymentAmount,
+                model.SettlementStatus,
+                model.PaymentDemandOn,
+                model.PaymentReceivedOn,
+                model.SettlementNotes);
             work.UpdateSchedule(model.PlannedIntakeOn, model.PlannedReleaseOn, model.PlannedInspectionOn);
             work.Assign(model.AssignedTo == null ? Enumerable.Empty<Employee>().ToArray() : model.AssignedTo.Select(x => repository.Get<Employee>(x)).ToArray());
 
@@ -805,6 +879,10 @@ from (
    w.claimnumber,
    w.insurer,
    w.damagetype,
+   w.assignmentofclaimsigned,
+   w.powerofattorneysigned,
+   w.clientpaysvat,
+   w.settlementstatus,
    w.number as worknr,   
    w.startedon ,  
 	{(onlyIssued?issuanceSql: "(select count(*) from domain.offer o where o.workid = w.id)  as numberOfOffers")}, 

@@ -53,6 +53,10 @@ const tileDefinitions = [
   { key: 'damage_cash_fleet', label: 'Gotówka / flota', href: '/home/work', icon: BanknotesIcon, color: 'text-emerald-700 bg-emerald-50' },
   { key: 'missing_claim_number', label: 'Bez numeru szkody', href: '/home/work', icon: ExclamationTriangleIcon, color: 'text-red-700 bg-red-50' },
   { key: 'missing_insurer', label: 'Bez ubezpieczyciela', href: '/home/work', icon: ExclamationTriangleIcon, color: 'text-amber-700 bg-amber-50' },
+  { key: 'missing_assignment', label: 'Bez cesji', href: '/home/work', icon: ExclamationTriangleIcon, color: 'text-rose-700 bg-rose-50' },
+  { key: 'missing_power_of_attorney', label: 'Bez pełnomocnictwa', href: '/home/work', icon: ExclamationTriangleIcon, color: 'text-orange-700 bg-orange-50' },
+  { key: 'client_vat_payment', label: 'Dopłaty VAT', href: '/home/work', icon: BanknotesIcon, color: 'text-emerald-700 bg-emerald-50' },
+  { key: 'unsettled_cases', label: 'Nierozliczone', href: '/home/work', icon: ClockIcon, color: 'text-slate-700 bg-slate-50' },
   { key: 'today_schedule', label: 'Dzisiejsze terminy', href: '/home/calendar', icon: CalendarDaysIcon, color: 'text-indigo-700 bg-indigo-50' },
   { key: 'overdue_schedule', label: 'Zaległe terminy', href: '/home/calendar', icon: ExclamationTriangleIcon, color: 'text-red-700 bg-red-50' },
   { key: 'replacement_returns_due', label: 'Pojazdy zastępcze do zwrotu', href: '/home/calendar', icon: TruckIcon, color: 'text-amber-700 bg-amber-50' },
@@ -72,6 +76,9 @@ const attentionDefinitions = [
   { key: 'planned_release_overdue', label: 'Przekroczony planowany termin wydania' },
   { key: 'vat_payment', label: 'Dopłata VAT klienta' },
   { key: 'missing_assignment', label: 'Brak podpisanej cesji' },
+  { key: 'missing_power_of_attorney', label: 'Brak podpisanego pełnomocnictwa' },
+  { key: 'unsettled_case', label: 'Sprawa nierozliczona' },
+  { key: 'client_vat_without_payment_date', label: 'Dopłata VAT bez daty zapłaty' },
 ] as const;
 
 const todayDefinitions = [

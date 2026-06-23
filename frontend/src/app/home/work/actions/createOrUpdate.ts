@@ -10,6 +10,10 @@ export async function createOrUpdate(
       
      
     const id = formData.get('id');
+    const optionalNumber = (name: string) => {
+       const value = formData.get(name)?.toString();
+       return value ? Number(value) : null;
+    };
     // When 'onlyClientVehicles' switch is ON, user is searching all vehicles (VehiclesCombobox)
     // When OFF, user selects from client's vehicles dropdown (Select)
     let vehicleId = formData.get('onlyClientVehicles') == 'on'
@@ -35,7 +39,17 @@ export async function createOrUpdate(
        damageType: formData.get('damageType')?.toString() || null,
        damageStatus: formData.get('damageStatus')?.toString() || null,
        assignmentOfClaimSigned: formData.get('assignmentOfClaimSigned') == 'on',
+       assignmentOfClaimSignedOn: formData.get('assignmentOfClaimSignedOn')?.toString() || null,
+       powerOfAttorneySigned: formData.get('powerOfAttorneySigned') == 'on',
+       powerOfAttorneySignedOn: formData.get('powerOfAttorneySignedOn')?.toString() || null,
        clientPaysVat: formData.get('clientPaysVat') == 'on',
+       clientVatPercent: optionalNumber('clientVatPercent'),
+       clientVatAmount: optionalNumber('clientVatAmount'),
+       underpaymentAmount: optionalNumber('underpaymentAmount'),
+       settlementStatus: formData.get('settlementStatus')?.toString() || 'unsettled',
+       paymentDemandOn: formData.get('paymentDemandOn')?.toString() || null,
+       paymentReceivedOn: formData.get('paymentReceivedOn')?.toString() || null,
+       settlementNotes: formData.get('settlementNotes')?.toString() || null,
        audatexEstimateNumber: formData.get('audatexEstimateNumber')?.toString() || null,
        insurerNotes: formData.get('insurerNotes')?.toString() || null,
        claimHandlerName: formData.get('claimHandlerName')?.toString() || null,
