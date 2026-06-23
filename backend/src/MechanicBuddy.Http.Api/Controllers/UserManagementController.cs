@@ -403,7 +403,7 @@ namespace MechanicBuddy.Http.Api.Controllers
         public ActionResult<CanManageUsersDto> CanManageUsers()
         {
             var tier = Environment.GetEnvironmentVariable("TENANT_TIER")?.ToLowerInvariant() ?? "solo";
-            var canManage = AppRoles.IsAdministrator(User) && (tier == "team" || tier == "lifetime");
+            var canManage = AppRoles.IsAdministrator(User);
             var hasWorkOrderLimit = tier == "solo" || tier == "free";
             var workOrderLimit = hasWorkOrderLimit ? 1000 : 0;
             var workOrderCount = session.QueryOver<Core.Domain.Work>().RowCount();
