@@ -7,16 +7,15 @@ import SimpleSearchBar from "../../_components/SimpleSearchBar";
 import Link from "next/link";
 import { httpGet } from "@/_lib/server/query-api";
 import BlueBadge from "@/_components/BlueBadge";
+import { getAppRoleLabel } from "@/_lib/appRoles";
 
 export default async function Page(
   { searchParams }: { searchParams: Promise<Record<string, string>> }) {
 
-  // Check if user can manage users
   const canManageResponse = await httpGet('usermanagement/canmanage');
-  const canManageUsers = await canManageResponse.json() as boolean;
+  const canManageUsers = await canManageResponse.json() as { canManageUsers?: boolean };
 
-  // If user cannot manage users, show upgrade prompt
-  if (!canManageUsers) {
+  if (!canManageUsers.canManageUsers) {
     return <Main header={
       <SearchCardHeader title="Użytkownicy" pageName="settings/users">
       </SearchCardHeader>
@@ -24,7 +23,7 @@ export default async function Page(
       <div className="text-center py-12">
         <h3 className="mt-2 text-sm font-semibold text-gray-900">Zarządzanie użytkownikami jest niedostępne</h3>
         <p className="mt-1 text-sm text-gray-500">
-          Zmień plan na wyższy, aby zarządzać wieloma użytkownikami.
+          Tylko administrator może zarządzać użytkownikami i rolami.
         </p>
       </div>
     </Main>
@@ -60,6 +59,10 @@ export default async function Page(
               </div>
             );
           }
+        }, {
+          dataField: "appRole",
+          headerText: "Rola",
+          dataFormatter: ({ appRole }) => getAppRoleLabel(appRole),
         }, {
           dataField: "email",
           headerText: "E-mail",
