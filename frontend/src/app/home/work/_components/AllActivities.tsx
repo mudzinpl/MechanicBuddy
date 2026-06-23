@@ -19,6 +19,7 @@ import ReplacementVehicle from './ReplacementVehicle'
 import WorkCommunication from './WorkCommunication'
 import InvoiceSettlement from './InvoiceSettlement'
 import PartOrders from './PartOrders'
+import WorkTasks from './WorkTasks'
 
  
 export default function Activities({
@@ -46,6 +47,9 @@ export default function Activities({
           <div className="p-5 pb-10">
             <WorkInformation hasRepairJobWithProductsOrServices={containsRepairJobWithProductsOrServices} work={ work} ></WorkInformation>
           </div>
+        </li>
+        <li>
+          <WorkTasks workId={work.id}></WorkTasks>
         </li>
         <li>
           <InvoiceSettlement workId={work.id}></InvoiceSettlement>

@@ -5,6 +5,7 @@ import {
   ChatBubbleLeftRightIcon,
   CheckCircleIcon,
   ClockIcon,
+  ClipboardDocumentListIcon,
   CubeIcon,
   ExclamationTriangleIcon,
   EyeIcon,
@@ -68,6 +69,10 @@ const tileDefinitions = [
 ] as const;
 
 const attentionDefinitions = [
+  { key: 'my_tasks', label: 'Moje zadania' },
+  { key: 'task_overdue', label: 'Zadania po terminie' },
+  { key: 'task_urgent', label: 'Pilne zadania' },
+  { key: 'task_unassigned', label: 'Zadania bez osoby przypisanej' },
   { key: 'missing_claim_number', label: 'Brak numeru szkody' },
   { key: 'missing_insurer', label: 'Brak ubezpieczyciela' },
   { key: 'missing_claim_handler', label: 'Brak opiekuna szkody' },
@@ -127,9 +132,11 @@ export default async function Page() {
   const communicationAttention = await communicationResponse.json() as DashboardWorkItem[];
   const partsResponse = await httpGet('work/part-order-alerts');
   const partsAttention = await partsResponse.json() as DashboardWorkItem[];
+  const tasksResponse = await httpGet('work/task-alerts');
+  const tasksAttention = await tasksResponse.json() as DashboardWorkItem[];
   const counts = new Map((data.tiles || []).map(tile => [tile.key, tile.count]));
   const insurers = data.insurers || [];
-  const attention = [...(data.attention || []), ...(partsAttention || []), ...(communicationAttention || [])];
+  const attention = [...(data.attention || []), ...(tasksAttention || []), ...(partsAttention || []), ...(communicationAttention || [])];
   const today = data.today || [];
 
   return (
@@ -204,6 +211,7 @@ export default async function Page() {
                     <h3 className="mb-1 flex items-center gap-2 px-3 text-sm font-semibold text-gray-700">
                       {group.key.startsWith('communication_') && <ChatBubbleLeftRightIcon className="size-4 text-gray-400" aria-hidden="true" />}
                       {group.key.startsWith('parts_') || group.key === 'repair_waiting_for_parts' ? <CubeIcon className="size-4 text-gray-400" aria-hidden="true" /> : null}
+                      {group.key.startsWith('task_') || group.key === 'my_tasks' ? <ClipboardDocumentListIcon className="size-4 text-gray-400" aria-hidden="true" /> : null}
                       <span>{group.label} ({items.length})</span>
                     </h3>
                     <div className="divide-y divide-gray-100">{items.map(item => <WorkLink key={`${group.key}-${item.id}-${item.scheduledOn ?? 'brak-daty'}`} item={item} />)}</div>
