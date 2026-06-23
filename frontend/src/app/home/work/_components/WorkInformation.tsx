@@ -42,9 +42,16 @@ export function WorkInformation({
         work.insurer ||
         work.damageType ||
         work.damageStatus ||
+        work.claimHandlerName ||
+        work.claimHandlerEmail ||
+        work.claimHandlerPhone ||
+        work.claimReportedOn ||
         work.assignmentOfClaimSigned ||
         work.clientPaysVat ||
         work.audatexEstimateNumber ||
+        work.estimateSentOn ||
+        work.insurerDecisionOn ||
+        work.supplementPaidOn ||
         work.insurerNotes ||
         work.plannedIntakeOn ||
         work.plannedReleaseOn ||
@@ -53,14 +60,21 @@ export function WorkInformation({
     const claimDetails = [
         ['Numer szkody', work.claimNumber],
         ['Ubezpieczyciel', work.insurer],
+        ['Opiekun szkody', work.claimHandlerName],
+        ['E-mail opiekuna', work.claimHandlerEmail],
+        ['Telefon opiekuna', work.claimHandlerPhone],
         ['Rodzaj szkody', work.damageType],
         ['Status procesu', getDamageStatusLabel(work.damageStatus)],
+        ['Data zgłoszenia szkody', work.claimReportedOn ? moment(work.claimReportedOn).locale('pl').format('DD.MM.YYYY') : ''],
         ['Cesja podpisana', work.assignmentOfClaimSigned ? 'Tak' : 'Nie'],
         ['Klient dopłaca VAT', work.clientPaysVat ? 'Tak' : 'Nie'],
         ['Kosztorys Audanet / Audatex', work.audatexEstimateNumber],
+        ['Data wysłania kosztorysu', work.estimateSentOn ? moment(work.estimateSentOn).locale('pl').format('DD.MM.YYYY') : ''],
+        ['Data decyzji ubezpieczyciela', work.insurerDecisionOn ? moment(work.insurerDecisionOn).locale('pl').format('DD.MM.YYYY') : ''],
+        ['Data dopłaty', work.supplementPaidOn ? moment(work.supplementPaidOn).locale('pl').format('DD.MM.YYYY') : ''],
         ['Planowane przyjęcie', work.plannedIntakeOn ? moment(work.plannedIntakeOn).locale('pl').format('DD.MM.YYYY') : ''],
         ['Planowane wydanie', work.plannedReleaseOn ? moment(work.plannedReleaseOn).locale('pl').format('DD.MM.YYYY') : ''],
-        ['Termin oględzin', work.plannedInspectionOn ? moment(work.plannedInspectionOn).locale('pl').format('DD.MM.YYYY') : ''],
+        ['Data oględzin', work.plannedInspectionOn ? moment(work.plannedInspectionOn).locale('pl').format('DD.MM.YYYY') : ''],
     ].filter(([, value]) => value);
 
     const deleteInvoiceRef = React.useRef<BaseDialogHandle>(null);
@@ -238,11 +252,11 @@ export function WorkInformation({
                     </div>}
                     {hasClaimDetails && <div className="mt-4 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-4">
                         <dt className="flex-none">
-                            <span className="sr-only">Likwidacja szkody</span>
+                            <span className="sr-only">Ubezpieczyciel i szkoda</span>
                             <ShieldCheckIcon aria-hidden="true" className="h-6 w-5 text-gray-400" />
                         </dt>
                         <dd className="text-sm/6 text-gray-500">
-                            <p className="font-semibold text-gray-900">Likwidacja szkody</p>
+                            <p className="font-semibold text-gray-900">Ubezpieczyciel i szkoda</p>
                             {claimDetails.map(([label, value]) => (
                                 <p key={label}>
                                     <span className="font-medium text-gray-700">{label}:</span> {value}

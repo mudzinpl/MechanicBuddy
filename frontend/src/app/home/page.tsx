@@ -33,6 +33,7 @@ interface DashboardWorkItem {
 
 interface DashboardData {
   tiles: DashboardTile[];
+  insurers: DashboardTile[];
   attention: DashboardWorkItem[];
   today: DashboardWorkItem[];
 }
@@ -47,6 +48,11 @@ const tileDefinitions = [
   { key: 'on_hold', label: 'Wstrzymane', href: '/home/work?damageStatus=on_hold', icon: PauseCircleIcon, color: 'text-red-700 bg-red-50' },
   { key: 'settled_this_month', label: 'Rozliczone w tym miesiącu', href: '/home/work?damageStatus=settled', icon: BanknotesIcon, color: 'text-emerald-700 bg-emerald-50' },
   { key: 'active_replacement_vehicles', label: 'Aktywne pojazdy zastępcze', href: '/home/work', icon: TruckIcon, color: 'text-sky-700 bg-sky-50' },
+  { key: 'damage_oc', label: 'Szkody OC', href: '/home/work', icon: ShieldCheckIcon, color: 'text-blue-700 bg-blue-50' },
+  { key: 'damage_ac', label: 'Szkody AC', href: '/home/work', icon: ShieldCheckIcon, color: 'text-indigo-700 bg-indigo-50' },
+  { key: 'damage_cash_fleet', label: 'Gotówka / flota', href: '/home/work', icon: BanknotesIcon, color: 'text-emerald-700 bg-emerald-50' },
+  { key: 'missing_claim_number', label: 'Bez numeru szkody', href: '/home/work', icon: ExclamationTriangleIcon, color: 'text-red-700 bg-red-50' },
+  { key: 'missing_insurer', label: 'Bez ubezpieczyciela', href: '/home/work', icon: ExclamationTriangleIcon, color: 'text-amber-700 bg-amber-50' },
   { key: 'today_schedule', label: 'Dzisiejsze terminy', href: '/home/calendar', icon: CalendarDaysIcon, color: 'text-indigo-700 bg-indigo-50' },
   { key: 'overdue_schedule', label: 'Zaległe terminy', href: '/home/calendar', icon: ExclamationTriangleIcon, color: 'text-red-700 bg-red-50' },
   { key: 'replacement_returns_due', label: 'Pojazdy zastępcze do zwrotu', href: '/home/calendar', icon: TruckIcon, color: 'text-amber-700 bg-amber-50' },
@@ -56,7 +62,9 @@ const tileDefinitions = [
 const attentionDefinitions = [
   { key: 'missing_claim_number', label: 'Brak numeru szkody' },
   { key: 'missing_insurer', label: 'Brak ubezpieczyciela' },
+  { key: 'missing_claim_handler', label: 'Brak opiekuna szkody' },
   { key: 'missing_estimate', label: 'Brak kosztorysu Audanet / Audatex' },
+  { key: 'insurer_decision_overdue', label: 'Brak decyzji ubezpieczyciela po 3 dniach od wysłania kosztorysu' },
   { key: 'inspection_missing_after_two_days', label: 'Brak oględzin po 2 dniach od zgłoszenia' },
   { key: 'approval_overdue', label: 'Oczekuje na akceptację dłużej niż 3 dni' },
   { key: 'repair_overdue', label: 'Pojazd w naprawie dłużej niż 7 dni' },
@@ -94,6 +102,7 @@ export default async function Page() {
   const response = await httpGet('work/dashboard');
   const data = await response.json() as DashboardData;
   const counts = new Map((data.tiles || []).map(tile => [tile.key, tile.count]));
+  const insurers = data.insurers || [];
   const attention = data.attention || [];
   const today = data.today || [];
 
@@ -122,6 +131,26 @@ export default async function Page() {
                 </Link>
               );
             })}
+          </div>
+        </section>
+
+        <section className="mt-6 rounded-lg bg-white shadow-sm ring-1 ring-gray-900/5" aria-labelledby="insurers-heading">
+          <div className="flex items-center gap-3 border-b border-gray-100 px-5 py-4">
+            <ShieldCheckIcon className="size-6 text-blue-600" aria-hidden="true" />
+            <div>
+              <h2 id="insurers-heading" className="font-semibold text-gray-900">Sprawy według ubezpieczyciela</h2>
+              <p className="text-sm text-gray-500">Najczęściej występujący ubezpieczyciele w zleceniach.</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 gap-3 p-4 sm:grid-cols-2 xl:grid-cols-4">
+            {insurers.length === 0 ? (
+              <p className="text-sm text-gray-500">Brak danych o ubezpieczycielach</p>
+            ) : insurers.map(item => (
+              <div key={item.key} className="rounded-md border border-gray-100 px-3 py-2">
+                <p className="truncate text-sm font-medium text-gray-700">{item.key}</p>
+                <p className="mt-1 text-2xl font-bold text-gray-900">{item.count}</p>
+              </div>
+            ))}
           </div>
         </section>
 

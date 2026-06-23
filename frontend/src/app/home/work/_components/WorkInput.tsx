@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import FormTextArea from '@/_components/FormTextArea';
 import PrimaryButton from '@/_components/PrimaryButton';
 import SecondaryButton from '@/_components/SecondaryButton';
-import { damageStatuses, getDamageStatusLabel, IWorkData, IMechanic } from '../model';
+import { damageStatuses, damageTypes, getDamageStatusLabel, insurers, IWorkData, IMechanic } from '../model';
 import FormLabel from '@/_components/FormLabel';
 import { ClientsCombobox, VehiclesCombobox } from '../../_components/SearchCombobox';
 import { useState } from 'react';
@@ -39,6 +39,10 @@ export default function WorkInput({
     const [clientUndisclosed, setClientUndisclosed] = useState(!work ? false : !work.clientId);
     const currentDamageStatus = work?.damageStatus || 'new';
     const hasKnownDamageStatus = damageStatuses.some(status => status.value === currentDamageStatus);
+    const currentInsurer = work?.insurer || '';
+    const hasKnownInsurer = !currentInsurer || insurers.some(insurer => insurer === currentInsurer);
+    const currentDamageType = work?.damageType || '';
+    const hasKnownDamageType = !currentDamageType || damageTypes.some(type => type === currentDamageType);
     const toDateInputValue = (value?: string) => value ? value.slice(0, 10) : '';
     const populateClientVehicles = (clientId: string) => {
         query({
@@ -157,7 +161,7 @@ export default function WorkInput({
                         </div>
                        <WorkInputMechanics mechanics={mechanics} work={work}></WorkInputMechanics>
                         <div className="mt-4 border-t border-gray-900/10 pt-8">
-                            <h3 className="text-base font-semibold text-gray-900">Likwidacja szkody</h3>
+                            <h3 className="text-base font-semibold text-gray-900">Ubezpieczyciel i szkoda</h3>
                             <p className="mt-1 text-sm text-gray-500">
                                 Dane szkody komunikacyjnej i rozliczenia z ubezpieczycielem.
                             </p>
@@ -169,22 +173,28 @@ export default function WorkInput({
                                     defaultValue={work?.claimNumber ?? ''}
                                     placeholder='np. PL/123456/2026'>
                                 </FormInput>
-                                <FormInput
-                                    name='insurer'
-                                    label='Ubezpieczyciel'
-                                    defaultValue={work?.insurer ?? ''}
-                                    placeholder='np. PZU'>
-                                </FormInput>
+                                <div>
+                                    <FormLabel name='insurer' label='Ubezpieczyciel'></FormLabel>
+                                    <div className="mt-2 grid grid-cols-1">
+                                        <Select name='insurer' defaultValue={currentInsurer}>
+                                            <option value=''>Nie wybrano</option>
+                                            {!hasKnownInsurer && <option value={currentInsurer}>{currentInsurer}</option>}
+                                            {insurers.map(insurer => (
+                                                <option key={insurer} value={insurer}>{insurer}</option>
+                                            ))}
+                                        </Select>
+                                    </div>
+                                </div>
 
                                 <div>
                                     <FormLabel name='damageType' label='Rodzaj szkody'></FormLabel>
                                     <div className="mt-2 grid grid-cols-1">
-                                        <Select name='damageType' defaultValue={work?.damageType ?? ''}>
+                                        <Select name='damageType' defaultValue={currentDamageType}>
                                             <option value=''>Nie wybrano</option>
-                                            <option value='OC'>OC</option>
-                                            <option value='AC'>AC</option>
-                                            <option value='Gotówka'>Gotówka</option>
-                                            <option value='Flota'>Flota</option>
+                                            {!hasKnownDamageType && <option value={currentDamageType}>{currentDamageType}</option>}
+                                            {damageTypes.map(type => (
+                                                <option key={type} value={type}>{type}</option>
+                                            ))}
                                         </Select>
                                     </div>
                                 </div>
@@ -211,6 +221,35 @@ export default function WorkInput({
                                 </FormInput>
 
                                 <FormInput
+                                    name='claimHandlerName'
+                                    label='Opiekun szkody'
+                                    defaultValue={work?.claimHandlerName ?? ''}
+                                    placeholder='Imię i nazwisko opiekuna'>
+                                </FormInput>
+
+                                <FormInput
+                                    name='claimHandlerEmail'
+                                    type='email'
+                                    label='E-mail opiekuna'
+                                    defaultValue={work?.claimHandlerEmail ?? ''}
+                                    placeholder='opiekun@example.pl'>
+                                </FormInput>
+
+                                <FormInput
+                                    name='claimHandlerPhone'
+                                    label='Telefon opiekuna'
+                                    defaultValue={work?.claimHandlerPhone ?? ''}
+                                    placeholder='Numer telefonu'>
+                                </FormInput>
+
+                                <FormInput
+                                    name='claimReportedOn'
+                                    type='date'
+                                    label='Data zgłoszenia szkody'
+                                    defaultValue={toDateInputValue(work?.claimReportedOn)}>
+                                </FormInput>
+
+                                <FormInput
                                     name='plannedIntakeOn'
                                     type='date'
                                     label='Planowane przyjęcie pojazdu'
@@ -227,8 +266,29 @@ export default function WorkInput({
                                 <FormInput
                                     name='plannedInspectionOn'
                                     type='date'
-                                    label='Termin oględzin'
+                                    label='Data oględzin'
                                     defaultValue={toDateInputValue(work?.plannedInspectionOn)}>
+                                </FormInput>
+
+                                <FormInput
+                                    name='estimateSentOn'
+                                    type='date'
+                                    label='Data wysłania kosztorysu'
+                                    defaultValue={toDateInputValue(work?.estimateSentOn)}>
+                                </FormInput>
+
+                                <FormInput
+                                    name='insurerDecisionOn'
+                                    type='date'
+                                    label='Data decyzji ubezpieczyciela'
+                                    defaultValue={toDateInputValue(work?.insurerDecisionOn)}>
+                                </FormInput>
+
+                                <FormInput
+                                    name='supplementPaidOn'
+                                    type='date'
+                                    label='Data dopłaty'
+                                    defaultValue={toDateInputValue(work?.supplementPaidOn)}>
                                 </FormInput>
 
                                 <div className="space-y-4 pt-1">

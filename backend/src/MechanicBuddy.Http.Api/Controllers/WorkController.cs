@@ -117,6 +117,13 @@ namespace MechanicBuddy.Http.Api.Controllers
                 work.ClientPaysVat,
                 work.AudatexEstimateNumber,
                 work.InsurerNotes,
+                work.ClaimHandlerName,
+                work.ClaimHandlerEmail,
+                work.ClaimHandlerPhone,
+                work.ClaimReportedOn,
+                work.EstimateSentOn,
+                work.InsurerDecisionOn,
+                work.SupplementPaidOn,
                 work.PlannedIntakeOn,
                 work.PlannedReleaseOn,
                 work.PlannedInspectionOn,
@@ -138,8 +145,12 @@ namespace MechanicBuddy.Http.Api.Controllers
                         w.id,
                         w.number::text AS worknr,
                         COALESCE(NULLIF(TRIM(w.damagestatus), ''), 'new') AS damagestatus,
+                        w.damagetype,
                         w.claimnumber,
                         w.insurer,
+                        w.claimhandlername,
+                        w.estimatesenton,
+                        w.insurerdecisionon,
                         w.audatexestimatenumber,
                         w.assignmentofclaimsigned,
                         w.clientpaysvat,
@@ -188,6 +199,16 @@ namespace MechanicBuddy.Http.Api.Controllers
                       AND changedon >= (DATE_TRUNC('month', CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw') AT TIME ZONE 'Europe/Warsaw')
                 UNION ALL SELECT 'active_replacement_vehicles', COUNT(*)::int FROM work_data
                     WHERE hasactivereplacementvehicle = TRUE
+                UNION ALL SELECT 'damage_oc', COUNT(*)::int FROM work_data
+                    WHERE lower(damagetype) = 'oc'
+                UNION ALL SELECT 'damage_ac', COUNT(*)::int FROM work_data
+                    WHERE lower(damagetype) = 'ac'
+                UNION ALL SELECT 'damage_cash_fleet', COUNT(*)::int FROM work_data
+                    WHERE lower(damagetype) IN ('gotówka', 'gotowka', 'flota')
+                UNION ALL SELECT 'missing_claim_number', COUNT(*)::int FROM work_data
+                    WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND COALESCE(TRIM(claimnumber), '') = ''
+                UNION ALL SELECT 'missing_insurer', COUNT(*)::int FROM work_data
+                    WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND COALESCE(TRIM(insurer), '') = ''
                 UNION ALL SELECT 'today_schedule', COUNT(*)::int FROM (
                     SELECT id FROM work_data WHERE (plannedintakeon AT TIME ZONE 'Europe/Warsaw')::date = (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
                     UNION ALL SELECT id FROM work_data WHERE (plannedinspectionon AT TIME ZONE 'Europe/Warsaw')::date = (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
@@ -209,7 +230,16 @@ namespace MechanicBuddy.Http.Api.Controllers
                     UNION ALL SELECT id FROM work_data WHERE damagestatus IN ('repair', 'paint_shop') AND changedon < CURRENT_TIMESTAMP - INTERVAL '7 days'
                     UNION ALL SELECT id FROM work_data WHERE replacementstatus = 'issued' AND replacementplannedreturnon IS NULL
                     UNION ALL SELECT id FROM work_data WHERE plannedreleaseon IS NOT NULL AND (plannedreleaseon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date AND damagestatus NOT IN ('released', 'settled', 'rejected')
+                    UNION ALL SELECT id FROM work_data WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND COALESCE(TRIM(claimhandlername), '') = ''
+                    UNION ALL SELECT id FROM work_data WHERE estimatesenton IS NOT NULL AND insurerdecisionon IS NULL AND estimatesenton < CURRENT_TIMESTAMP - INTERVAL '3 days'
                 ) manager_attention").ToArray();
+
+            var insurers = session.Connection.Query<DashboardTileDto>(baseWorkCte + @"
+                SELECT COALESCE(NULLIF(TRIM(insurer), ''), 'Brak ubezpieczyciela') AS key, COUNT(*)::int AS count
+                FROM work_data
+                GROUP BY COALESCE(NULLIF(TRIM(insurer), ''), 'Brak ubezpieczyciela')
+                ORDER BY count DESC, key
+                LIMIT 12").ToArray();
 
             var attention = session.Connection.Query<DashboardWorkItemDto>(baseWorkCte + @"
                 SELECT id, worknr, clientname, regnr, damagestatus, 'missing_claim_number' AS kind, NULL::timestamptz AS scheduledon
@@ -218,8 +248,14 @@ namespace MechanicBuddy.Http.Api.Controllers
                 SELECT id, worknr, clientname, regnr, damagestatus, 'missing_insurer', NULL::timestamptz
                 FROM work_data WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND COALESCE(TRIM(insurer), '') = ''
                 UNION ALL
+                SELECT id, worknr, clientname, regnr, damagestatus, 'missing_claim_handler', NULL::timestamptz
+                FROM work_data WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND COALESCE(TRIM(claimhandlername), '') = ''
+                UNION ALL
                 SELECT id, worknr, clientname, regnr, damagestatus, 'missing_estimate', NULL::timestamptz
                 FROM work_data WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND COALESCE(TRIM(audatexestimatenumber), '') = ''
+                UNION ALL
+                SELECT id, worknr, clientname, regnr, damagestatus, 'insurer_decision_overdue', estimatesenton
+                FROM work_data WHERE estimatesenton IS NOT NULL AND insurerdecisionon IS NULL AND estimatesenton < CURRENT_TIMESTAMP - INTERVAL '3 days'
                 UNION ALL
                 SELECT id, worknr, clientname, regnr, damagestatus, 'inspection_missing_after_two_days', plannedinspectionon
                 FROM work_data WHERE damagestatus IN ('new', 'inspection_pending') AND plannedinspectionon IS NULL AND startedon < CURRENT_TIMESTAMP - INTERVAL '2 days'
@@ -262,7 +298,7 @@ namespace MechanicBuddy.Http.Api.Controllers
                 WHERE (replacementplannedreturnon AT TIME ZONE 'Europe/Warsaw')::date = (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
                 ORDER BY scheduledon, worknr").ToArray();
 
-            return new { Tiles = tiles, Attention = attention, Today = today };
+            return new { Tiles = tiles, Insurers = insurers, Attention = attention, Today = today };
         }
 
         [HttpGet("calendar")]
@@ -274,6 +310,11 @@ namespace MechanicBuddy.Http.Api.Controllers
                         w.id,
                         w.number::text AS worknr,
                         COALESCE(NULLIF(TRIM(w.damagestatus), ''), 'new') AS damagestatus,
+                        w.claimnumber,
+                        w.insurer,
+                        w.claimhandlername,
+                        w.estimatesenton,
+                        w.insurerdecisionon,
                         w.startedon,
                         w.changedon,
                         w.plannedintakeon,
@@ -311,8 +352,20 @@ namespace MechanicBuddy.Http.Api.Controllers
                     FROM work_data WHERE replacementplannedreturnon IS NOT NULL AND replacementstatus = 'issued'
                 ),
                 alert_items AS (
+                    SELECT id, worknr, clientname, regnr, damagestatus, 'missing_claim_number' AS kind, NULL::timestamptz AS scheduledon
+                    FROM work_data WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND COALESCE(TRIM(claimnumber), '') = ''
+                    UNION ALL
+                    SELECT id, worknr, clientname, regnr, damagestatus, 'missing_insurer', NULL::timestamptz
+                    FROM work_data WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND COALESCE(TRIM(insurer), '') = ''
+                    UNION ALL
                     SELECT id, worknr, clientname, regnr, damagestatus, 'inspection_missing_after_two_days' AS kind, startedon AS scheduledon
                     FROM work_data WHERE damagestatus IN ('new', 'inspection_pending') AND plannedinspectionon IS NULL AND startedon < CURRENT_TIMESTAMP - INTERVAL '2 days'
+                    UNION ALL
+                    SELECT id, worknr, clientname, regnr, damagestatus, 'missing_claim_handler', NULL::timestamptz
+                    FROM work_data WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND COALESCE(TRIM(claimhandlername), '') = ''
+                    UNION ALL
+                    SELECT id, worknr, clientname, regnr, damagestatus, 'insurer_decision_overdue', estimatesenton
+                    FROM work_data WHERE estimatesenton IS NOT NULL AND insurerdecisionon IS NULL AND estimatesenton < CURRENT_TIMESTAMP - INTERVAL '3 days'
                     UNION ALL
                     SELECT id, worknr, clientname, regnr, damagestatus, 'approval_overdue', changedon
                     FROM work_data WHERE damagestatus = 'approval_pending' AND changedon < CURRENT_TIMESTAMP - INTERVAL '3 days'
@@ -446,7 +499,14 @@ namespace MechanicBuddy.Http.Api.Controllers
                 model.AssignmentOfClaimSigned,
                 model.ClientPaysVat,
                 model.AudatexEstimateNumber,
-                model.InsurerNotes);
+                model.InsurerNotes,
+                model.ClaimHandlerName,
+                model.ClaimHandlerEmail,
+                model.ClaimHandlerPhone,
+                model.ClaimReportedOn,
+                model.EstimateSentOn,
+                model.InsurerDecisionOn,
+                model.SupplementPaidOn);
             work.UpdateSchedule(model.PlannedIntakeOn, model.PlannedReleaseOn, model.PlannedInspectionOn);
 
             if (model.AssignedTo != null) work.Assign(model.AssignedTo.Select(x => repository.Get<Employee>(x)).ToArray());
@@ -522,7 +582,14 @@ namespace MechanicBuddy.Http.Api.Controllers
                 model.AssignmentOfClaimSigned,
                 model.ClientPaysVat,
                 model.AudatexEstimateNumber,
-                model.InsurerNotes);
+                model.InsurerNotes,
+                model.ClaimHandlerName,
+                model.ClaimHandlerEmail,
+                model.ClaimHandlerPhone,
+                model.ClaimReportedOn,
+                model.EstimateSentOn,
+                model.InsurerDecisionOn,
+                model.SupplementPaidOn);
             work.UpdateSchedule(model.PlannedIntakeOn, model.PlannedReleaseOn, model.PlannedInspectionOn);
             work.Assign(model.AssignedTo == null ? Enumerable.Empty<Employee>().ToArray() : model.AssignedTo.Select(x => repository.Get<Employee>(x)).ToArray());
 
@@ -716,7 +783,7 @@ inner join domain.employee ii on ii.id = ip.issuerid";
                query
                  .FilterBy(searchText)
                  .SearchFields(
-@"concat_ws(' ', w.number::text,p.firstname,p.lastname,l.name, v.regnr, v.vin,
+@"concat_ws(' ', w.number::text,p.firstname,p.lastname,l.name, v.regnr, v.vin, w.claimnumber, w.insurer, w.damagetype,
 	array_to_string((select array_agg(e.number)   from domain.offer o
 	inner join domain.estimate e on e.id = o.estimateid
 	where workid = w.id ),'/ '),
@@ -735,6 +802,9 @@ from (
    w.id,
    w.userstatus,
    w.damagestatus,
+   w.claimnumber,
+   w.insurer,
+   w.damagetype,
    w.number as worknr,   
    w.startedon ,  
 	{(onlyIssued?issuanceSql: "(select count(*) from domain.offer o where o.workid = w.id)  as numberOfOffers")}, 

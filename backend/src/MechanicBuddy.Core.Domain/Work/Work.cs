@@ -72,7 +72,14 @@ namespace MechanicBuddy.Core.Domain
                 AssignmentOfClaimSigned,
                 ClientPaysVat,
                 AudatexEstimateNumber,
-                InsurerNotes);
+                InsurerNotes,
+                ClaimHandlerName,
+                ClaimHandlerEmail,
+                ClaimHandlerPhone,
+                ClaimReportedOn,
+                EstimateSentOn,
+                InsurerDecisionOn,
+                SupplementPaidOn);
             foreach (var job in jobs)
             {
                 work.jobs.Add(job.MakeCopy(work, starter));
@@ -133,7 +140,14 @@ namespace MechanicBuddy.Core.Domain
             bool assignmentOfClaimSigned,
             bool clientPaysVat,
             string audatexEstimateNumber,
-            string insurerNotes)
+            string insurerNotes,
+            string claimHandlerName = null,
+            string claimHandlerEmail = null,
+            string claimHandlerPhone = null,
+            DateTime? claimReportedOn = null,
+            DateTime? estimateSentOn = null,
+            DateTime? insurerDecisionOn = null,
+            DateTime? supplementPaidOn = null)
         {
             ClaimNumber = claimNumber;
             Insurer = insurer;
@@ -143,6 +157,13 @@ namespace MechanicBuddy.Core.Domain
             ClientPaysVat = clientPaysVat;
             AudatexEstimateNumber = audatexEstimateNumber;
             InsurerNotes = insurerNotes;
+            ClaimHandlerName = claimHandlerName;
+            ClaimHandlerEmail = claimHandlerEmail;
+            ClaimHandlerPhone = claimHandlerPhone;
+            ClaimReportedOn = claimReportedOn;
+            EstimateSentOn = estimateSentOn;
+            InsurerDecisionOn = insurerDecisionOn;
+            SupplementPaidOn = supplementPaidOn;
         }
 
         public virtual void UpdateSchedule(
@@ -183,6 +204,13 @@ namespace MechanicBuddy.Core.Domain
         public virtual bool ClientPaysVat { get; protected set; }
         public virtual string AudatexEstimateNumber { get; protected set; }
         public virtual string InsurerNotes { get; protected set; }
+        public virtual string ClaimHandlerName { get; protected set; }
+        public virtual string ClaimHandlerEmail { get; protected set; }
+        public virtual string ClaimHandlerPhone { get; protected set; }
+        public virtual DateTime? ClaimReportedOn { get; protected set; }
+        public virtual DateTime? EstimateSentOn { get; protected set; }
+        public virtual DateTime? InsurerDecisionOn { get; protected set; }
+        public virtual DateTime? SupplementPaidOn { get; protected set; }
         public virtual DateTime? PlannedIntakeOn { get; protected set; }
         public virtual DateTime? PlannedReleaseOn { get; protected set; }
         public virtual DateTime? PlannedInspectionOn { get; protected set; }

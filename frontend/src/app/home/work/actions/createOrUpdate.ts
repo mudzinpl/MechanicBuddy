@@ -38,6 +38,13 @@ export async function createOrUpdate(
        clientPaysVat: formData.get('clientPaysVat') == 'on',
        audatexEstimateNumber: formData.get('audatexEstimateNumber')?.toString() || null,
        insurerNotes: formData.get('insurerNotes')?.toString() || null,
+       claimHandlerName: formData.get('claimHandlerName')?.toString() || null,
+       claimHandlerEmail: formData.get('claimHandlerEmail')?.toString() || null,
+       claimHandlerPhone: formData.get('claimHandlerPhone')?.toString() || null,
+       claimReportedOn: formData.get('claimReportedOn')?.toString() || null,
+       estimateSentOn: formData.get('estimateSentOn')?.toString() || null,
+       insurerDecisionOn: formData.get('insurerDecisionOn')?.toString() || null,
+       supplementPaidOn: formData.get('supplementPaidOn')?.toString() || null,
        plannedIntakeOn: formData.get('plannedIntakeOn')?.toString() || null,
        plannedReleaseOn: formData.get('plannedReleaseOn')?.toString() || null,
        plannedInspectionOn: formData.get('plannedInspectionOn')?.toString() || null

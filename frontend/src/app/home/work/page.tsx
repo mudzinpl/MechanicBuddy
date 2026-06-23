@@ -111,6 +111,17 @@ export default async function Page(
       }
     },
     {
+      dataField: 'claimNumber',
+      headerText: 'Szkoda',
+      dataFormatter: ({ insurer, claimNumber, damageType }: { insurer?: string, claimNumber?: string, damageType?: string }) => (
+        <div className="max-w-52 text-sm">
+          <p className="font-medium text-gray-900">{insurer || 'Brak ubezpieczyciela'}</p>
+          <p className="text-gray-500">{claimNumber || 'Brak numeru szkody'}</p>
+          {damageType && <span className="mt-1 inline-flex rounded-full bg-gray-100 px-2 py-0.5 text-xs font-medium text-gray-700">{damageType}</span>}
+        </div>
+      )
+    },
+    {
       dataField: 'documentCount',
       headerText: 'Dokumenty',
       dataFormatter: ({ documentCount }: { documentCount: number }) => (

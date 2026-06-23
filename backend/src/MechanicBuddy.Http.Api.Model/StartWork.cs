@@ -31,6 +31,13 @@ namespace MechanicBuddy.Http.Api.Models
         bool ClientPaysVat,
         string AudatexEstimateNumber,
         string InsurerNotes,
+        string ClaimHandlerName,
+        string ClaimHandlerEmail,
+        string ClaimHandlerPhone,
+        DateTime? ClaimReportedOn,
+        DateTime? EstimateSentOn,
+        DateTime? InsurerDecisionOn,
+        DateTime? SupplementPaidOn,
         DateTime? PlannedIntakeOn,
         DateTime? PlannedReleaseOn,
         DateTime? PlannedInspectionOn);
@@ -54,6 +61,9 @@ namespace MechanicBuddy.Http.Api.Models
         DateTime? SentOn,
         string Status,
         string DamageStatus,
+        string ClaimNumber,
+        string Insurer,
+        string DamageType,
         string Issued, 
         Guid ClientId, 
         string ClientName, 
@@ -67,7 +77,7 @@ namespace MechanicBuddy.Http.Api.Models
         JsonNode OfferIssuance, 
         JsonNode Issuance) 
     {
-        public WorkPage() : this(default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default) { }
+        public WorkPage() : this(default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default) { }
     }
 
 }
