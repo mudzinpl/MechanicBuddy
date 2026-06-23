@@ -24,7 +24,8 @@ export async function createOrUpdate(
         regNr: formData.get('regNr'),
         odo: odo,
         description: formData.get('about'),
-        ownerId:ownerId
+        ownerId:ownerId,
+        isReplacementVehicle: formData.get('isReplacementVehicle') == 'on'
     };
  
     debugger;

@@ -29,6 +29,7 @@ export default async function Page({
                 <DescriptionItem label='Marka i model' value={[vehicle.producer, vehicle.model].join(' ')}></DescriptionItem>
                 <DescriptionItem label='VIN' value={vehicle.vin}></DescriptionItem>
                 <DescriptionItem label='Numer rejestracyjny' value={vehicle.regNr}></DescriptionItem>
+                <DescriptionItem label='Pojazd zastępczy' value={vehicle.isReplacementVehicle ? 'Tak' : 'Nie'}></DescriptionItem>
                 <DescriptionItem label='Przebieg' value={vehicle.odo}></DescriptionItem>
                 <DescriptionItem label='Właściciel' value={vehicle.ownerName}></DescriptionItem>
                 <DescriptionItem label='Uwagi' value={vehicle.description}></DescriptionItem>

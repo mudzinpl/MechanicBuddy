@@ -2,9 +2,9 @@
 
 namespace MechanicBuddy.Http.Api.Models
 {
-    public record VehiclePageDto(string Producer, string Model, string RegNr, string Vin, string Body, string Engine, DateTime? ProductionDate, string Region, string Series, string Transmission, Guid Id, string OwnerName, Guid? OwnerId)
+    public record VehiclePageDto(string Producer, string Model, string RegNr, string Vin, string Body, string Engine, DateTime? ProductionDate, string Region, string Series, string Transmission, Guid Id, string OwnerName, Guid? OwnerId, bool IsReplacementVehicle)
     {
-        public VehiclePageDto() : this(default, default, default, default, default,default,default,default,default,default,default,default,default) { }
+        public VehiclePageDto() : this(default, default, default, default, default,default,default,default,default,default,default,default,default,default) { }
     }
 
     public class ClientVehicleDto
@@ -38,6 +38,7 @@ namespace MechanicBuddy.Http.Api.Models
         public string OwnerName { get; set; }
         public string Description { get; set; }
         public DateTime IntroducedAt { get; set; } 
+        public bool IsReplacementVehicle { get; set; }
     } 
 
 }

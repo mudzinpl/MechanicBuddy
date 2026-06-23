@@ -63,6 +63,18 @@ export default function VehicleInput({
                         <div className="sm:col-span-2">  <FormInput name='vin' defaultValue={vehicle?.vin} label='Numer VIN'></FormInput></div>
                         <div className="sm:col-span-2">  <FormInput name='regNr' defaultValue={vehicle?.regNr} label='Numer rejestracyjny'></FormInput></div>
                         <div className="sm:col-span-2">  <FormInput name='odo' defaultValue={vehicle?.odo} label='Przebieg'></FormInput> </div>
+                        <div className="sm:col-span-2 flex items-center gap-2 pt-8">
+                            <input
+                                id="isReplacementVehicle"
+                                name="isReplacementVehicle"
+                                type="checkbox"
+                                defaultChecked={vehicle?.isReplacementVehicle}
+                                className="size-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                            />
+                            <label htmlFor="isReplacementVehicle" className="text-sm font-medium text-gray-900">
+                                Pojazd zastępczy
+                            </label>
+                        </div>
                         <div className="col-span-full">
                             <FormLabel name='ownerId' label='Właściciel'></FormLabel>
                             <ClientsCombobox  

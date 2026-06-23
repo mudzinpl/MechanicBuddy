@@ -10,6 +10,7 @@ import {
   InboxIcon,
   PauseCircleIcon,
   ShieldCheckIcon,
+  TruckIcon,
   WrenchScrewdriverIcon,
 } from '@heroicons/react/20/solid';
 import Link from 'next/link';
@@ -45,6 +46,7 @@ const tileDefinitions = [
   { key: 'ready_for_pickup', label: 'Gotowe do odbioru', href: '/home/work?damageStatus=ready_for_pickup', icon: CheckCircleIcon, color: 'text-green-700 bg-green-50' },
   { key: 'on_hold', label: 'Wstrzymane', href: '/home/work?damageStatus=on_hold', icon: PauseCircleIcon, color: 'text-red-700 bg-red-50' },
   { key: 'settled_this_month', label: 'Rozliczone w tym miesiącu', href: '/home/work?damageStatus=settled', icon: BanknotesIcon, color: 'text-emerald-700 bg-emerald-50' },
+  { key: 'active_replacement_vehicles', label: 'Aktywne pojazdy zastępcze', href: '/home/work', icon: TruckIcon, color: 'text-sky-700 bg-sky-50' },
 ] as const;
 
 const attentionDefinitions = [

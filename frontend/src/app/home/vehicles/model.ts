@@ -16,4 +16,5 @@ export interface IVehicleData{
     ownerName: string
     description: string
     introducedAt: string
+    isReplacementVehicle: boolean
 }

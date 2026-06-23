@@ -26,10 +26,11 @@ namespace MechanicBuddy.Core.Domain
             string series = null,
             string transmission = null,
             string description = null,
+            bool isReplacementVehicle = false,
             Guid? id = null)
         {  
             IntroducedAt = introducedAt; 
-            SetValues(regNr, producer, model, vin, odo, body, drivingSide, engine, productionDate, region, series, transmission,description);
+            SetValues(regNr, producer, model, vin, odo, body, drivingSide, engine, productionDate, region, series, transmission,description, isReplacementVehicle);
             this.Id = id.GetValueOrDefault();
         }
 
@@ -46,7 +47,8 @@ namespace MechanicBuddy.Core.Domain
                                string region,
                                string series,
                                string transmission,
-                               string description)
+                               string description,
+                               bool isReplacementVehicle)
         {
             if (string.IsNullOrWhiteSpace(regNr)&& string.IsNullOrWhiteSpace(vin))
             {
@@ -65,6 +67,7 @@ namespace MechanicBuddy.Core.Domain
             Region = region;
             Series = series;
             Transmission = transmission;
+            IsReplacementVehicle = isReplacementVehicle;
         }
          
         public  virtual string Producer { get; protected set; }
@@ -79,6 +82,7 @@ namespace MechanicBuddy.Core.Domain
         public  virtual string Region { get; protected set; }
         public  virtual string Series { get; protected set; }
         public  virtual string Transmission { get; protected set; }
+        public virtual bool IsReplacementVehicle { get; protected set; }
 
         public  virtual Client Owner { get 
             { 
@@ -100,9 +104,10 @@ namespace MechanicBuddy.Core.Domain
             string region = null,
             string series = null,
             string transmission = null,
-            string description = null)
+            string description = null,
+            bool isReplacementVehicle = false)
         {
-            SetValues(regNr, producer, model, vin, odo, body, drivingSide, engine, productionDate, region, series, transmission,description);
+            SetValues(regNr, producer, model, vin, odo, body, drivingSide, engine, productionDate, region, series, transmission,description, isReplacementVehicle);
         }
 
 
