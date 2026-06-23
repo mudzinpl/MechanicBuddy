@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 
@@ -60,6 +60,17 @@ namespace MechanicBuddy.Http.Api.Models
         DateTime? PaymentDemandOn,
         DateTime? PaymentReceivedOn,
         string SettlementNotes,
+        decimal? InvoiceNetAmount,
+        decimal? InvoiceVatAmount,
+        decimal? InvoiceGrossAmount,
+        decimal? InsurerPaidAmount,
+        decimal? ClientSurchargeAmount,
+        DateTime? PaymentDueOn,
+        DateTime? InvoicePaymentOn,
+        string InvoicePaymentStatus,
+        string ExternalInvoiceId,
+        string ExternalInvoiceNumber,
+        string InvoiceSourceSystem,
         DateTime? PlannedIntakeOn,
         DateTime? PlannedReleaseOn,
         DateTime? PlannedInspectionOn);
@@ -93,6 +104,9 @@ namespace MechanicBuddy.Http.Api.Models
         bool PowerOfAttorneySigned,
         bool ClientPaysVat,
         string SettlementStatus,
+        string InvoicePaymentStatus,
+        decimal? UnderpaymentAmount,
+        DateTime? PaymentDueOn,
         string Issued, 
         Guid ClientId, 
         string ClientName, 
@@ -106,7 +120,7 @@ namespace MechanicBuddy.Http.Api.Models
         JsonNode OfferIssuance, 
         JsonNode Issuance) 
     {
-        public WorkPage() : this(default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default) { }
+        public WorkPage() : this(default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default,default) { }
     }
 
 }

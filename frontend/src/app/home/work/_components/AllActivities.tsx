@@ -17,6 +17,7 @@ import PricingDownloadLink from './activity/PricingDownloadLink'
 import WorkDocuments from './WorkDocuments'
 import ReplacementVehicle from './ReplacementVehicle'
 import WorkCommunication from './WorkCommunication'
+import InvoiceSettlement from './InvoiceSettlement'
 
  
 export default function Activities({
@@ -44,6 +45,9 @@ export default function Activities({
           <div className="p-5 pb-10">
             <WorkInformation hasRepairJobWithProductsOrServices={containsRepairJobWithProductsOrServices} work={ work} ></WorkInformation>
           </div>
+        </li>
+        <li>
+          <InvoiceSettlement workId={work.id}></InvoiceSettlement>
         </li>
         <li>
           <ReplacementVehicle workId={work.id} rental={work.replacementVehicle}></ReplacementVehicle>

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -101,7 +101,18 @@ namespace MechanicBuddy.Core.Domain
                 SettlementStatus,
                 PaymentDemandOn,
                 PaymentReceivedOn,
-                SettlementNotes);
+                SettlementNotes,
+                InvoiceNetAmount,
+                InvoiceVatAmount,
+                InvoiceGrossAmount,
+                InsurerPaidAmount,
+                ClientSurchargeAmount,
+                PaymentDueOn,
+                InvoicePaymentOn,
+                InvoicePaymentStatus,
+                ExternalInvoiceId,
+                ExternalInvoiceNumber,
+                InvoiceSourceSystem);
             foreach (var job in jobs)
             {
                 work.jobs.Add(job.MakeCopy(work, starter));
@@ -191,7 +202,18 @@ namespace MechanicBuddy.Core.Domain
             string settlementStatus = null,
             DateTime? paymentDemandOn = null,
             DateTime? paymentReceivedOn = null,
-            string settlementNotes = null)
+            string settlementNotes = null,
+            decimal? invoiceNetAmount = null,
+            decimal? invoiceVatAmount = null,
+            decimal? invoiceGrossAmount = null,
+            decimal? insurerPaidAmount = null,
+            decimal? clientSurchargeAmount = null,
+            DateTime? paymentDueOn = null,
+            DateTime? invoicePaymentOn = null,
+            string invoicePaymentStatus = null,
+            string externalInvoiceId = null,
+            string externalInvoiceNumber = null,
+            string invoiceSourceSystem = null)
         {
             ClaimNumber = claimNumber;
             Insurer = insurer;
@@ -230,6 +252,17 @@ namespace MechanicBuddy.Core.Domain
             PaymentDemandOn = paymentDemandOn;
             PaymentReceivedOn = paymentReceivedOn;
             SettlementNotes = settlementNotes;
+            InvoiceNetAmount = invoiceNetAmount;
+            InvoiceVatAmount = invoiceVatAmount;
+            InvoiceGrossAmount = invoiceGrossAmount;
+            InsurerPaidAmount = insurerPaidAmount;
+            ClientSurchargeAmount = clientSurchargeAmount;
+            PaymentDueOn = paymentDueOn;
+            InvoicePaymentOn = invoicePaymentOn;
+            InvoicePaymentStatus = string.IsNullOrWhiteSpace(invoicePaymentStatus) ? InvoicePaymentStatus ?? "not_issued" : invoicePaymentStatus;
+            ExternalInvoiceId = externalInvoiceId;
+            ExternalInvoiceNumber = externalInvoiceNumber;
+            InvoiceSourceSystem = string.IsNullOrWhiteSpace(invoiceSourceSystem) ? InvoiceSourceSystem ?? "manual" : invoiceSourceSystem;
         }
 
         public virtual void UpdateSchedule(
@@ -299,6 +332,17 @@ namespace MechanicBuddy.Core.Domain
         public virtual DateTime? PaymentDemandOn { get; protected set; }
         public virtual DateTime? PaymentReceivedOn { get; protected set; }
         public virtual string SettlementNotes { get; protected set; }
+        public virtual decimal? InvoiceNetAmount { get; protected set; }
+        public virtual decimal? InvoiceVatAmount { get; protected set; }
+        public virtual decimal? InvoiceGrossAmount { get; protected set; }
+        public virtual decimal? InsurerPaidAmount { get; protected set; }
+        public virtual decimal? ClientSurchargeAmount { get; protected set; }
+        public virtual DateTime? PaymentDueOn { get; protected set; }
+        public virtual DateTime? InvoicePaymentOn { get; protected set; }
+        public virtual string InvoicePaymentStatus { get; protected set; }
+        public virtual string ExternalInvoiceId { get; protected set; }
+        public virtual string ExternalInvoiceNumber { get; protected set; }
+        public virtual string InvoiceSourceSystem { get; protected set; }
         public virtual DateTime? PlannedIntakeOn { get; protected set; }
         public virtual DateTime? PlannedReleaseOn { get; protected set; }
         public virtual DateTime? PlannedInspectionOn { get; protected set; }
