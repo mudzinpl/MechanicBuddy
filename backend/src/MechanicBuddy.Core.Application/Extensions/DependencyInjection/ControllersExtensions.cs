@@ -27,6 +27,7 @@ namespace MechanicBuddy.Core.Application.Extensions.DependencyInjection
             {
                 options.Filters.Add<JsonResponseExceptionFilter>();
                 options.Filters.Add(typeof(UnitOfWorkAspect));
+                options.Filters.Add<AppRoleAuthorizationFilter>();
                  
 
             });
