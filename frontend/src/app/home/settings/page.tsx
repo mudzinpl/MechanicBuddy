@@ -4,7 +4,7 @@ import SettingsTabs from "@/_components/SettingsTabs";
 import Main from "../_components/Main";
 import Link from "next/link";
 import { DescriptionItem } from "@/_components/DescriptionItem";
-import { createAppraDemoData, getAppraDemoDataStatus } from "./actions/appraDemoData";
+import { getAppraDemoDataStatus } from "./actions/appraDemoData";
 
 export default async function Page() {
 
@@ -76,7 +76,7 @@ export default async function Page() {
                         Liczba zleceń demo APPRA: <span className="font-semibold text-gray-900">{appraDemoStatus.workCount}</span>
                     </p>}
                     <div className="mt-4 flex flex-wrap gap-3">
-                        <form action={createAppraDemoData}>
+                        <form action="/home/settings/appra-demo-data" method="post">
                             <input type="hidden" name="reset" value="false" />
                             <button
                                 type="submit"
@@ -86,7 +86,7 @@ export default async function Page() {
                                 Utwórz dane demonstracyjne APPRA
                             </button>
                         </form>
-                        <form action={createAppraDemoData}>
+                        <form action="/home/settings/appra-demo-data" method="post">
                             <input type="hidden" name="reset" value="true" />
                             <button
                                 type="submit"
