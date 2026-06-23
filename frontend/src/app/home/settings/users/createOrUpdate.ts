@@ -10,6 +10,7 @@ interface UserFormData {
     userName: FormDataEntryValue | null;
     email: FormDataEntryValue | null;
     phone: FormDataEntryValue | null;
+    appRole: FormDataEntryValue | null;
     password?: FormDataEntryValue | null;
 }
 
@@ -25,9 +26,9 @@ export async function createOrUpdate(
         userName: formData.get('userName'),
         email: formData.get('email'),
         phone: formData.get('phone'),
+        appRole: formData.get('appRole'),
     };
 
-    // Add password if provided
     const password = formData.get('password');
     if (password) {
         body.password = password;

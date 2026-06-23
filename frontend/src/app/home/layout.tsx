@@ -10,9 +10,11 @@ import { redirect } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
 import { httpGet } from '@/_lib/server/query-api';
 import { escapeColorForScript } from '@/_lib/colorValidator';
+import { normalizeAppRole } from '@/_lib/appRoles';
 
 interface CustomJwtPayload {
     FullName?: string;
+    app_role?: string;
 }
 
 interface IBrandingOptions {
@@ -48,6 +50,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
     // Decode the JWT to get the claims
     const decodedToken = jwtDecode<CustomJwtPayload>(jwt);
     const fullName = decodedToken.FullName || ''; // Extract the FullName claim
+    const appRole = normalizeAppRole(decodedToken.app_role);
 
     // If there's no full name in the token, you might want to redirect or handle it
     if(!fullName) {
@@ -95,10 +98,10 @@ export default async function Layout({ children }: { children: React.ReactNode }
                     <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-62 lg:flex-col">
                         {/* Sidebar component, swap this element with another sidebar if you like */}
                         <div className="flex grow flex-col gap-y-5 overflow-y-auto px-6" style={{ backgroundColor: 'var(--portal-sidebar-bg, #111827)' }}>
-                          <Nav imageUrl={imageUrl} fullName={fullName} onSmallScreen={false}></Nav>
+                          <Nav imageUrl={imageUrl} fullName={fullName} appRole={appRole} onSmallScreen={false}></Nav>
                         </div>
                     </div>
-                     <NavDialog imageUrl={imageUrl} fullName={fullName}></NavDialog>
+                     <NavDialog imageUrl={imageUrl} fullName={fullName} appRole={appRole}></NavDialog>
                     <main style={{ backgroundColor: 'var(--portal-content-bg, #f9fafb)' }}>
                         {children}
                     </main>

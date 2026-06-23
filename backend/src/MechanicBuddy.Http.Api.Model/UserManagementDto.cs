@@ -17,6 +17,7 @@ namespace MechanicBuddy.Http.Api.Models
         public string FullName { get; set; }
         public string Phone { get; set; }
         public string Proffession { get; set; }
+        public string AppRole { get; set; }
         public bool Validated { get; set; }
         public bool IsDefaultAdmin { get; set; }
         public bool MustChangePassword { get; set; }
@@ -36,6 +37,7 @@ namespace MechanicBuddy.Http.Api.Models
         public string Description { get; set; }
         public string UserName { get; set; }
         public string Password { get; set; }
+        public string AppRole { get; set; }
         public bool MustChangePassword { get; set; } = true;
     }
 
@@ -52,6 +54,7 @@ namespace MechanicBuddy.Http.Api.Models
         public string Description { get; set; }
         public string UserName { get; set; }
         public string Password { get; set; }
+        public string AppRole { get; set; }
     }
 
     /// <summary>
