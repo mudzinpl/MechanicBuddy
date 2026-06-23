@@ -1,6 +1,7 @@
 'use client'
 import ProfileMenu from "./ProfileMenu"
 import { InboxIcon,
+    CalendarDaysIcon,
     Cog6ToothIcon,
     QueueListIcon,
     TruckIcon,
@@ -13,6 +14,7 @@ const navigationIconClass = "size-6 shrink-0";
 const navigation = [
     // { name: 'Dashboard', href: '/home', icon: <HomeIcon aria-hidden="true" className={navigationIconClass}></HomeIcon>},
     { name: 'Zlecenia', href: '/home/work', icon: <QueueListIcon aria-hidden="true" className={navigationIconClass}></QueueListIcon> },
+    { name: 'Terminy', href: '/home/calendar', icon: <CalendarDaysIcon aria-hidden="true" className={navigationIconClass}></CalendarDaysIcon> },
     { name: 'Klienci', href: '/home/clients', icon: <UsersIcon aria-hidden="true" className={navigationIconClass}></UsersIcon>  },
     { name: 'Pojazdy', href: '/home/vehicles', icon: <TruckIcon aria-hidden="true" className={navigationIconClass}></TruckIcon>  },
     { name: 'Magazyn', href: '/home/inventory', icon: <Cog6ToothIcon aria-hidden="true" className={navigationIconClass}></Cog6ToothIcon>  },

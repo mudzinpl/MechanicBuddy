@@ -24,6 +24,7 @@ export async function addReplacementVehicle(formData: FormData) {
         body: {
             replacementVehicleId,
             issuedOn: emptyToNull(formData.get('issuedOn')),
+            plannedReturnOn: emptyToNull(formData.get('plannedReturnOn')),
             mileageOut: numberOrNull(formData.get('mileageOut')),
             fuelOut: emptyToNull(formData.get('fuelOut')),
             conditionOut: emptyToNull(formData.get('conditionOut')),
