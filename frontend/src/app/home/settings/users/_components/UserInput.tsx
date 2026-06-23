@@ -2,10 +2,12 @@
 
 import { useState } from 'react'
 import FormInput from '@/_components/FormInput';
+import FormLabel from '@/_components/FormLabel';
 import { useRouter } from 'next/navigation';
 import PrimaryButton from '@/_components/PrimaryButton';
 import SecondaryButton from '@/_components/SecondaryButton';
 import { IUser } from '../model';
+import { appRoleOptions, normalizeAppRole } from '@/_lib/appRoles';
 
 export default function UserInput({
     user
@@ -57,7 +59,6 @@ export default function UserInput({
             setEmailError("");
         }
 
-        // Password validation only for new users or if password fields are filled
         if (!user) {
             const password = (document.querySelector('[name="password"]') as HTMLInputElement)?.value;
             const confirmPassword = (document.querySelector('[name="confirmPassword"]') as HTMLInputElement)?.value;
@@ -91,6 +92,8 @@ export default function UserInput({
             event.preventDefault();
         }
     }
+
+    const selectedRole = user?.isDefaultAdmin ? 'administrator' : normalizeAppRole(user?.appRole);
 
     return (
         <>
@@ -150,7 +153,21 @@ export default function UserInput({
                             />
                         </div>
 
-                        <div className="sm:col-span-3"></div>
+                        <div className="sm:col-span-3">
+                            <FormLabel name="appRole" label="Rola" />
+                            {user?.isDefaultAdmin && <input type="hidden" name="appRole" value="administrator" />}
+                            <select
+                                id="appRole"
+                                name="appRole"
+                                defaultValue={selectedRole}
+                                disabled={user?.isDefaultAdmin}
+                                className="mt-2 block w-full rounded-md bg-white px-3 py-1.5 text-sm/6 text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 disabled:bg-gray-100 disabled:text-gray-500"
+                            >
+                                {appRoleOptions.map((role) => (
+                                    <option key={role.value} value={role.value}>{role.label}</option>
+                                ))}
+                            </select>
+                        </div>
 
                         {!user && (
                             <>
