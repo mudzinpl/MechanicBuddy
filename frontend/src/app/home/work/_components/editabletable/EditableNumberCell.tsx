@@ -1,6 +1,12 @@
 import React, { useState, useImperativeHandle } from "react";
 import { EditableCellHandle, IEditableNumericCellProps, Input } from "./EditableCell";
 
+const formatPln = (value: number) =>
+    `${new Intl.NumberFormat('pl-PL', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    }).format(value).replace(/\u00A0/g, ' ')} zł`;
+
 const EditableNumberCell = React.forwardRef<EditableCellHandle<number|null>, IEditableNumericCellProps<number|null>>((props, ref) => {
     const {
         defaultValue, placeholder, id, name, isEditing, className, step, isMoney, isPercentage, required
@@ -21,7 +27,7 @@ const EditableNumberCell = React.forwardRef<EditableCellHandle<number|null>, IEd
         if (internalValue === 0) return '';
         if (isMoney) {
             if (!internalValue) return '';
-            return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' }).format(internalValue);
+            return formatPln(internalValue);
         }
         if (isPercentage) return internalValue + ' %';
         return internalValue;
