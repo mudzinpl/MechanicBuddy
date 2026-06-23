@@ -30,6 +30,17 @@ export interface IWorkData extends IActivity{
     paymentDemandOn: string;
     paymentReceivedOn: string;
     settlementNotes: string;
+    invoiceNetAmount: number | null;
+    invoiceVatAmount: number | null;
+    invoiceGrossAmount: number | null;
+    insurerPaidAmount: number | null;
+    clientSurchargeAmount: number | null;
+    paymentDueOn: string;
+    invoicePaymentOn: string;
+    invoicePaymentStatus: string;
+    externalInvoiceId: string;
+    externalInvoiceNumber: string;
+    invoiceSourceSystem: string;
     audatexEstimateNumber: string;
     estimateSystem: string;
     estimateVersion: string;
@@ -152,6 +163,21 @@ export const settlementStatuses = [
   { value: 'settled', label: 'Rozliczone' },
 ] as const;
 
+export const invoicePaymentStatuses = [
+  { value: 'not_issued', label: 'Nie wystawiono' },
+  { value: 'issued', label: 'Wystawiono' },
+  { value: 'partially_paid', label: 'Częściowo opłacona' },
+  { value: 'paid', label: 'Opłacona' },
+  { value: 'overdue', label: 'Zaległa' },
+  { value: 'disputed', label: 'Sporna' },
+] as const;
+
+export const invoiceSourceSystems = [
+  { value: 'manual', label: 'Ręcznie' },
+  { value: 'fakturownia', label: 'Fakturownia' },
+  { value: 'other', label: 'Inny' },
+] as const;
+
 export const estimateSystems = [
   { value: 'audanet', label: 'Audanet' },
   { value: 'audatex', label: 'Audatex' },
@@ -179,6 +205,18 @@ export function getSettlementStatusLabel(status?: string | null): string {
   if (!status) return 'Nierozliczone';
 
   return settlementStatuses.find(item => item.value === status)?.label ?? status;
+}
+
+export function getInvoicePaymentStatusLabel(status?: string | null): string {
+  if (!status) return 'Nie wystawiono';
+
+  return invoicePaymentStatuses.find(item => item.value === status)?.label ?? status;
+}
+
+export function getInvoiceSourceSystemLabel(system?: string | null): string {
+  if (!system) return 'Ręcznie';
+
+  return invoiceSourceSystems.find(item => item.value === system)?.label ?? system;
 }
 
 export function getEstimateSystemLabel(system?: string | null): string {
