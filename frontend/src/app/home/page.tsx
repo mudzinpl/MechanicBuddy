@@ -86,6 +86,10 @@ const attentionDefinitions = [
   { key: 'missing_power_of_attorney', label: 'Brak podpisanego pełnomocnictwa' },
   { key: 'unsettled_case', label: 'Sprawa nierozliczona' },
   { key: 'client_vat_without_payment_date', label: 'Dopłata VAT bez daty zapłaty' },
+  { key: 'parts_to_order', label: 'Części do zamówienia' },
+  { key: 'parts_ordered_without_delivery_date', label: 'Części zamówione bez daty dostawy' },
+  { key: 'parts_delivery_overdue', label: 'Opóźniona dostawa części' },
+  { key: 'repair_waiting_for_parts', label: 'Naprawa wstrzymana przez części' },
   { key: 'communication_waiting_client', label: 'Oczekuje na odpowiedź klienta' },
   { key: 'communication_waiting_insurer', label: 'Oczekuje na odpowiedź ubezpieczyciela' },
   { key: 'communication_no_contact_7_days', label: 'Brak kontaktu ponad 7 dni' },
@@ -121,9 +125,11 @@ export default async function Page() {
   const data = await response.json() as DashboardData;
   const communicationResponse = await httpGet('work/communication-alerts');
   const communicationAttention = await communicationResponse.json() as DashboardWorkItem[];
+  const partsResponse = await httpGet('work/part-order-alerts');
+  const partsAttention = await partsResponse.json() as DashboardWorkItem[];
   const counts = new Map((data.tiles || []).map(tile => [tile.key, tile.count]));
   const insurers = data.insurers || [];
-  const attention = [...(data.attention || []), ...(communicationAttention || [])];
+  const attention = [...(data.attention || []), ...(partsAttention || []), ...(communicationAttention || [])];
   const today = data.today || [];
 
   return (
@@ -197,6 +203,7 @@ export default async function Page() {
                   <div key={group.key} className="mb-5 last:mb-0">
                     <h3 className="mb-1 flex items-center gap-2 px-3 text-sm font-semibold text-gray-700">
                       {group.key.startsWith('communication_') && <ChatBubbleLeftRightIcon className="size-4 text-gray-400" aria-hidden="true" />}
+                      {group.key.startsWith('parts_') || group.key === 'repair_waiting_for_parts' ? <CubeIcon className="size-4 text-gray-400" aria-hidden="true" /> : null}
                       <span>{group.label} ({items.length})</span>
                     </h3>
                     <div className="divide-y divide-gray-100">{items.map(item => <WorkLink key={`${group.key}-${item.id}-${item.scheduledOn ?? 'brak-daty'}`} item={item} />)}</div>
