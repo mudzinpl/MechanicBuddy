@@ -28,7 +28,19 @@ export interface IWorkData extends IActivity{
     mechanics:       IMechanic[];
     status:          string;
     issuance:       IWorkIssuance;  
+    statusHistory?: IWorkStatusHistory[];
     
+}
+
+export interface IWorkStatusHistory {
+    id: string;
+    workId: string;
+    oldStatus: string;
+    newStatus: string;
+    comment: string | null;
+    changedByEmployeeId: string | null;
+    changedByName: string | null;
+    changedOn: string;
 }
 
 export interface IWorkDocument {

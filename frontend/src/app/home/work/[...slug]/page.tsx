@@ -1,7 +1,7 @@
 'use server'
 
 import { httpGet } from '@/_lib/server/query-api'
-import { IWorkData, IActivities, IOfferIssuance, IWorkDocument } from '../model';
+import { IWorkData, IActivities, IOfferIssuance, IWorkDocument, IWorkStatusHistory, statusNames } from '../model';
 import { Card, CardHeader } from '@/_components/Card';
 import NoProducts from '../_components/NoProducts';
 import { createOrUpdateProducts } from '../actions/createOrUpdateProducts';
@@ -44,8 +44,15 @@ export default async function Page({
 
     data = await httpGet(`work/${work.id}/documents`);
     const documents = await data.json() as IWorkDocument[];
+
+    data = await httpGet(`workstatushistory/${work.id}`);
+    work.statusHistory = await data.json() as IWorkStatusHistory[];
  
     const activityDisplayName = getActivityDisplayName(activityName,activityNumber,issuance?.number);
+    const getStatusName = (status?: string | null) => {
+        if (!status) return '';
+        return statusNames[status.toLowerCase()] ?? status;
+    };
 
 
     return (
@@ -88,6 +95,37 @@ export default async function Page({
                                 }
                               
                             </Card>}
+                            <section className="mt-4 rounded-md border border-gray-200 bg-white px-4 py-4">
+                                <h3 className="text-base font-semibold text-gray-900">Historia statusów</h3>
+                                {(work.statusHistory?.length ?? 0) > 0 ? (
+                                    <div className="mt-3 space-y-3">
+                                        {work.statusHistory?.map((item) => (
+                                            <div key={item.id} className="border-l-2 border-gray-200 pl-3 text-sm text-gray-600">
+                                                <p className="font-medium text-gray-900">
+                                                    {new Intl.DateTimeFormat('pl-PL', {
+                                                        dateStyle: 'medium',
+                                                        timeStyle: 'short',
+                                                    }).format(new Date(item.changedOn))}
+                                                </p>
+                                                <p>
+                                                    <span className="font-medium text-gray-700">Pracownik:</span>{' '}
+                                                    {item.changedByName || 'Nieznany'}
+                                                </p>
+                                                <p>
+                                                    <span className="font-medium text-gray-700">Status:</span>{' '}
+                                                    {getStatusName(item.oldStatus)} → {getStatusName(item.newStatus)}
+                                                </p>
+                                                {item.comment && <p className="whitespace-pre-line">
+                                                    <span className="font-medium text-gray-700">Komentarz:</span>{' '}
+                                                    {item.comment}
+                                                </p>}
+                                            </div>
+                                        ))}
+                                    </div>
+                                ) : (
+                                    <p className="mt-2 text-sm text-gray-500">Brak historii statusów</p>
+                                )}
+                            </section>
                         </div>
                     </div>
                 </div>
