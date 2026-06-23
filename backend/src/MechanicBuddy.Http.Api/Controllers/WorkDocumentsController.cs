@@ -32,6 +32,7 @@ namespace MechanicBuddy.Http.Api.Controllers
             "claim_assignments",
             "authorizations",
             "invoices",
+            "notes",
             "client_documents",
             "other"
         };

@@ -6,6 +6,12 @@ import React, { useRef }  from "react";
 import { DataItemRow, DataItemRowHandle } from "./DataIItemRow"; 
 import { dragAndDrop } from "../activity/dragAndDrop"; 
 
+const formatPln = (value: number) =>
+    `${new Intl.NumberFormat('pl-PL', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+    }).format(value).replace(/\u00A0/g, ' ')} zł`;
+
 export default function Saleables({
     edit, 
     data,
@@ -22,9 +28,6 @@ export default function Saleables({
     refreshData: (data: IProduct[]) => void
 }) {
 
-     
-    const moneyFormatter = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' });
- 
     const dragItem = useRef<string | undefined>(null);
     const dragOverItem = useRef<string | undefined>(null);
     
@@ -87,16 +90,16 @@ export default function Saleables({
                                         <div className="grid grid-rows-3 gap-0">
                                             <div className="flex flex-row-reverse " >
 
-                                                <div className="hidden pt-4 pr-3 pl-4 text-right text-sm font-normal text-gray-500 sm:table-cell sm:pl-0 w-25">{moneyFormatter.format(priceSummary.totalWithoutVat)}</div>
+                                                <div className="hidden pt-4 pr-3 pl-4 text-right text-sm font-normal text-gray-500 sm:table-cell sm:pl-0 w-25">{formatPln(priceSummary.totalWithoutVat)}</div>
                                                 <div className="hidden pt-4 pr-3 pl-4 text-right text-sm font-normal text-gray-500 sm:table-cell sm:pl-0">Suma częściowa</div>
                                             </div>
                                             <div className="flex flex-row-reverse " >
-                                                <div className="hidden pt-4 pr-3 pl-4 text-right text-sm font-normal text-gray-500 sm:table-cell sm:pl-0 w-25">{moneyFormatter.format(priceSummary.totalWithVat - priceSummary.totalWithoutVat)}</div>
+                                                <div className="hidden pt-4 pr-3 pl-4 text-right text-sm font-normal text-gray-500 sm:table-cell sm:pl-0 w-25">{formatPln(priceSummary.totalWithVat - priceSummary.totalWithoutVat)}</div>
                                                 <div className="hidden pt-4 pr-3 pl-4 text-right text-sm font-normal text-gray-500 sm:table-cell sm:pl-0">Podatek</div>
                                             </div>
                                             <div className="flex flex-row-reverse  " >
 
-                                                <div className="hidden pt-4 pr-3 pl-4 text-right text-sm font-semibold text-gray-900 sm:table-cell sm:pl-0 w-25">{moneyFormatter.format(priceSummary.totalWithVat)}</div>
+                                                <div className="hidden pt-4 pr-3 pl-4 text-right text-sm font-semibold text-gray-900 sm:table-cell sm:pl-0 w-25">{formatPln(priceSummary.totalWithVat)}</div>
                                                 <div className="hidden pt-4 pr-3 pl-4 text-right text-sm font-semibold text-gray-900 sm:table-cell sm:pl-0">Razem</div>
                                             </div>
                                         </div>

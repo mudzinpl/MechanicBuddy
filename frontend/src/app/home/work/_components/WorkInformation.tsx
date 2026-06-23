@@ -1,14 +1,14 @@
 
 
 'use client'
-import { getDamageStatusLabel, IWorkData } from '../model';
-import { DocumentTextIcon, ShieldCheckIcon, TruckIcon, UserCircleIcon, WrenchScrewdriverIcon } from '@heroicons/react/20/solid';
+import { damageStatuses, getDamageStatusLabel, IWorkData, statusNames } from '../model';
+import { ClockIcon, DocumentTextIcon, ShieldCheckIcon, TruckIcon, UserCircleIcon, WrenchScrewdriverIcon } from '@heroicons/react/20/solid';
 import moment from 'moment';
 import React from 'react';
 import { startAnActivity } from '../actions/startAnActivity';
 import ButtonGroup, { IButtonOption } from '@/_components/ButtonGroup';
 import HamburgerMenu from '@/_components/HamburgerMenu'; 
-import { BaseDialogHandle } from '@/_components/BaseDialog';
+import BaseDialog, { BaseDialogHandle } from '@/_components/BaseDialog';
 import IssueInvoiceDialog from './activity/IssueInvoiceDialog';
 import DeleteInvoiceDialog from './activity/DeleteInvoiceDialog';
 import PricingDownloadLink from './activity/PricingDownloadLink';
@@ -21,7 +21,8 @@ import ConfirmDialog, { ConfirmDialogHandle } from '@/_components/ConfirmDialog'
 import { createACopy } from '../actions/createACopy';
 import FormSwitch from '@/_components/FormSwitch'; 
 import { Field, Label } from '@headlessui/react';
-import { changeWorkStatus } from '../actions/changeWorkStatus';
+import { changeDamageStatus, changeWorkStatus } from '../actions/changeWorkStatus';
+import FormTextArea from '@/_components/FormTextArea';
 
 
 export function WorkInformation({
@@ -65,7 +66,28 @@ export function WorkInformation({
     const deleteInvoiceRef = React.useRef<BaseDialogHandle>(null);
     const createInvoiceRef = React.useRef<BaseDialogHandle>(null);
     const sendInvoiceRef = React.useRef<BaseDialogHandle>(null);
+    const changeStatusRef = React.useRef<BaseDialogHandle>(null);
     const deleteWorkRef = React.useRef<ConfirmDialogHandle>(null);
+    const [statusToChange, setStatusToChange] = React.useState<{ kind: 'work' | 'damage', status: string } | null>(null);
+    const [statusComment, setStatusComment] = React.useState('');
+
+    const getStatusName = (status?: string | null) => {
+        if (!status) return '';
+        const normalizedStatus = status.toLowerCase();
+        return statusNames[normalizedStatus] ?? getDamageStatusLabel(normalizedStatus);
+    };
+
+    const openStatusDialog = (status: string) => {
+        setStatusToChange({ kind: 'work', status });
+        setStatusComment('');
+        changeStatusRef.current?.open();
+    };
+
+    const openDamageStatusDialog = (status: string) => {
+        setStatusToChange({ kind: 'damage', status });
+        setStatusComment('');
+        changeStatusRef.current?.open();
+    };
     
     const workMenuOptions = work.issuance ? [] : [
         { name: 'Przygotuj ofertę', onClick: async () => { await startAnActivity(work.id, "offer") } },
@@ -106,18 +128,14 @@ export function WorkInformation({
         if(work.status!=='closed'){
             editButtonOptions.push({ 
                 name: 'Zamknij',
-                onClick: async() => { 
-                    await changeWorkStatus(work.id,'Closed');
-                }, 
+                onClick: () => openStatusDialog('Closed'),
              });
         }
         else if(work.status==='closed'){
             editButtonOptions.push({ 
                 name: 'Otwórz',
                 isPrimary: true,
-                onClick: async() => { 
-                    await changeWorkStatus(work.id,'Default');
-                }, 
+                onClick: () => openStatusDialog('Default'),
              });
         }
 
@@ -136,6 +154,31 @@ export function WorkInformation({
             <IssueInvoiceDialog work={work} dialogRef={createInvoiceRef}></IssueInvoiceDialog>
             <DeleteInvoiceDialog work={work} dialogRef={deleteInvoiceRef}></DeleteInvoiceDialog>
             <SendPricingDialog work={work} dialogRef={sendInvoiceRef}></SendPricingDialog>
+            <BaseDialog
+                ref={changeStatusRef}
+                title="Zmień status"
+                description="Możesz dodać krótki komentarz do historii statusów."
+                yesButtonText="Zapisz"
+                onConfirm={async () => {
+                    if (!statusToChange) return;
+                    changeStatusRef.current?.loading(true);
+                    if (statusToChange.kind === 'damage') {
+                        await changeDamageStatus(work.id, statusToChange.status, statusComment);
+                    }
+                    else {
+                        await changeWorkStatus(work.id, statusToChange.status, statusComment);
+                    }
+                    changeStatusRef.current?.close();
+                }}
+            >
+                <FormTextArea
+                    name="statusComment"
+                    label="Komentarz"
+                    value={statusComment}
+                    placeholder="Opcjonalny komentarz"
+                    onInputChange={(event) => setStatusComment(event.target.value)}
+                />
+            </BaseDialog>
             <ConfirmDialog ref={deleteWorkRef} onConfirm={async ()=>{
                 await deleteWork(work.id) ;
             }} ></ConfirmDialog>
@@ -209,8 +252,57 @@ export function WorkInformation({
                                 <span className="font-medium text-gray-700">Uwagi do ubezpieczyciela:</span>{' '}
                                 {work.insurerNotes}
                             </p>}
+                            {!work.issuance && <div className="mt-3 max-w-xs">
+                                <label htmlFor="damage-status-change" className="block text-sm font-medium text-gray-700">
+                                    Zmień status procesu
+                                </label>
+                                <select
+                                    id="damage-status-change"
+                                    value={work.damageStatus || 'new'}
+                                    onChange={(event) => openDamageStatusDialog(event.target.value)}
+                                    className="mt-1 block w-full rounded-md border-0 bg-white py-2 pr-8 pl-3 text-sm text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset focus:ring-2 focus:ring-indigo-600"
+                                >
+                                    {damageStatuses.map(status => (
+                                        <option key={status.value} value={status.value}>{status.label}</option>
+                                    ))}
+                                </select>
+                            </div>}
                         </dd>
                     </div>}
+                    <div className="mt-4 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-4">
+                        <dt className="flex-none">
+                            <span className="sr-only">Historia statusów</span>
+                            <ClockIcon aria-hidden="true" className="h-6 w-5 text-gray-400" />
+                        </dt>
+                        <dd className="w-full text-sm/6 text-gray-500">
+                            <p className="font-semibold text-gray-900">Historia statusów</p>
+                            {(work.statusHistory?.length ?? 0) > 0 ? (
+                                <div className="mt-2 space-y-3">
+                                    {work.statusHistory?.map((item) => (
+                                        <div key={item.id} className="border-l-2 border-gray-200 pl-3">
+                                            <p className="font-medium text-gray-900">
+                                                {moment(item.changedOn).format('LLL')}
+                                            </p>
+                                            <p>
+                                                <span className="font-medium text-gray-700">Pracownik:</span>{' '}
+                                                {item.changedByName || 'Nieznany'}
+                                            </p>
+                                            <p>
+                                                <span className="font-medium text-gray-700">Status:</span>{' '}
+                                                {getStatusName(item.oldStatus)} → {getStatusName(item.newStatus)}
+                                            </p>
+                                            {item.comment && <p className="whitespace-pre-line">
+                                                <span className="font-medium text-gray-700">Komentarz:</span>{' '}
+                                                {item.comment}
+                                            </p>}
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <p className="mt-2">Brak historii statusów</p>
+                            )}
+                        </dd>
+                    </div>
                     <div className="mt-6 flex gap-x-2 xl:px-6   ">  
                         {work.issuance && <>
                             

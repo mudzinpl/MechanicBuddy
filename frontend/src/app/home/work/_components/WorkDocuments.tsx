@@ -14,12 +14,13 @@ import { IWorkDocument } from '../model';
 
 const categories = [
   { value: 'vehicle_photos', label: 'Zdjęcia pojazdu' },
-  { value: 'audatex_estimates', label: 'Kosztorysy Audanet / Audatex' },
-  { value: 'insurer_decisions', label: 'Decyzje ubezpieczyciela' },
-  { value: 'claim_assignments', label: 'Cesje wierzytelności' },
-  { value: 'authorizations', label: 'Upoważnienia' },
-  { value: 'invoices', label: 'Faktury' },
-  { value: 'client_documents', label: 'Dokumenty klienta' },
+  { value: 'audatex_estimates', label: 'Kosztorys Audanet / Audatex' },
+  { value: 'insurer_decisions', label: 'Decyzja ubezpieczyciela' },
+  { value: 'claim_assignments', label: 'Cesja' },
+  { value: 'authorizations', label: 'Upoważnienie' },
+  { value: 'invoices', label: 'Faktura' },
+  { value: 'notes', label: 'Nota' },
+  { value: 'client_documents', label: 'Dokument klienta' },
   { value: 'other', label: 'Inne' },
 ] as const;
 
