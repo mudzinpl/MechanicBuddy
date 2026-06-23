@@ -69,6 +69,10 @@ const tileDefinitions = [
 ] as const;
 
 const attentionDefinitions = [
+  { key: 'vehicle_ready_for_release', label: 'Pojazdy gotowe do wydania' },
+  { key: 'vehicle_release_overdue', label: 'Pojazdy po terminie wydania' },
+  { key: 'vehicle_release_without_final_checklist', label: 'Wydanie bez checklisty końcowej' },
+  { key: 'vehicle_release_without_settlement', label: 'Wydanie bez rozliczenia' },
   { key: 'checklist_incomplete', label: 'Checklista niekompletna' },
   { key: 'ready_for_quality_control', label: 'Gotowe do kontroli jakości' },
   { key: 'quality_control_completed', label: 'Kontrola jakości zakończona' },
@@ -133,6 +137,8 @@ export default async function Page() {
   const data = await response.json() as DashboardData;
   const checklistResponse = await httpGet('work/quality-checklist-alerts');
   const checklistAttention = await checklistResponse.json() as DashboardWorkItem[];
+  const releaseResponse = await httpGet('work/vehicle-release-alerts');
+  const releaseAttention = await releaseResponse.json() as DashboardWorkItem[];
   const communicationResponse = await httpGet('work/communication-alerts');
   const communicationAttention = await communicationResponse.json() as DashboardWorkItem[];
   const partsResponse = await httpGet('work/part-order-alerts');
@@ -141,7 +147,7 @@ export default async function Page() {
   const tasksAttention = await tasksResponse.json() as DashboardWorkItem[];
   const counts = new Map((data.tiles || []).map(tile => [tile.key, tile.count]));
   const insurers = data.insurers || [];
-  const attention = [...(data.attention || []), ...(checklistAttention || []), ...(tasksAttention || []), ...(partsAttention || []), ...(communicationAttention || [])];
+  const attention = [...(data.attention || []), ...(releaseAttention || []), ...(checklistAttention || []), ...(tasksAttention || []), ...(partsAttention || []), ...(communicationAttention || [])];
   const today = data.today || [];
 
   return (
@@ -217,6 +223,7 @@ export default async function Page() {
                       {group.key.startsWith('communication_') && <ChatBubbleLeftRightIcon className="size-4 text-gray-400" aria-hidden="true" />}
                       {group.key.startsWith('parts_') || group.key === 'repair_waiting_for_parts' ? <CubeIcon className="size-4 text-gray-400" aria-hidden="true" /> : null}
                       {group.key.startsWith('task_') || group.key === 'my_tasks' ? <ClipboardDocumentListIcon className="size-4 text-gray-400" aria-hidden="true" /> : null}
+                      {group.key.startsWith('vehicle_') ? <TruckIcon className="size-4 text-gray-400" aria-hidden="true" /> : null}
                       {group.key.startsWith('checklist_') || group.key.includes('quality_control') ? <CheckCircleIcon className="size-4 text-gray-400" aria-hidden="true" /> : null}
                       <span>{group.label} ({items.length})</span>
                     </h3>
