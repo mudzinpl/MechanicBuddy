@@ -1,6 +1,7 @@
 'use client'
 
 import {IActivities, IActivity, IOfferIssuance, IWorkData, IWorkDocument } from '../model'
+import { IWorkCommunicationEntry } from '../communicationModel'
 import clsx from 'clsx'
 import Link from 'next/link'
 import { WorkInformation } from './WorkInformation'
@@ -15,6 +16,7 @@ import { IssuanceBadges } from './activity/badges/IssuanceBadges'
 import PricingDownloadLink from './activity/PricingDownloadLink' 
 import WorkDocuments from './WorkDocuments'
 import ReplacementVehicle from './ReplacementVehicle'
+import WorkCommunication from './WorkCommunication'
 
  
 export default function Activities({
@@ -22,11 +24,13 @@ export default function Activities({
   activities,
   issueances,
   documents,
+  communicationEntries,
 }: {
   work: IWorkData,
   activities: IActivities,
   issueances: IOfferIssuance[]
   documents: IWorkDocument[]
+  communicationEntries: IWorkCommunicationEntry[]
 }) {
  
   const confirmRemoveActivityRef = React.useRef<ConfirmDialogHandle>(null);
@@ -43,6 +47,9 @@ export default function Activities({
         </li>
         <li>
           <ReplacementVehicle workId={work.id} rental={work.replacementVehicle}></ReplacementVehicle>
+        </li>
+        <li>
+          <WorkCommunication workId={work.id} entries={communicationEntries} documents={documents}></WorkCommunication>
         </li>
         <li>
           <WorkDocuments workId={work.id} documents={documents}></WorkDocuments>

@@ -2,6 +2,7 @@
 
 import { httpGet } from '@/_lib/server/query-api'
 import { IWorkData, IActivities, IOfferIssuance, IWorkDocument, IWorkStatusHistory } from '../model';
+import { IWorkCommunicationEntry } from '../communicationModel';
 import { Card, CardHeader } from '@/_components/Card';
 import NoProducts from '../_components/NoProducts';
 import { createOrUpdateProducts } from '../actions/createOrUpdateProducts';
@@ -45,6 +46,9 @@ export default async function Page({
     data = await httpGet(`work/${work.id}/documents`);
     const documents = await data.json() as IWorkDocument[];
 
+    data = await httpGet(`work/${work.id}/communication`);
+    const communicationEntries = await data.json() as IWorkCommunicationEntry[];
+
     data = await httpGet(`workstatushistory/${work.id}`);
     work.statusHistory = await data.json() as IWorkStatusHistory[];
  
@@ -53,7 +57,7 @@ export default async function Page({
 
     return (
         <div  >
-              <Activities work={work} issueances={issueances} activities={activities} documents={documents}></Activities>
+              <Activities work={work} issueances={issueances} activities={activities} documents={documents} communicationEntries={communicationEntries}></Activities>
             <main className='pl-0 lg:pl-62  2xl:pr-108  '>
                 <div>
                     <div className="  px-4  xl:py-10 xl:px-8 xl:py-6 ">
