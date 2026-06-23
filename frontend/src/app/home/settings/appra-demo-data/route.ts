@@ -11,13 +11,14 @@ export async function POST(request: NextRequest) {
     const reset = formData.get('reset') === 'true';
     const jwt = await getJwt();
 
-    if (!jwt) {
+    if (typeof jwt !== 'string' || !jwt) {
       return redirectWithToast(redirectUrl, 'Sesja wygasła. Zaloguj się ponownie i spróbuj utworzyć dane demonstracyjne APPRA.', true);
     }
 
     const headers: Record<string, string> = {
       'Authorization': `Bearer ${jwt}`,
       'Content-Type': 'application/json',
+      'X-App-Frontend-Host': request.nextUrl.host,
     };
 
     const tenantId = getTenantIdFromHost(request.nextUrl.hostname);
