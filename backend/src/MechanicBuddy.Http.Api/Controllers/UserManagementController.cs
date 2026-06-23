@@ -31,12 +31,10 @@ namespace MechanicBuddy.Http.Api.Controllers
         private readonly ISession session;
         private readonly DbOptions dbOptions;
 
-        // Security: allow-list of sortable employee columns. `orderby` is
-        // interpolated into the ORDER BY clause, so only these values may be used.
         private static readonly HashSet<string> AllowedOrderByColumns =
             new(StringComparer.OrdinalIgnoreCase)
             {
-                "introducedat", "firstname", "lastname", "email", "phone", "proffession"
+                "introducedat", "firstname", "lastname", "email", "phone", "proffession", "app_role"
             };
 
         public UserManagementController(
@@ -51,9 +49,6 @@ namespace MechanicBuddy.Http.Api.Controllers
             this.dbOptions = dbOptions.Value;
         }
 
-        /// <summary>
-        /// Get all users for the current tenant
-        /// </summary>
         [HttpGet]
         public ActionResult<IEnumerable<UserManagementDto>> GetAll()
         {
@@ -68,15 +63,16 @@ namespace MechanicBuddy.Http.Api.Controllers
                 var employee = session.Get<Employee>(user.Id.EmployeeId);
                 if (employee == null) continue;
 
-                // Query additional user fields from database
                 var isDefaultAdmin = false;
                 var mustChangePassword = false;
+                var appRole = user.AppRole;
 
                 using (var connection = CreateConnection())
                 {
                     var userFields = connection.QuerySingleOrDefault<UserFieldsDto>(
                         @"SELECT is_default_admin as IsDefaultAdmin,
-                                 must_change_password as MustChangePassword
+                                 must_change_password as MustChangePassword,
+                                 COALESCE(app_role, 'manager') as AppRole
                           FROM public.user
                           WHERE tenantname = @TenantName AND employeeid = @EmployeeId",
                         new { TenantName = tenantName, EmployeeId = user.Id.EmployeeId });
@@ -85,6 +81,7 @@ namespace MechanicBuddy.Http.Api.Controllers
                     {
                         isDefaultAdmin = userFields.IsDefaultAdmin;
                         mustChangePassword = userFields.MustChangePassword;
+                        appRole = AppRoles.Normalize(userFields.AppRole, isDefaultAdmin);
                     }
                 }
 
@@ -98,6 +95,7 @@ namespace MechanicBuddy.Http.Api.Controllers
                     FullName = employee.Name,
                     Phone = employee.Phone,
                     Proffession = employee.Proffession,
+                    AppRole = appRole,
                     Validated = user.Validated,
                     IsDefaultAdmin = isDefaultAdmin,
                     MustChangePassword = mustChangePassword,
@@ -108,9 +106,6 @@ namespace MechanicBuddy.Http.Api.Controllers
             return Ok(userDtos);
         }
 
-        /// <summary>
-        /// Get paginated list of users (for Search component)
-        /// </summary>
         [HttpGet("page")]
         public ActionResult<PagedResult<UserManagementDto>> GetPage(
             string searchText,
@@ -123,18 +118,15 @@ namespace MechanicBuddy.Http.Api.Controllers
 
             using (var connection = CreateConnection())
             {
-                // Build the query.
-                // Security: `orderby` is interpolated into SQL, so restrict it to
-                // an allow-listed column; anything else falls back to the default.
                 var orderColumn = AllowedOrderByColumns.Contains(orderby ?? string.Empty)
                     ? orderby
                     : "introducedat";
-                var orderByClause = $"e.{orderColumn}";
+                var orderByClause = orderColumn == "app_role" ? "u.app_role" : $"e.{orderColumn}";
                 var orderDirection = desc ? "DESC" : "ASC";
 
                 var whereClause = string.IsNullOrEmpty(searchText)
                     ? ""
-                    : @" AND (LOWER(CONCAT_WS(' ', e.firstname, e.lastname, e.email, e.phone, u.username))
+                    : @" AND (LOWER(CONCAT_WS(' ', e.firstname, e.lastname, e.email, e.phone, u.username, u.app_role))
                          LIKE LOWER(@SearchText))";
 
                 var countQuery = $@"
@@ -153,6 +145,7 @@ namespace MechanicBuddy.Http.Api.Controllers
                         CONCAT(e.firstname, ' ', e.lastname) as FullName,
                         e.phone as Phone,
                         e.proffession as Proffession,
+                        COALESCE(u.app_role, 'manager') as AppRole,
                         u.validated as Validated,
                         COALESCE(u.is_default_admin, false) as IsDefaultAdmin,
                         COALESCE(u.must_change_password, false) as MustChangePassword,
@@ -174,6 +167,11 @@ namespace MechanicBuddy.Http.Api.Controllers
                 var total = connection.QuerySingle<int>(countQuery, parameters);
                 var items = connection.Query<UserManagementDto>(selectQuery, parameters).ToArray();
 
+                foreach (var item in items)
+                {
+                    item.AppRole = AppRoles.Normalize(item.AppRole, item.IsDefaultAdmin);
+                }
+
                 return Ok(new PagedResult<UserManagementDto>
                 {
                     Items = items,
@@ -182,9 +180,6 @@ namespace MechanicBuddy.Http.Api.Controllers
             }
         }
 
-        /// <summary>
-        /// Get a specific user by employee ID
-        /// </summary>
         [HttpGet("{id}")]
         public ActionResult<UserManagementDto> GetById(Guid id)
         {
@@ -198,15 +193,16 @@ namespace MechanicBuddy.Http.Api.Controllers
             if (employee == null)
                 return NotFound($"Employee with ID {id} not found");
 
-            // Query additional user fields
             var isDefaultAdmin = false;
             var mustChangePassword = false;
+            var appRole = user.AppRole;
 
             using (var connection = CreateConnection())
             {
                 var userFields = connection.QuerySingleOrDefault<UserFieldsDto>(
                     @"SELECT is_default_admin as IsDefaultAdmin,
-                             must_change_password as MustChangePassword
+                             must_change_password as MustChangePassword,
+                             COALESCE(app_role, 'manager') as AppRole
                       FROM public.user
                       WHERE tenantname = @TenantName AND employeeid = @EmployeeId",
                     new { TenantName = tenantName, EmployeeId = id });
@@ -215,6 +211,7 @@ namespace MechanicBuddy.Http.Api.Controllers
                 {
                     isDefaultAdmin = userFields.IsDefaultAdmin;
                     mustChangePassword = userFields.MustChangePassword;
+                    appRole = AppRoles.Normalize(userFields.AppRole, isDefaultAdmin);
                 }
             }
 
@@ -228,6 +225,7 @@ namespace MechanicBuddy.Http.Api.Controllers
                 FullName = employee.Name,
                 Phone = employee.Phone,
                 Proffession = employee.Proffession,
+                AppRole = appRole,
                 Validated = user.Validated,
                 IsDefaultAdmin = isDefaultAdmin,
                 MustChangePassword = mustChangePassword,
@@ -237,9 +235,6 @@ namespace MechanicBuddy.Http.Api.Controllers
             return Ok(dto);
         }
 
-        /// <summary>
-        /// Create a new user
-        /// </summary>
         [HttpPost]
         public ActionResult<Guid> CreateUser([FromBody] CreateUserDto model)
         {
@@ -254,12 +249,10 @@ namespace MechanicBuddy.Http.Api.Controllers
 
             var tenantName = this.TenantName();
 
-            // Check if username already exists
             var existingUser = userRepository.GetBy(model.UserName);
             if (existingUser != null)
                 throw new UserException($"Username '{model.UserName}' is already taken");
 
-            // Create employee record first
             var employee = new Employee(
                 model.FirstName,
                 model.LastName,
@@ -272,19 +265,18 @@ namespace MechanicBuddy.Http.Api.Controllers
             repository.Add(employee);
             session.Flush();
 
-            // Create user record
             var hashedPassword = PasswordHasher.getHash(model.Password);
             var user = new User(
                 model.UserName,
                 hashedPassword,
                 model.Email,
-                false, // validated
-                null, // profile image
-                new UserIdentifier(tenantName, employee.Id));
+                false,
+                null,
+                new UserIdentifier(tenantName, employee.Id),
+                AppRoles.Normalize(model.AppRole));
 
             userRepository.Add(user);
 
-            // Set must_change_password flag if needed
             if (model.MustChangePassword)
             {
                 using (var connection = CreateConnection())
@@ -305,9 +297,6 @@ namespace MechanicBuddy.Http.Api.Controllers
             return Ok(employee.Id);
         }
 
-        /// <summary>
-        /// Update an existing user
-        /// </summary>
         [HttpPut("{id}")]
         public ActionResult UpdateUser(Guid id, [FromBody] UpdateUserDto model)
         {
@@ -321,7 +310,16 @@ namespace MechanicBuddy.Http.Api.Controllers
             if (employee == null)
                 return NotFound($"Employee with ID {id} not found");
 
-            // Update employee details
+            var isDefaultAdmin = false;
+            using (var connection = CreateConnection())
+            {
+                isDefaultAdmin = connection.QuerySingleOrDefault<bool>(
+                    @"SELECT COALESCE(is_default_admin, false)
+                      FROM public.user
+                      WHERE tenantname = @TenantName AND employeeid = @EmployeeId",
+                    new { TenantName = tenantName, EmployeeId = id });
+            }
+
             employee.Change(
                 model.FirstName,
                 model.LastName,
@@ -332,7 +330,6 @@ namespace MechanicBuddy.Http.Api.Controllers
 
             session.Update(employee);
 
-            // Update user details
             if (!string.IsNullOrWhiteSpace(model.UserName) && model.UserName != user.UserName)
             {
                 var existingUser = userRepository.GetBy(model.UserName);
@@ -347,7 +344,8 @@ namespace MechanicBuddy.Http.Api.Controllers
                 user.ChangeEmail(model.Email);
             }
 
-            // Update password if provided
+            user.ChangeAppRole(AppRoles.Normalize(model.AppRole, isDefaultAdmin));
+
             if (!string.IsNullOrWhiteSpace(model.Password))
             {
                 var hashedPassword = PasswordHasher.getHash(model.Password);
@@ -359,9 +357,6 @@ namespace MechanicBuddy.Http.Api.Controllers
             return Ok(id);
         }
 
-        /// <summary>
-        /// Delete a user
-        /// </summary>
         [HttpDelete]
         public ActionResult Delete([FromBody] Guid[] ids)
         {
@@ -372,7 +367,6 @@ namespace MechanicBuddy.Http.Api.Controllers
 
             foreach (var id in ids)
             {
-                // Check if this is the default admin
                 using (var connection = CreateConnection())
                 {
                     var isDefaultAdmin = connection.QuerySingleOrDefault<bool>(
@@ -387,7 +381,6 @@ namespace MechanicBuddy.Http.Api.Controllers
                     }
                 }
 
-                // Delete user record
                 using (var connection = CreateConnection())
                 {
                     connection.Execute(
@@ -396,7 +389,6 @@ namespace MechanicBuddy.Http.Api.Controllers
                         new { TenantName = tenantName, EmployeeId = id });
                 }
 
-                // Delete employee record
                 var employee = session.Get<Employee>(id);
                 if (employee != null)
                 {
@@ -407,15 +399,11 @@ namespace MechanicBuddy.Http.Api.Controllers
             return Ok();
         }
 
-        /// <summary>
-        /// Check if the current tenant can manage users (team or lifetime tier only)
-        /// </summary>
         [HttpGet("canmanage")]
         public ActionResult<CanManageUsersDto> CanManageUsers()
         {
-            // Check tenant tier from environment variable set during deployment
             var tier = Environment.GetEnvironmentVariable("TENANT_TIER")?.ToLowerInvariant() ?? "solo";
-            var canManage = tier == "team" || tier == "lifetime";
+            var canManage = AppRoles.IsAdministrator(User) && (tier == "team" || tier == "lifetime");
             var hasWorkOrderLimit = tier == "solo" || tier == "free";
             var workOrderLimit = hasWorkOrderLimit ? 1000 : 0;
             var workOrderCount = session.QueryOver<Core.Domain.Work>().RowCount();
@@ -430,9 +418,6 @@ namespace MechanicBuddy.Http.Api.Controllers
             });
         }
 
-        /// <summary>
-        /// Helper method to create a database connection
-        /// </summary>
         private DbConnection CreateConnection()
         {
             var databaseName = dbOptions.MultiTenancy?.Enabled == true
@@ -453,13 +438,11 @@ namespace MechanicBuddy.Http.Api.Controllers
             return connection;
         }
 
-        /// <summary>
-        /// Internal DTO for querying user fields
-        /// </summary>
         private class UserFieldsDto
         {
             public bool IsDefaultAdmin { get; set; }
             public bool MustChangePassword { get; set; }
+            public string AppRole { get; set; }
         }
     }
 }
