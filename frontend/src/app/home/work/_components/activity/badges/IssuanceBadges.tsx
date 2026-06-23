@@ -27,12 +27,12 @@ export function IssuanceBadges({
 
     return (
         <> 
-           <GreenBadge text='Wystawiono' title={'Wystawiono ' + moment(issueance.issuedOn, true).locale('pl').format('LLL') + ' przez ' + issueance.issuedBy} ></GreenBadge>
-           {offerIssuance.acceptedOn && <>{' '}<GreenBadge text='Zaakceptowano' title={'Zaakceptowano ' + moment(offerIssuance.acceptedOn, true).locale('pl').format('LLL') + ' przez ' + offerIssuance.acceptedBy} ></GreenBadge></>}
+           <GreenBadge text='Wystawiono' title={'Wystawiono ' + moment(issueance.issuedOn, true).locale('pl').format('DD.MM.YYYY HH:mm') + ' przez ' + issueance.issuedBy} ></GreenBadge>
+           {offerIssuance.acceptedOn && <>{' '}<GreenBadge text='Zaakceptowano' title={'Zaakceptowano ' + moment(offerIssuance.acceptedOn, true).locale('pl').format('DD.MM.YYYY HH:mm') + ' przez ' + offerIssuance.acceptedBy} ></GreenBadge></>}
            <EmailSentBadge issueance={issueance}></EmailSentBadge>
            <OverdueBadge issueance={workIssuance}></OverdueBadge>
-           {workIssuance.invoiceNumber && workIssuance.isPaid && !isOverDue(workIssuance) && <> <GreenBadge text="Paid"></GreenBadge></>}
-           {workIssuance.invoiceNumber && !workIssuance.isPaid && !isOverDue(workIssuance) && <> <BlueBadge text="Unpaid"></BlueBadge></>}
+           {workIssuance.invoiceNumber && workIssuance.isPaid && !isOverDue(workIssuance) && <> <GreenBadge text="Opłacona"></GreenBadge></>}
+           {workIssuance.invoiceNumber && !workIssuance.isPaid && !isOverDue(workIssuance) && <> <BlueBadge text="Nieopłacona"></BlueBadge></>}
         </>
     )
 }
@@ -46,7 +46,7 @@ export function OverdueBadge({
 })
 { 
     return (
-        <>{issueance?.invoiceNumber && isOverDue(issueance) && <> <RedBadge text="Overdue" ></RedBadge></>}</>
+        <>{issueance?.invoiceNumber && isOverDue(issueance) && <> <RedBadge text="Po terminie" ></RedBadge></>}</>
     )
 }
 
@@ -58,6 +58,6 @@ export function EmailSentBadge({
 })
 {
     return (
-        <>{issueance?.sentOn && <span title={'Wiadomość e-mail wysłano do ' + issueance.receiverEmail + ' dnia ' + moment(issueance.sentOn, true).locale('pl').format('LLL')}><FontAwesomeIcon icon={faEnvelopeCircleCheck}  size="lg" color='Green' /></span>}</>
+        <>{issueance?.sentOn && <span title={'Wiadomość e-mail wysłano do ' + issueance.receiverEmail + ' dnia ' + moment(issueance.sentOn, true).locale('pl').format('DD.MM.YYYY HH:mm')}><FontAwesomeIcon icon={faEnvelopeCircleCheck}  size="lg" color='Green' /></span>}</>
     )
 }

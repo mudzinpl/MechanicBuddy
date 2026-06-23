@@ -17,7 +17,6 @@ export async function changeWorkStatus(workId: string,status:string, comment?: s
 }
 
 export async function changeDamageStatus(workId: string, status: string, comment?: string) {
-
     const response = await httpPut({
         url: `workstatushistory/${workId}/damage-status/${status}`,
         body:{ comment: comment || null }

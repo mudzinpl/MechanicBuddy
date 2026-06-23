@@ -121,7 +121,7 @@ export default async function Page(
       headerText: 'Rozpoczęto',//  {moment(activity?.startedOn, true).format('LLL')}
       dataFormatter: ({ startedOn }: { startedOn: Date }) => {
         return (
-          moment(startedOn, true).format('LL')
+          moment(startedOn, true).locale('pl').format('DD.MM.YYYY')
         );
       }
     },

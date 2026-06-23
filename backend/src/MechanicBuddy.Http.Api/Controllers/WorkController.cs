@@ -292,6 +292,21 @@ namespace MechanicBuddy.Http.Api.Controllers
             }
 
             repository.Add(work);
+            session.Flush();
+
+            session.Connection.Execute(
+                @"insert into domain.work_status_history
+                    (workid, oldstatus, newstatus, comment, changedbyemployeeid, changedon)
+                  values
+                    (@WorkId, @OldStatus, @NewStatus, @Comment, @ChangedByEmployeeId, CURRENT_TIMESTAMP)",
+                new
+                {
+                    WorkId = work.Id,
+                    OldStatus = "new",
+                    NewStatus = string.IsNullOrWhiteSpace(work.DamageStatus) ? "new" : work.DamageStatus,
+                    Comment = "Utworzono zlecenie",
+                    ChangedByEmployeeId = this.EmployeeId()
+                });
 
             var activityId = model.StartWithOffer ? offer.Id : repairJob.Id;
 
@@ -385,8 +400,22 @@ namespace MechanicBuddy.Http.Api.Controllers
             DateTime? invoiceTo )
         {
             var onlyIssued = issued == "on" ;
-            var clientId  = Request.Query["clientiId[value]"].FirstOrDefault();
-            var vehicleId = Request.Query["vehicleId[value]"].FirstOrDefault();
+            Guid? GetOptionalGuidQuery(params string[] keys)
+            {
+                foreach (var key in keys)
+                {
+                    var value = Request.Query[key].FirstOrDefault();
+                    if (Guid.TryParse(value, out var id) && id != Guid.Empty)
+                    {
+                        return id;
+                    }
+                }
+
+                return null;
+            }
+
+            var clientId = GetOptionalGuidQuery("clientId[value]", "clientiId[value]");
+            var vehicleId = GetOptionalGuidQuery("vehicleId[value]");
             orderby = onlyIssued? "i.number": "w.changedon";
 
              
@@ -413,8 +442,8 @@ namespace MechanicBuddy.Http.Api.Controllers
 
             }
           
-            if (!string.IsNullOrWhiteSpace(clientId)) query.Where($"w.clientid = '{clientId}'");
-            if (!string.IsNullOrWhiteSpace(vehicleId)) query.Where($"w.vehicleid = '{vehicleId}'");
+            if (clientId is not null) query.Where($"w.clientid = '{clientId}'");
+            if (vehicleId is not null) query.Where($"w.vehicleid = '{vehicleId}' ");
             if (workForm is not null || workForm is not null)
             { 
                 var dateRestriction = @" work.startedon {0})";
