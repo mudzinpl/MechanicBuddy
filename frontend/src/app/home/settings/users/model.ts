@@ -5,6 +5,7 @@ export interface IUser {
     firstName: string;
     lastName: string;
     phone?: string;
+    appRole?: string;
     isDefaultAdmin: boolean;
     mustChangePassword: boolean;
 }
