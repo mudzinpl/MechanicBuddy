@@ -95,7 +95,9 @@ export default async function Page(
         assignmentOfClaimSigned,
         powerOfAttorneySigned,
         clientPaysVat,
-        settlementStatus
+        settlementStatus,
+        audatexEstimateNumber,
+        estimateStatus
       }: {
         id: string,
         status: string,
@@ -104,9 +106,15 @@ export default async function Page(
         assignmentOfClaimSigned: boolean,
         powerOfAttorneySigned: boolean,
         clientPaysVat: boolean,
-        settlementStatus?: string
+        settlementStatus?: string,
+        audatexEstimateNumber?: string,
+        estimateStatus?: string
       }) => {
         const badges = [
+          !audatexEstimateNumber ? 'Brak kosztorysu' : '',
+          estimateStatus === 'sent' ? 'Kosztorys wysłany' : '',
+          estimateStatus === 'sent' ? 'Oczekuje na akceptację' : '',
+          estimateStatus === 'accepted' ? 'Kosztorys zaakceptowany' : '',
           !assignmentOfClaimSigned ? 'Brak cesji' : '',
           !powerOfAttorneySigned ? 'Brak pełnomocnictwa' : '',
           clientPaysVat ? 'Dopłata VAT' : '',

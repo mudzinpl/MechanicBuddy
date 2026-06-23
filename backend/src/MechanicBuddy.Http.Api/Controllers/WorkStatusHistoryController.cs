@@ -38,22 +38,31 @@ namespace MechanicBuddy.Http.Api.Controllers
                   from domain.work_status_history h
                   left join domain.employee e on e.id = h.changedbyemployeeid
                   where h.workid = @id
-                  union all
-                  select
-                    gen_random_uuid() as id,
-                    w.id as workid,
-                    lower(coalesce(nullif(w.damagestatus, ''), w.userstatus::text, 'new')) as oldstatus,
-                    lower(coalesce(nullif(w.damagestatus, ''), w.userstatus::text, 'new')) as newstatus,
-                    'Stan początkowy przed włączeniem historii statusów' as comment,
-                    w.starterid as changedbyemployeeid,
-                    concat_ws(' ', e.firstname, e.lastname) as changedbyname,
-                    w.startedon as changedon
-                  from domain.work w
-                  left join domain.employee e on e.id = w.starterid
-                  where w.id = @id
-                    and not exists (select 1 from domain.work_status_history h where h.workid = w.id)
-                  order by changedon desc",
+                  order by h.changedon desc",
                 new { id }).ToArray();
+
+            if (!history.Any())
+            {
+                var current = session.Connection.QuerySingleOrDefault<WorkStatusHistoryDto>(
+                    @"select
+                        gen_random_uuid() as id,
+                        w.id as workid,
+                        lower(coalesce(nullif(w.damagestatus, ''), lower(w.userstatus), 'new')) as oldstatus,
+                        lower(coalesce(nullif(w.damagestatus, ''), lower(w.userstatus), 'new')) as newstatus,
+                        'Stan początkowy przed włączeniem historii statusów' as comment,
+                        w.starterid as changedbyemployeeid,
+                        concat_ws(' ', e.firstname, e.lastname) as changedbyname,
+                        w.startedon as changedon
+                      from domain.work w
+                      left join domain.employee e on e.id = w.starterid
+                      where w.id = @id",
+                    new { id });
+
+                if (current != null)
+                {
+                    history = new[] { current };
+                }
+            }
 
             return Ok(history);
         }
@@ -70,14 +79,15 @@ namespace MechanicBuddy.Http.Api.Controllers
                 return Ok();
             }
 
-            EnsureInitialHistory(work.Id, oldWorkStatus.ToString(), work.StartedOn, work.Starter?.Id);
             work.ChangeState(newWorkStatus);
             if (newWorkStatus != WorkStatus.Closed)
             {
                 work.Changed();
             }
 
+            EnsureInitialHistory(work.Id, oldWorkStatus.ToString(), work.StartedOn, work.Starter?.Id);
             SaveHistory(work.Id, oldWorkStatus.ToString(), newWorkStatus.ToString(), model?.Comment);
+
             session.Update(work);
             return Ok();
         }
@@ -103,21 +113,50 @@ namespace MechanicBuddy.Http.Api.Controllers
                 work.AssignmentOfClaimSigned,
                 work.ClientPaysVat,
                 work.AudatexEstimateNumber,
-                work.InsurerNotes);
+                work.InsurerNotes,
+                work.ClaimHandlerName,
+                work.ClaimHandlerEmail,
+                work.ClaimHandlerPhone,
+                work.ClaimReportedOn,
+                work.EstimateSentOn,
+                work.InsurerDecisionOn,
+                work.SupplementPaidOn,
+                work.EstimateSystem,
+                work.EstimateVersion,
+                work.EstimatePreparedOn,
+                work.EstimateNetAmount,
+                work.EstimateVatAmount,
+                work.EstimateGrossAmount,
+                work.EstimateLaborMechanicalRbg,
+                work.EstimateLaborPaintRbg,
+                work.EstimateStatus,
+                work.EstimateAcceptedOn,
+                work.EstimateNotes,
+                work.EstimateDocumentId,
+                work.AssignmentOfClaimSignedOn,
+                work.PowerOfAttorneySigned,
+                work.PowerOfAttorneySignedOn,
+                work.ClientVatPercent,
+                work.ClientVatAmount,
+                work.UnderpaymentAmount,
+                work.SettlementStatus,
+                work.PaymentDemandOn,
+                work.PaymentReceivedOn,
+                work.SettlementNotes);
             work.Changed();
-
             SaveHistory(work.Id, oldStatus, newStatus, model?.Comment);
+
             session.Update(work);
             return Ok();
         }
 
-        private void EnsureInitialHistory(Guid workId, string status, DateTime startedOn, Guid? starterId)
+        private void EnsureInitialHistory(Guid workId, string status, DateTime changedOn, Guid? employeeId)
         {
-            var exists = session.Connection.ExecuteScalar<bool>(
+            var hasHistory = session.Connection.ExecuteScalar<bool>(
                 "select exists(select 1 from domain.work_status_history where workid = @WorkId)",
                 new { WorkId = workId });
 
-            if (exists) return;
+            if (hasHistory) return;
 
             session.Connection.Execute(
                 @"insert into domain.work_status_history
@@ -127,10 +166,10 @@ namespace MechanicBuddy.Http.Api.Controllers
                 new
                 {
                     WorkId = workId,
-                    Status = status,
+                    Status = string.IsNullOrWhiteSpace(status) ? "new" : status,
                     Comment = "Stan początkowy przed włączeniem historii statusów",
-                    ChangedByEmployeeId = starterId,
-                    ChangedOn = startedOn
+                    ChangedByEmployeeId = employeeId,
+                    ChangedOn = changedOn
                 });
         }
 
@@ -144,8 +183,8 @@ namespace MechanicBuddy.Http.Api.Controllers
                 new
                 {
                     WorkId = workId,
-                    OldStatus = oldStatus,
-                    NewStatus = newStatus,
+                    OldStatus = string.IsNullOrWhiteSpace(oldStatus) ? "new" : oldStatus,
+                    NewStatus = string.IsNullOrWhiteSpace(newStatus) ? "new" : newStatus,
                     Comment = string.IsNullOrWhiteSpace(comment) ? null : comment.Trim(),
                     ChangedByEmployeeId = this.EmployeeId()
                 });

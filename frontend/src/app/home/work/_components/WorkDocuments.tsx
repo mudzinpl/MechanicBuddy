@@ -14,7 +14,10 @@ import { IWorkDocument } from '../model';
 
 const categories = [
   { value: 'vehicle_photos', label: 'Zdjęcia pojazdu' },
-  { value: 'audatex_estimates', label: 'Kosztorys Audanet / Audatex' },
+  { value: 'audatex_estimates', label: 'Kosztorys Audatex' },
+  { value: 'audanet_estimates', label: 'Kosztorys Audanet' },
+  { value: 'manual_calculations', label: 'Kalkulacja własna' },
+  { value: 'insurer_verifications', label: 'Weryfikacja ubezpieczyciela' },
   { value: 'insurer_decisions', label: 'Decyzja ubezpieczyciela' },
   { value: 'claim_assignments', label: 'Cesja' },
   { value: 'authorizations', label: 'Pełnomocnictwo' },

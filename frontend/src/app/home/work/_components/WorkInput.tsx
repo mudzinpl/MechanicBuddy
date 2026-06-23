@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import FormTextArea from '@/_components/FormTextArea';
 import PrimaryButton from '@/_components/PrimaryButton';
 import SecondaryButton from '@/_components/SecondaryButton';
-import { damageStatuses, damageTypes, getDamageStatusLabel, insurers, IWorkData, IMechanic, settlementStatuses } from '../model';
+import { damageStatuses, damageTypes, estimateStatuses, estimateSystems, getDamageStatusLabel, insurers, IWorkData, IMechanic, IWorkDocument, settlementStatuses } from '../model';
 import FormLabel from '@/_components/FormLabel';
 import { ClientsCombobox, VehiclesCombobox } from '../../_components/SearchCombobox';
 import { useState } from 'react';
@@ -21,9 +21,11 @@ import WorkInputMechanics from './WorkInputMechanics';
 export default function WorkInput({
     work,
     mechanics,
+    documents = [],
 }: {
     work?: IWorkData | undefined,
-    mechanics: IMechanic[]
+    mechanics: IMechanic[],
+    documents?: IWorkDocument[]
 }) {
 
 
@@ -44,6 +46,10 @@ export default function WorkInput({
     const currentDamageType = work?.damageType || '';
     const hasKnownDamageType = !currentDamageType || damageTypes.some(type => type === currentDamageType);
     const toDateInputValue = (value?: string) => value ? value.slice(0, 10) : '';
+    const estimateDocuments = documents.filter(document =>
+        document.contentType === 'application/pdf' ||
+        ['audatex_estimates', 'audanet_estimates', 'manual_calculations', 'insurer_verifications'].includes(document.category)
+    );
     const populateClientVehicles = (clientId: string) => {
         query({
             url: 'vehicles/client/' + clientId,
@@ -214,13 +220,6 @@ export default function WorkInput({
                                 </div>
 
                                 <FormInput
-                                    name='audatexEstimateNumber'
-                                    label='Numer kosztorysu Audanet / Audatex'
-                                    defaultValue={work?.audatexEstimateNumber ?? ''}
-                                    placeholder='Numer kosztorysu'>
-                                </FormInput>
-
-                                <FormInput
                                     name='claimHandlerName'
                                     label='Opiekun szkody'
                                     defaultValue={work?.claimHandlerName ?? ''}
@@ -271,13 +270,6 @@ export default function WorkInput({
                                 </FormInput>
 
                                 <FormInput
-                                    name='estimateSentOn'
-                                    type='date'
-                                    label='Data wysłania kosztorysu'
-                                    defaultValue={toDateInputValue(work?.estimateSentOn)}>
-                                </FormInput>
-
-                                <FormInput
                                     name='insurerDecisionOn'
                                     type='date'
                                     label='Data decyzji ubezpieczyciela'
@@ -297,6 +289,129 @@ export default function WorkInput({
                                         rows={4}
                                         label='Uwagi do ubezpieczyciela'
                                         defaultValue={work?.insurerNotes ?? ''}>
+                                    </FormTextArea>
+                                </div>
+                            </div>
+                        </div>
+                        <div className="mt-4 border-t border-gray-900/10 pt-8">
+                            <h3 className="text-base font-semibold text-gray-900">Kosztorysy</h3>
+                            <p className="mt-1 text-sm text-gray-500">
+                                Dane kosztorysu naprawy, wersje, kwoty i status akceptacji.
+                            </p>
+
+                            <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                                <FormInput
+                                    name='audatexEstimateNumber'
+                                    label='Numer kosztorysu'
+                                    defaultValue={work?.audatexEstimateNumber ?? ''}
+                                    placeholder='Numer kosztorysu'>
+                                </FormInput>
+
+                                <div>
+                                    <FormLabel name='estimateSystem' label='System'></FormLabel>
+                                    <div className="mt-2 grid grid-cols-1">
+                                        <Select name='estimateSystem' defaultValue={work?.estimateSystem || ''}>
+                                            <option value=''>Nie wybrano</option>
+                                            {estimateSystems.map(system => (
+                                                <option key={system.value} value={system.value}>{system.label}</option>
+                                            ))}
+                                        </Select>
+                                    </div>
+                                </div>
+
+                                <FormInput
+                                    name='estimateVersion'
+                                    label='Wersja kosztorysu'
+                                    defaultValue={work?.estimateVersion ?? ''}
+                                    placeholder='np. 1, 2, korekta'>
+                                </FormInput>
+
+                                <FormInput
+                                    name='estimatePreparedOn'
+                                    type='date'
+                                    label='Data sporządzenia'
+                                    defaultValue={toDateInputValue(work?.estimatePreparedOn)}>
+                                </FormInput>
+
+                                <FormInput
+                                    name='estimateNetAmount'
+                                    type='number'
+                                    step='0.01'
+                                    label='Wartość netto'
+                                    defaultValue={work?.estimateNetAmount ?? ''}>
+                                </FormInput>
+                                <FormInput
+                                    name='estimateVatAmount'
+                                    type='number'
+                                    step='0.01'
+                                    label='VAT'
+                                    defaultValue={work?.estimateVatAmount ?? ''}>
+                                </FormInput>
+                                <FormInput
+                                    name='estimateGrossAmount'
+                                    type='number'
+                                    step='0.01'
+                                    label='Wartość brutto'
+                                    defaultValue={work?.estimateGrossAmount ?? ''}>
+                                </FormInput>
+                                <FormInput
+                                    name='estimateLaborMechanicalRbg'
+                                    type='number'
+                                    step='0.01'
+                                    label='RBG blacharsko-mechaniczne'
+                                    defaultValue={work?.estimateLaborMechanicalRbg ?? ''}>
+                                </FormInput>
+                                <FormInput
+                                    name='estimateLaborPaintRbg'
+                                    type='number'
+                                    step='0.01'
+                                    label='RBG lakiernicze'
+                                    defaultValue={work?.estimateLaborPaintRbg ?? ''}>
+                                </FormInput>
+
+                                <div>
+                                    <FormLabel name='estimateStatus' label='Status kosztorysu'></FormLabel>
+                                    <div className="mt-2 grid grid-cols-1">
+                                        <Select name='estimateStatus' defaultValue={work?.estimateStatus || ''}>
+                                            <option value=''>Nie wybrano</option>
+                                            {estimateStatuses.map(status => (
+                                                <option key={status.value} value={status.value}>{status.label}</option>
+                                            ))}
+                                        </Select>
+                                    </div>
+                                </div>
+
+                                <FormInput
+                                    name='estimateSentOn'
+                                    type='date'
+                                    label='Data wysłania do ubezpieczyciela'
+                                    defaultValue={toDateInputValue(work?.estimateSentOn)}>
+                                </FormInput>
+                                <FormInput
+                                    name='estimateAcceptedOn'
+                                    type='date'
+                                    label='Data akceptacji'
+                                    defaultValue={toDateInputValue(work?.estimateAcceptedOn)}>
+                                </FormInput>
+
+                                {estimateDocuments.length > 0 && <div className="sm:col-span-2">
+                                    <FormLabel name='estimateDocumentId' label='Dokument PDF kosztorysu'></FormLabel>
+                                    <div className="mt-2 grid grid-cols-1">
+                                        <Select name='estimateDocumentId' defaultValue={work?.estimateDocumentId ?? ''}>
+                                            <option value=''>Nie wybrano</option>
+                                            {estimateDocuments.map(document => (
+                                                <option key={document.id} value={document.id}>{document.fileName}</option>
+                                            ))}
+                                        </Select>
+                                    </div>
+                                </div>}
+
+                                <div className="sm:col-span-2">
+                                    <FormTextArea
+                                        name='estimateNotes'
+                                        rows={4}
+                                        label='Uwagi do kosztorysu'
+                                        defaultValue={work?.estimateNotes ?? ''}>
                                     </FormTextArea>
                                 </div>
                             </div>

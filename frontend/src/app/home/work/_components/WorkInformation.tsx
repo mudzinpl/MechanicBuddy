@@ -1,8 +1,8 @@
 
 
 'use client'
-import { damageStatuses, getDamageStatusLabel, getSettlementStatusLabel, IWorkData, statusNames } from '../model';
-import { BanknotesIcon, ClockIcon, DocumentTextIcon, ShieldCheckIcon, TruckIcon, UserCircleIcon, WrenchScrewdriverIcon } from '@heroicons/react/20/solid';
+import { damageStatuses, getDamageStatusLabel, getEstimateStatusLabel, getEstimateSystemLabel, getSettlementStatusLabel, IWorkData, statusNames } from '../model';
+import { BanknotesIcon, ClipboardDocumentListIcon, ClockIcon, DocumentTextIcon, ShieldCheckIcon, TruckIcon, UserCircleIcon, WrenchScrewdriverIcon } from '@heroicons/react/20/solid';
 import moment from 'moment';
 import React from 'react';
 import { startAnActivity } from '../actions/startAnActivity';
@@ -39,7 +39,7 @@ export function WorkInformation({
     const clientSummary = [work.clientName, work.clientPhone, work.clientEmail].filter(x => x).join(', ');
     const formatDate = (value?: string | null) => value ? moment(value).locale('pl').format('DD.MM.YYYY') : '';
     const formatCurrency = (value?: number | null) => typeof value === 'number'
-        ? new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(value)
+        ? new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(value).replace(/\u00A0/g, ' ')
         : '';
     const hasClaimDetails = Boolean(
         work.claimNumber ||
@@ -50,14 +50,27 @@ export function WorkInformation({
         work.claimHandlerEmail ||
         work.claimHandlerPhone ||
         work.claimReportedOn ||
-        work.audatexEstimateNumber ||
-        work.estimateSentOn ||
         work.insurerDecisionOn ||
         work.supplementPaidOn ||
         work.insurerNotes ||
         work.plannedIntakeOn ||
         work.plannedReleaseOn ||
         work.plannedInspectionOn
+    );
+    const hasEstimateDetails = Boolean(
+        work.audatexEstimateNumber ||
+        work.estimateSystem ||
+        work.estimateVersion ||
+        work.estimatePreparedOn ||
+        work.estimateNetAmount ||
+        work.estimateVatAmount ||
+        work.estimateGrossAmount ||
+        work.estimateLaborMechanicalRbg ||
+        work.estimateLaborPaintRbg ||
+        work.estimateStatus ||
+        work.estimateSentOn ||
+        work.estimateAcceptedOn ||
+        work.estimateNotes
     );
     const claimDetails = [
         ['Numer szkody', work.claimNumber],
@@ -68,13 +81,25 @@ export function WorkInformation({
         ['Rodzaj szkody', work.damageType],
         ['Status procesu', getDamageStatusLabel(work.damageStatus)],
         ['Data zgłoszenia szkody', formatDate(work.claimReportedOn)],
-        ['Kosztorys Audanet / Audatex', work.audatexEstimateNumber],
-        ['Data wysłania kosztorysu', formatDate(work.estimateSentOn)],
         ['Data decyzji ubezpieczyciela', formatDate(work.insurerDecisionOn)],
         ['Data dopłaty', formatDate(work.supplementPaidOn)],
         ['Planowane przyjęcie', formatDate(work.plannedIntakeOn)],
         ['Planowane wydanie', formatDate(work.plannedReleaseOn)],
         ['Data oględzin', formatDate(work.plannedInspectionOn)],
+    ].filter(([, value]) => value);
+    const estimateDetails = [
+        ['Numer kosztorysu', work.audatexEstimateNumber],
+        ['System', getEstimateSystemLabel(work.estimateSystem)],
+        ['Wersja kosztorysu', work.estimateVersion],
+        ['Data sporządzenia', formatDate(work.estimatePreparedOn)],
+        ['Wartość netto', formatCurrency(work.estimateNetAmount)],
+        ['VAT', formatCurrency(work.estimateVatAmount)],
+        ['Wartość brutto', formatCurrency(work.estimateGrossAmount)],
+        ['RBG blacharsko-mechaniczne', work.estimateLaborMechanicalRbg],
+        ['RBG lakiernicze', work.estimateLaborPaintRbg],
+        ['Status kosztorysu', getEstimateStatusLabel(work.estimateStatus)],
+        ['Data wysłania do ubezpieczyciela', formatDate(work.estimateSentOn)],
+        ['Data akceptacji', formatDate(work.estimateAcceptedOn)],
     ].filter(([, value]) => value);
     const settlementDetails = [
         ['Cesja podpisana', work.assignmentOfClaimSigned ? 'Tak' : 'Nie'],
@@ -294,6 +319,24 @@ export function WorkInformation({
                                     ))}
                                 </select>
                             </div>}
+                        </dd>
+                    </div>}
+                    {hasEstimateDetails && <div className="mt-4 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-4">
+                        <dt className="flex-none">
+                            <span className="sr-only">Kosztorysy</span>
+                            <ClipboardDocumentListIcon aria-hidden="true" className="h-6 w-5 text-gray-400" />
+                        </dt>
+                        <dd className="text-sm/6 text-gray-500">
+                            <p className="font-semibold text-gray-900">Kosztorysy</p>
+                            {estimateDetails.map(([label, value]) => (
+                                <p key={label}>
+                                    <span className="font-medium text-gray-700">{label}:</span> {value}
+                                </p>
+                            ))}
+                            {work.estimateNotes && <p className="mt-2 whitespace-pre-line">
+                                <span className="font-medium text-gray-700">Uwagi:</span>{' '}
+                                {work.estimateNotes}
+                            </p>}
                         </dd>
                     </div>}
                     <div className="mt-4 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-4">
