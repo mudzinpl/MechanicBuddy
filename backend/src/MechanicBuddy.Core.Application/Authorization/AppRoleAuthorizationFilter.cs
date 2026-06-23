@@ -15,6 +15,11 @@ namespace MechanicBuddy.Core.Application.Authorization
             "/api/usermanagement"
         };
 
+        private static readonly string[] ReadOnlyWriteExceptions =
+        {
+            "/api/users/extendsession"
+        };
+
         public void OnActionExecuting(ActionExecutingContext context)
         {
             var request = context.HttpContext.Request;
@@ -26,7 +31,7 @@ namespace MechanicBuddy.Core.Application.Authorization
                 return;
             }
 
-            if (AppRoles.IsReadOnly(context.HttpContext.User) && IsWriteMethod(method))
+            if (AppRoles.IsReadOnly(context.HttpContext.User) && IsWriteMethod(method) && !IsReadOnlyWriteException(path))
             {
                 context.Result = new ForbidResult();
                 return;
@@ -53,6 +58,11 @@ namespace MechanicBuddy.Core.Application.Authorization
         private static bool IsTechnicalSettingsPath(string path)
         {
             return TechnicalSettingsPrefixes.Any(prefix => path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase));
+        }
+
+        private static bool IsReadOnlyWriteException(string path)
+        {
+            return ReadOnlyWriteExceptions.Any(prefix => path.StartsWith(prefix, StringComparison.OrdinalIgnoreCase));
         }
     }
 }
