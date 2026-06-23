@@ -7,7 +7,7 @@ import { redirect } from "next/navigation";
 export async function changeWorkStatus(workId: string,status:string, comment?: string) {
 
     const response = await httpPut({
-        url: `work/${workId}/status/${status}`,
+        url: `workstatushistory/${workId}/status/${status}`,
         body:{ comment: comment || null }
     });
     await response.text();
