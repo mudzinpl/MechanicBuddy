@@ -96,6 +96,26 @@ app.Use(async (context, next) =>
     await next();
 });
 
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path.StartsWithSegments("/api/demo/appra-data")
+        && context.Request.Headers.TryGetValue("X-App-Frontend-Host", out var frontendHostHeader))
+    {
+        var frontendHost = frontendHostHeader.ToString();
+        var isAllowedDemoHost = frontendHost.Contains("localhost", StringComparison.OrdinalIgnoreCase)
+            || frontendHost.Contains("127.0.0.1", StringComparison.OrdinalIgnoreCase)
+            || frontendHost.StartsWith("demo", StringComparison.OrdinalIgnoreCase)
+            || frontendHost.Contains(".demo.", StringComparison.OrdinalIgnoreCase);
+
+        if (isAllowedDemoHost)
+        {
+            context.Request.Host = new HostString(frontendHost);
+        }
+    }
+
+    await next();
+});
+
 app.UseRouting();
 app.UseStaticFiles();
 app.UseRateLimiting();
