@@ -2,6 +2,7 @@ import { httpGet } from '@/_lib/server/query-api';
 import {
   BanknotesIcon,
   CalendarDaysIcon,
+  ChatBubbleLeftRightIcon,
   CheckCircleIcon,
   ClockIcon,
   CubeIcon,
@@ -85,6 +86,10 @@ const attentionDefinitions = [
   { key: 'missing_power_of_attorney', label: 'Brak podpisanego pełnomocnictwa' },
   { key: 'unsettled_case', label: 'Sprawa nierozliczona' },
   { key: 'client_vat_without_payment_date', label: 'Dopłata VAT bez daty zapłaty' },
+  { key: 'communication_waiting_client', label: 'Oczekuje na odpowiedź klienta' },
+  { key: 'communication_waiting_insurer', label: 'Oczekuje na odpowiedź ubezpieczyciela' },
+  { key: 'communication_no_contact_7_days', label: 'Brak kontaktu ponad 7 dni' },
+  { key: 'communication_unresolved', label: 'Nierozwiązane wpisy komunikacji' },
 ] as const;
 
 const todayDefinitions = [
@@ -114,9 +119,11 @@ function WorkLink({ item }: { item: DashboardWorkItem }) {
 export default async function Page() {
   const response = await httpGet('work/dashboard');
   const data = await response.json() as DashboardData;
+  const communicationResponse = await httpGet('work/communication-alerts');
+  const communicationAttention = await communicationResponse.json() as DashboardWorkItem[];
   const counts = new Map((data.tiles || []).map(tile => [tile.key, tile.count]));
   const insurers = data.insurers || [];
-  const attention = data.attention || [];
+  const attention = [...(data.attention || []), ...(communicationAttention || [])];
   const today = data.today || [];
 
   return (
@@ -188,7 +195,10 @@ export default async function Page() {
                 if (items.length === 0) return null;
                 return (
                   <div key={group.key} className="mb-5 last:mb-0">
-                    <h3 className="mb-1 px-3 text-sm font-semibold text-gray-700">{group.label} ({items.length})</h3>
+                    <h3 className="mb-1 flex items-center gap-2 px-3 text-sm font-semibold text-gray-700">
+                      {group.key.startsWith('communication_') && <ChatBubbleLeftRightIcon className="size-4 text-gray-400" aria-hidden="true" />}
+                      <span>{group.label} ({items.length})</span>
+                    </h3>
                     <div className="divide-y divide-gray-100">{items.map(item => <WorkLink key={`${group.key}-${item.id}`} item={item} />)}</div>
                   </div>
                 );
