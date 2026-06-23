@@ -10,6 +10,7 @@ import YellowBadge from '@/_components/YellowBadge';
 import { CardHeader } from '@/_components/Card';
 import DeleteUserButton from '../_components/DeleteUserButton';
 import { deleteUser } from '../createOrUpdate';
+import { getAppRoleLabel } from '@/_lib/appRoles';
 
 export default async function Page({
     params,
@@ -42,6 +43,7 @@ export default async function Page({
                 <dl className="divide-y divide-gray-100">
                     <DescriptionItem label='Imię i nazwisko' value={`${user.firstName} ${user.lastName}`}></DescriptionItem>
                     <DescriptionItem label='Nazwa użytkownika' value={user.userName}></DescriptionItem>
+                    <DescriptionItem label='Rola' value={getAppRoleLabel(user.appRole)}></DescriptionItem>
                     <DescriptionItem label='Email' value={user.email}></DescriptionItem>
                     <DescriptionItem label='Telefon' value={user.phone || 'N/A'}></DescriptionItem>
                     <DescriptionItem label='Główny administrator' value={user.isDefaultAdmin ? 'Tak' : 'Nie'}></DescriptionItem>
