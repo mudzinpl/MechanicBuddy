@@ -1,7 +1,7 @@
 'use server'
 
 import { httpGet } from '@/_lib/server/query-api'
-import { IWorkData, IActivities, IOfferIssuance, IWorkDocument } from '../model';
+import { IWorkData, IActivities, IOfferIssuance, IWorkDocument, IWorkStatusHistory } from '../model';
 import { Card, CardHeader } from '@/_components/Card';
 import NoProducts from '../_components/NoProducts';
 import { createOrUpdateProducts } from '../actions/createOrUpdateProducts';
@@ -44,6 +44,9 @@ export default async function Page({
 
     data = await httpGet(`work/${work.id}/documents`);
     const documents = await data.json() as IWorkDocument[];
+
+    data = await httpGet(`work/${work.id}/status-history`);
+    work.statusHistory = await data.json() as IWorkStatusHistory[];
  
     const activityDisplayName = getActivityDisplayName(activityName,activityNumber,issuance?.number);
 
