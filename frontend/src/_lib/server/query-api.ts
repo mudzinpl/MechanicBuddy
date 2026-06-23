@@ -12,10 +12,16 @@ interface IAPICall
   method: string
 }
 
-// Extract tenant ID from hostname (e.g., "demo-1b94f2" from "demo-1b94f2.mechanicbuddy.app")
-async function getTenantIdFromHost(): Promise<string | null> {
+async function getRequestHost(): Promise<string | null> {
   const headersList = await headers();
   const host = headersList.get('host');
+  if (!host) return null;
+  return host;
+}
+
+// Extract tenant ID from hostname (e.g., "demo-1b94f2" from "demo-1b94f2.mechanicbuddy.app")
+async function getTenantIdFromHost(): Promise<string | null> {
+  const host = await getRequestHost();
   if (!host) return null;
 
   const parts = host.split('.');
@@ -47,6 +53,10 @@ async function apiCall({
   const tenantId = await getTenantIdFromHost();
   if (tenantId) {
     requestHeaders["X-Tenant-ID"] = tenantId;
+  }
+  const requestHost = await getRequestHost();
+  if (requestHost) {
+    requestHeaders["X-App-Frontend-Host"] = requestHost;
   }
 
   const fullUrl = process.env.API_URL +`/api/${url}`;
