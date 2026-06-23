@@ -11,8 +11,10 @@ import clsx from "clsx";
 import { usePathname } from "next/navigation"
 import { canAccessMainSection } from "@/_lib/appRoles";
 
+type NavigationSection = Parameters<typeof canAccessMainSection>[1];
+
 const navigationIconClass = "size-6 shrink-0";
-const navigation = [
+const navigation: { name: string; href: string; section: NavigationSection; icon: React.ReactNode }[] = [
     { name: 'Zlecenia', href: '/home/work', section: 'work', icon: <QueueListIcon aria-hidden="true" className={navigationIconClass}></QueueListIcon> },
     { name: 'Terminy', href: '/home/calendar', section: 'calendar', icon: <CalendarDaysIcon aria-hidden="true" className={navigationIconClass}></CalendarDaysIcon> },
     { name: 'Klienci', href: '/home/clients', section: 'clients', icon: <UsersIcon aria-hidden="true" className={navigationIconClass}></UsersIcon>  },
@@ -34,7 +36,7 @@ export default function Nav({
     appRole: string,
 }) {
     const currentPath = usePathname();
-    const visibleNavigation = navigation.filter((item) => canAccessMainSection(appRole, item.section as Parameters<typeof canAccessMainSection>[1]));
+    const visibleNavigation = navigation.filter((item) => canAccessMainSection(appRole, item.section));
     const canOpenSettings = canAccessMainSection(appRole, 'settings');
 
     return (
