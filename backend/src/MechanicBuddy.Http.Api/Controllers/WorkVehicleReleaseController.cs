@@ -131,10 +131,10 @@ namespace MechanicBuddy.Http.Api.Controllers
                     w.id AS workid,
                     w.number::text AS worknr,
                     w.claimnumber,
-                    COALESCE(CONCAT_WS(' ', p.firstname, p.lastname), l.name) AS clientname,
-                    COALESCE(p.address, l.address) AS clientaddress,
-                    COALESCE(p.phone, l.phone) AS clientphone,
-                    COALESCE(p.email, l.email) AS clientemail,
+                    COALESCE(NULLIF(TRIM(CONCAT_WS(' ', p.firstname, p.lastname)), ''), l.name) AS clientname,
+                    NULLIF(CONCAT_WS(', ', NULLIF(c.address, ''), NULLIF(c.postalcode, ''), NULLIF(c.city, '')), '') AS clientaddress,
+                    c.phone AS clientphone,
+                    ce.address AS clientemail,
                     v.producer AS vehicleproducer,
                     v.model AS vehiclemodel,
                     v.vin AS vehiclevin,
@@ -155,6 +155,8 @@ namespace MechanicBuddy.Http.Api.Controllers
                 FROM domain.work w
                 LEFT JOIN domain.work_vehicle_release r ON r.workid = w.id
                 LEFT JOIN domain.employee e ON e.id = r.releasedbyemployeeid
+                LEFT JOIN domain.client c ON c.id = w.clientid
+                LEFT JOIN domain.clientemail ce ON ce.clientid = c.id AND ce.isactive = TRUE
                 LEFT JOIN domain.legalclient l ON l.id = w.clientid
                 LEFT JOIN domain.privateclient p ON p.id = w.clientid
                 LEFT JOIN domain.vehicle v ON v.id = w.vehicleid
