@@ -26,6 +26,7 @@ namespace MechanicBuddy.Core.Application.Database
             Map(x => x.Password).Column("password").Access.BackingField();
             Map(x => x.Email).Column("email").Access.BackingField();
             Map(x => x.Validated).Column("validated").Access.BackingField();
+            Map(x => x.AppRole).Column("app_role").Access.BackingField();
         }
     }
 }
