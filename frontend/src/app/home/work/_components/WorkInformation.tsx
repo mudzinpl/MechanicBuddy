@@ -58,9 +58,9 @@ export function WorkInformation({
         ['Cesja podpisana', work.assignmentOfClaimSigned ? 'Tak' : 'Nie'],
         ['Klient dopłaca VAT', work.clientPaysVat ? 'Tak' : 'Nie'],
         ['Kosztorys Audanet / Audatex', work.audatexEstimateNumber],
-        ['Planowane przyjęcie', work.plannedIntakeOn ? moment(work.plannedIntakeOn).locale('pl').format('LL') : ''],
-        ['Planowane wydanie', work.plannedReleaseOn ? moment(work.plannedReleaseOn).locale('pl').format('LL') : ''],
-        ['Termin oględzin', work.plannedInspectionOn ? moment(work.plannedInspectionOn).locale('pl').format('LL') : ''],
+        ['Planowane przyjęcie', work.plannedIntakeOn ? moment(work.plannedIntakeOn).locale('pl').format('DD.MM.YYYY') : ''],
+        ['Planowane wydanie', work.plannedReleaseOn ? moment(work.plannedReleaseOn).locale('pl').format('DD.MM.YYYY') : ''],
+        ['Termin oględzin', work.plannedInspectionOn ? moment(work.plannedInspectionOn).locale('pl').format('DD.MM.YYYY') : ''],
     ].filter(([, value]) => value);
 
     const deleteInvoiceRef = React.useRef<BaseDialogHandle>(null);
@@ -190,7 +190,7 @@ export function WorkInformation({
                             <WorkStatusBadge   status={work.status}></WorkStatusBadge> 
                         </dt>
                         <dd className="text-sm/6 text-gray-500">
-                            <time dateTime="2023-01-31">{moment(work.startedOn).format('LLL')}</time>
+                            <time dateTime="2023-01-31">{moment(work.startedOn).locale('pl').format('DD.MM.YYYY HH:mm')}</time>
                         </dd>
                     </div>
                      
@@ -281,7 +281,7 @@ export function WorkInformation({
                                     {work.statusHistory?.map((item) => (
                                         <div key={item.id} className="border-l-2 border-gray-200 pl-3">
                                             <p className="font-medium text-gray-900">
-                                                {moment(item.changedOn).format('LLL')}
+                                                {moment(item.changedOn).locale('pl').format('DD.MM.YYYY HH:mm')}
                                             </p>
                                             <p>
                                                 <span className="font-medium text-gray-700">Pracownik:</span>{' '}

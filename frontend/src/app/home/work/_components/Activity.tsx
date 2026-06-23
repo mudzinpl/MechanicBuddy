@@ -63,7 +63,7 @@ export default function Activity({
     const issued = !!issuance?.issuedOn;
 
     const readOptions =work.issuance?[]: [
-        { name: issued ? 'Edytuj ' : 'Edit ', isPrimary: true, inMenu:issued, href: pathEdit },
+        { name: 'Edytuj', isPrimary: true, inMenu:issued, href: pathEdit },
 
     
     ] as IButtonOption[]

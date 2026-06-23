@@ -9,7 +9,7 @@ export  function ActivityCreatedBy({
     return ( 
         <div className=" flex items-center gap-x-2 text-xs/5 text-gray-500">
             <p className="whitespace-nowrap">
-                {moment(activity?.startedOn, true).format('LLL')}
+                {moment(activity?.startedOn, true).locale('pl').format('DD.MM.YYYY HH:mm')}
             </p>
             <svg viewBox="0 0 2 2" className="size-0.5 fill-current">
                 <circle r={1} cx={1} cy={1} />

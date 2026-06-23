@@ -68,7 +68,7 @@ export default async function Page({
                                             <h3 className={clsx(activities.items.length>1 && "hidden", "text-base  2xl:block font-semibold text-gray-900")}>{activityDisplayName}</h3>
                                             </div>
                                             <div  className='my-1' > 
-                                                {issuance && <PricingDownloadLink name="Offer" hideLabel={!!issuance.number} id={issuance.id} number={issuance.number} ></PricingDownloadLink>}
+                                                {issuance && <PricingDownloadLink name="Oferta" hideLabel={!!issuance.number} id={issuance.id} number={issuance.number} ></PricingDownloadLink>}
                                                 </div>
                                             <div className='flex gap-x-2 my-1'>
                                                 {issuance && <IssuanceBadges issueance={issuance}   ></IssuanceBadges>} </div>

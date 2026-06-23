@@ -79,7 +79,7 @@ export default function Activities({
                       {name} 
                     </Link>
                   </p> 
-                  {issuance&& <PricingDownloadLink name="Offer"  hideLabel={true} id={issuance.id} number={issuance.number} ></PricingDownloadLink>}
+                  {issuance&& <PricingDownloadLink name="Oferta"  hideLabel={true} id={issuance.id} number={issuance.number} ></PricingDownloadLink>}
                   {issuance&& <IssuanceBadges issueance={issuance}   ></IssuanceBadges>}
                 </div>
                  <ActivityCreatedBy activity={item}></ActivityCreatedBy>  
