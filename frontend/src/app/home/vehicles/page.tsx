@@ -42,10 +42,13 @@ export default async function Page(
         {
           dataField: 'regNr',
           headerText: 'Numer rejestracyjny',
-          dataFormatter: ({ regNr, id }) => {
+          dataFormatter: ({ regNr, id, isReplacementVehicle }) => {
             return (
               <Link href={'/home/vehicles/' + id} >
-                <h5 className="font-semibold"> {regNr}</h5>
+                <h5 className="inline-flex items-center gap-2 font-semibold">
+                  {regNr}
+                  {isReplacementVehicle && <span className="rounded-full bg-sky-50 px-2 py-0.5 text-xs font-semibold text-sky-700">Zastępczy</span>}
+                </h5>
               </Link>
             );
           }

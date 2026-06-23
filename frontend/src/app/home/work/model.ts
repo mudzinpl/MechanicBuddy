@@ -29,7 +29,27 @@ export interface IWorkData extends IActivity{
     status:          string;
     issuance:       IWorkIssuance;  
     statusHistory?: IWorkStatusHistory[];
+    replacementVehicle?: IWorkReplacementVehicle | null;
     
+}
+
+export interface IWorkReplacementVehicle {
+    id: string;
+    workId: string;
+    replacementVehicleId: string;
+    replacementVehicleName: string;
+    issuedOn: string | null;
+    returnedOn: string | null;
+    mileageOut: number | null;
+    mileageIn: number | null;
+    fuelOut: string | null;
+    fuelIn: string | null;
+    conditionOut: string | null;
+    conditionIn: string | null;
+    notes: string | null;
+    status: string;
+    createdOn: string;
+    changedOn: string;
 }
 
 export interface IWorkStatusHistory {

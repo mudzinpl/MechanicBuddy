@@ -68,6 +68,7 @@ namespace MechanicBuddy.Http.Api.Controllers
                 RegNr = entity.RegNr,
                 Series = entity.Series,
                 Transmission = entity.Transmission,
+                IsReplacementVehicle = entity.IsReplacementVehicle,
                 Vin = entity.Vin
             };
         }
@@ -88,7 +89,8 @@ namespace MechanicBuddy.Http.Api.Controllers
                         model.Region,
                         model.Series,
                         model.Transmission,
-                        model.Description);
+                        model.Description,
+                        model.IsReplacementVehicle);
             if (model.OwnerId != null)
             {
                 vehicle.RegisterTo(repository.Get<Client>(model.OwnerId.GetValueOrDefault()));
@@ -113,7 +115,8 @@ namespace MechanicBuddy.Http.Api.Controllers
                         model.Region,
                         model.Series,
                         model.Transmission,
-                        model.Description);
+                        model.Description,
+                        model.IsReplacementVehicle);
             if (model.OwnerId != null)
             {
                 if (entity.Owner?.Id != model.OwnerId.GetValueOrDefault())
@@ -135,7 +138,7 @@ namespace MechanicBuddy.Http.Api.Controllers
                   .SearchFields("concat_ws(' ',v.regnr,vin,firstname,lastname,l.name,producer,model)") //,body,drivingside,engine,TO_CHAR(productiondate,'MM-YYYY'),region,series,transmission
                   .SelectSql(@"SELECT 
                         v.id, 
-                        v.regnr,vin, producer,model,body,drivingside,engine,TO_CHAR(productiondate,'MM-YYYY') as productiondate,region,series,transmission,
+                        v.regnr,vin, producer,model,body,drivingside,engine,TO_CHAR(productiondate,'MM-YYYY') as productiondate,region,series,transmission,isreplacementvehicle,
                         concat_ws(' ',firstname,lastname,l.name)  as ownername,
                         v0.ownerid as ownerid
                         FROM domain.vehicle AS v

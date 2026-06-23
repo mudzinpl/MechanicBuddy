@@ -60,6 +60,32 @@ namespace MechanicBuddy.Http.Api.Controllers
             NHibernateUtil.Initialize(work.Jobs);
 
             var status = work.Invoice is not null ? "completed" : (work.UserStatus.ToString().ToLower());
+            var replacementVehicle = session.Connection.QuerySingleOrDefault<WorkReplacementVehicleDto>(@"
+                SELECT
+                    r.id,
+                    r.workid,
+                    r.replacementvehicleid,
+                    CONCAT_WS(' ', v.producer, v.model, NULLIF('(' || v.regnr || ')', '()')) AS replacementvehiclename,
+                    r.issuedon,
+                    r.returnedon,
+                    r.mileageout,
+                    r.mileagein,
+                    r.fuelout,
+                    r.fuelin,
+                    r.conditionout,
+                    r.conditionin,
+                    r.notes,
+                    r.status,
+                    r.createdon,
+                    r.changedon
+                FROM domain.work_replacement_vehicle r
+                INNER JOIN domain.vehicle v ON v.id = r.replacementvehicleid
+                WHERE r.workid = @WorkId
+                  AND r.status <> 'cancelled'
+                ORDER BY
+                    CASE WHEN r.status = 'issued' THEN 0 WHEN r.status = 'planned' THEN 1 ELSE 2 END,
+                    r.changedon DESC
+                LIMIT 1", new { WorkId = id });
              
             return new
             {
@@ -93,6 +119,7 @@ namespace MechanicBuddy.Http.Api.Controllers
                 work.PlannedIntakeOn,
                 work.PlannedReleaseOn,
                 work.PlannedInspectionOn,
+                ReplacementVehicle = replacementVehicle,
                 Mechanics = work.Mechanics.ToList().Select(x => new { x.Id, x.Name }).ToArray(),
                 Status= status,
                 Issuance = work.Invoice is not null ? 
@@ -120,7 +147,11 @@ namespace MechanicBuddy.Http.Api.Controllers
                         w.plannedreleaseon,
                         w.plannedinspectionon,
                         CONCAT_WS(' ', p.firstname, p.lastname, l.name) AS clientname,
-                        v.regnr
+                        v.regnr,
+                        EXISTS (
+                            SELECT 1 FROM domain.work_replacement_vehicle rv
+                            WHERE rv.workid = w.id AND rv.status IN ('planned', 'issued')
+                        ) AS hasactivereplacementvehicle
                     FROM domain.work w
                     LEFT JOIN domain.legalclient l ON l.id = w.clientid
                     LEFT JOIN domain.privateclient p ON p.id = w.clientid
@@ -137,7 +168,9 @@ namespace MechanicBuddy.Http.Api.Controllers
                 UNION ALL SELECT 'on_hold', COUNT(*)::int FROM work_data WHERE damagestatus = 'on_hold'
                 UNION ALL SELECT 'settled_this_month', COUNT(*)::int FROM work_data
                     WHERE damagestatus = 'settled'
-                      AND changedon >= (DATE_TRUNC('month', CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw') AT TIME ZONE 'Europe/Warsaw')").ToArray();
+                      AND changedon >= (DATE_TRUNC('month', CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw') AT TIME ZONE 'Europe/Warsaw')
+                UNION ALL SELECT 'active_replacement_vehicles', COUNT(*)::int FROM work_data
+                    WHERE hasactivereplacementvehicle = TRUE").ToArray();
 
             var attention = session.Connection.Query<DashboardWorkItemDto>(baseWorkCte + @"
                 SELECT id, worknr, clientname, regnr, damagestatus, 'missing_claim_number' AS kind, NULL::timestamptz AS scheduledon
@@ -576,8 +609,12 @@ from (
 	   from domain.assignment a 
 		inner join domain.employee m on  a.mechanicid = m.id and a.workid = w.id
 		) as mechanicnames,
-	w.notes,
-    (select count(*) from domain.workdocument wd where wd.workid = w.id)::int as documentcount
+    w.notes,
+    (select count(*) from domain.workdocument wd where wd.workid = w.id)::int as documentcount,
+    exists (
+        select 1 from domain.work_replacement_vehicle rv
+        where rv.workid = w.id and rv.status in ('planned', 'issued')
+    ) as hasactivereplacementvehicle
      from domain.work w
          {extraJoins}
 	  left join domain.legalclient l on l.id =  w.clientid

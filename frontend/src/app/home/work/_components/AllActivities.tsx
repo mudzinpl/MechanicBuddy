@@ -14,6 +14,7 @@ import { getActivityDisplayName } from './activity/getActivityDisplayName'
 import { IssuanceBadges } from './activity/badges/IssuanceBadges' 
 import PricingDownloadLink from './activity/PricingDownloadLink' 
 import WorkDocuments from './WorkDocuments'
+import ReplacementVehicle from './ReplacementVehicle'
 
  
 export default function Activities({
@@ -39,6 +40,9 @@ export default function Activities({
           <div className="p-5 pb-10">
             <WorkInformation hasRepairJobWithProductsOrServices={containsRepairJobWithProductsOrServices} work={ work} ></WorkInformation>
           </div>
+        </li>
+        <li>
+          <ReplacementVehicle workId={work.id} rental={work.replacementVehicle}></ReplacementVehicle>
         </li>
         <li>
           <WorkDocuments workId={work.id} documents={documents}></WorkDocuments>

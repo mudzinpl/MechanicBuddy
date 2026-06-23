@@ -2,7 +2,7 @@ import Search from "../_components/Search";
 import moment from "moment";
 import { damageStatuses, IOfferIssuance, IWorkIssuance } from "./model";
 import PricingDownloadLink from "./_components/activity/PricingDownloadLink";
-import { ArrowDownTrayIcon, PaperClipIcon } from "@heroicons/react/20/solid";
+import { ArrowDownTrayIcon, PaperClipIcon, TruckIcon } from "@heroicons/react/20/solid";
 import Spinner from "@/_components/Spinner";
 import BlueBadge from "@/_components/BlueBadge";
 import WorkStatusBadge from "./_components/activity/badges/WorkStatusBadge";
@@ -87,12 +87,16 @@ export default async function Page(
       dataField: 'workNr',
       headerText: 'Zlecenie',
 
-      dataFormatter: ({ id, workNr, status }: { id: string, status: string, workNr: string }) => {
+      dataFormatter: ({ id, workNr, status, hasActiveReplacementVehicle }: { id: string, status: string, workNr: string, hasActiveReplacementVehicle: boolean }) => {
 
         return (
           <Link href={'/home/work/' + id}>
-            <h5 >Zlecenie nr {workNr}
+            <h5 className="inline-flex items-center gap-1.5">Zlecenie nr {workNr}
               {' '} {!isInvoiceView && <WorkStatusBadge status={status} ></WorkStatusBadge>}
+              {hasActiveReplacementVehicle && <span title="Aktywny pojazd zastępczy" className="inline-flex items-center rounded-full bg-sky-50 px-2 py-0.5 text-xs font-semibold text-sky-700">
+                <TruckIcon className="mr-1 size-3" aria-hidden="true" />
+                Zastępczy
+              </span>}
             </h5>
           </Link>
         );
