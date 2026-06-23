@@ -20,6 +20,7 @@ import WorkCommunication from './WorkCommunication'
 import InvoiceSettlement from './InvoiceSettlement'
 import PartOrders from './PartOrders'
 import WorkTasks from './WorkTasks'
+import QualityChecklist from './QualityChecklist'
 
  
 export default function Activities({
@@ -50,6 +51,9 @@ export default function Activities({
         </li>
         <li>
           <WorkTasks workId={work.id}></WorkTasks>
+        </li>
+        <li>
+          <QualityChecklist workId={work.id}></QualityChecklist>
         </li>
         <li>
           <InvoiceSettlement workId={work.id}></InvoiceSettlement>
