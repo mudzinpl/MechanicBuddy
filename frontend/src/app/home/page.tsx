@@ -199,7 +199,7 @@ export default async function Page() {
                       {group.key.startsWith('communication_') && <ChatBubbleLeftRightIcon className="size-4 text-gray-400" aria-hidden="true" />}
                       <span>{group.label} ({items.length})</span>
                     </h3>
-                    <div className="divide-y divide-gray-100">{items.map(item => <WorkLink key={`${group.key}-${item.id}`} item={item} />)}</div>
+                    <div className="divide-y divide-gray-100">{items.map(item => <WorkLink key={`${group.key}-${item.id}-${item.scheduledOn ?? 'brak-daty'}`} item={item} />)}</div>
                   </div>
                 );
               })}
@@ -226,7 +226,7 @@ export default async function Page() {
                     </div>
                     {items.length === 0
                       ? <p className="px-3 py-2 text-sm text-gray-400">{group.empty}</p>
-                      : <div className="divide-y divide-gray-100">{items.map(item => <WorkLink key={`${group.key}-${item.id}`} item={item} />)}</div>}
+                      : <div className="divide-y divide-gray-100">{items.map(item => <WorkLink key={`${group.key}-${item.id}-${item.scheduledOn ?? 'brak-daty'}`} item={item} />)}</div>}
                   </div>
                 );
               })}
