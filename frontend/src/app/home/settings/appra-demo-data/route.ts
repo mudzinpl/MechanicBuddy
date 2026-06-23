@@ -18,6 +18,7 @@ export async function POST(request: NextRequest) {
     const headers: Record<string, string> = {
       'Authorization': `Bearer ${jwt}`,
       'Content-Type': 'application/json',
+      'Host': request.nextUrl.host,
       'X-App-Frontend-Host': request.nextUrl.host,
     };
 
