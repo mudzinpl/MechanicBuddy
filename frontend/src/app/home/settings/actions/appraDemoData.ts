@@ -17,7 +17,7 @@ export interface AppraDemoDataStatus {
 export async function getAppraDemoDataStatus(): Promise<AppraDemoDataStatus | null> {
   try {
     const jwt = await getJwt();
-    if (!jwt) return null;
+    if (typeof jwt !== 'string' || !jwt) return null;
 
     const response = await fetch(`${API_URL}/api/demo/appra-data`, {
       method: 'GET',
@@ -35,7 +35,7 @@ export async function createAppraDemoData(formData: FormData) {
   const reset = formData.get('reset') === 'true';
   const jwt = await getJwt();
 
-  if (!jwt) {
+  if (typeof jwt !== 'string' || !jwt) {
     pushToast('Sesja wygasła. Zaloguj się ponownie i spróbuj utworzyć dane demonstracyjne APPRA.', true);
     redirect('/home/settings');
   }
