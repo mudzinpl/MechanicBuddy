@@ -158,7 +158,7 @@ export default function InvoiceSettlement({ workId }: { workId: string }) {
 
           <p className="text-xs text-gray-500">Fakturownia jest tylko przygotowana jako źródło danych. Połączenie z API nie jest jeszcze zaimplementowane.</p>
           {message && <p className="text-sm text-gray-500">{message}</p>}
-          <PrimaryButton id="btnInvoiceSettlement" type="submit" disabled={isSaving}>{isSaving ? 'Zapisywanie...' : 'Zapisz rozliczenie'}</PrimaryButton>
+          <PrimaryButton id="btnInvoiceSettlement" disabled={isSaving}>{isSaving ? 'Zapisywanie...' : 'Zapisz rozliczenie'}</PrimaryButton>
         </form>
       )}
     </section>
