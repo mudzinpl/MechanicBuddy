@@ -4,11 +4,13 @@ import SettingsTabs from "@/_components/SettingsTabs";
 import Main from "../_components/Main";
 import Link from "next/link";
 import { DescriptionItem } from "@/_components/DescriptionItem";
+import { createAppraDemoData, getAppraDemoDataStatus } from "./actions/appraDemoData";
 
 export default async function Page() {
 
     const data = await httpGet('options');
     const options = await data.json() as IUserOptions;
+    const appraDemoStatus = await getAppraDemoDataStatus();
  
     return (
 
@@ -59,6 +61,42 @@ export default async function Page() {
                     <Link href="/home/settings/integrations" className="text-sm/6 font-semibold text-indigo-600 hover:text-indigo-500">
                         Przejdź do integracji
                     </Link>
+                </div>
+            </div>
+            <div className="pt-8 px-0">
+                <h3 className="text-base/7 font-semibold text-gray-900">Dane demonstracyjne APPRA</h3>
+                <p className="mt-1 max-w-2xl text-sm/6 text-gray-500">
+                    Generator tworzy przykładowe szkody, dokumenty, części, zadania, checklisty, pojazdy zastępcze, rozliczenia i alerty na potrzeby prezentacji.
+                </p>
+                <div className="mt-4 rounded-md border border-gray-200 p-4">
+                    <p className="text-sm text-gray-600">
+                        {appraDemoStatus?.message || 'Nie udało się sprawdzić statusu generatora danych demonstracyjnych.'}
+                    </p>
+                    {appraDemoStatus && <p className="mt-1 text-sm text-gray-600">
+                        Liczba zleceń demo APPRA: <span className="font-semibold text-gray-900">{appraDemoStatus.workCount}</span>
+                    </p>}
+                    <div className="mt-4 flex flex-wrap gap-3">
+                        <form action={createAppraDemoData}>
+                            <input type="hidden" name="reset" value="false" />
+                            <button
+                                type="submit"
+                                disabled={!appraDemoStatus?.allowed || appraDemoStatus.exists}
+                                className="inline-flex items-center gap-x-1.5 rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 disabled:cursor-not-allowed disabled:bg-gray-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+                            >
+                                Utwórz dane demonstracyjne APPRA
+                            </button>
+                        </form>
+                        <form action={createAppraDemoData}>
+                            <input type="hidden" name="reset" value="true" />
+                            <button
+                                type="submit"
+                                disabled={!appraDemoStatus?.allowed}
+                                className="inline-flex items-center gap-x-1.5 rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50 disabled:cursor-not-allowed disabled:text-gray-400"
+                            >
+                                Odtwórz dane demo
+                            </button>
+                        </form>
+                    </div>
                 </div>
             </div>
              <div className="mt-6 flex items-center justify-end gap-x-6">
