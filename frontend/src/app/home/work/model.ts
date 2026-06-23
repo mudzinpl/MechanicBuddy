@@ -31,6 +31,18 @@ export interface IWorkData extends IActivity{
     paymentReceivedOn: string;
     settlementNotes: string;
     audatexEstimateNumber: string;
+    estimateSystem: string;
+    estimateVersion: string;
+    estimatePreparedOn: string;
+    estimateNetAmount: number | null;
+    estimateVatAmount: number | null;
+    estimateGrossAmount: number | null;
+    estimateLaborMechanicalRbg: number | null;
+    estimateLaborPaintRbg: number | null;
+    estimateStatus: string;
+    estimateAcceptedOn: string;
+    estimateNotes: string;
+    estimateDocumentId: string | null;
     insurerNotes:    string;
     claimHandlerName: string;
     claimHandlerEmail: string;
@@ -140,6 +152,21 @@ export const settlementStatuses = [
   { value: 'settled', label: 'Rozliczone' },
 ] as const;
 
+export const estimateSystems = [
+  { value: 'audanet', label: 'Audanet' },
+  { value: 'audatex', label: 'Audatex' },
+  { value: 'manual', label: 'Ręczny' },
+  { value: 'other', label: 'Inny' },
+] as const;
+
+export const estimateStatuses = [
+  { value: 'draft', label: 'Roboczy' },
+  { value: 'sent', label: 'Wysłany' },
+  { value: 'accepted', label: 'Zaakceptowany' },
+  { value: 'rejected', label: 'Odrzucony' },
+  { value: 'needs_correction', label: 'Do poprawy' },
+] as const;
+
 export function getDamageStatusLabel(status?: string | null): string {
   if (!status) return '';
 
@@ -152,6 +179,18 @@ export function getSettlementStatusLabel(status?: string | null): string {
   if (!status) return 'Nierozliczone';
 
   return settlementStatuses.find(item => item.value === status)?.label ?? status;
+}
+
+export function getEstimateSystemLabel(system?: string | null): string {
+  if (!system) return '';
+
+  return estimateSystems.find(item => item.value === system)?.label ?? system;
+}
+
+export function getEstimateStatusLabel(status?: string | null): string {
+  if (!status) return '';
+
+  return estimateStatuses.find(item => item.value === status)?.label ?? status;
 }
 
 export interface ICurrentActivity{

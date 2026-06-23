@@ -134,6 +134,18 @@ namespace MechanicBuddy.Http.Api.Controllers
                 work.EstimateSentOn,
                 work.InsurerDecisionOn,
                 work.SupplementPaidOn,
+                work.EstimateSystem,
+                work.EstimateVersion,
+                work.EstimatePreparedOn,
+                work.EstimateNetAmount,
+                work.EstimateVatAmount,
+                work.EstimateGrossAmount,
+                work.EstimateLaborMechanicalRbg,
+                work.EstimateLaborPaintRbg,
+                work.EstimateStatus,
+                work.EstimateAcceptedOn,
+                work.EstimateNotes,
+                work.EstimateDocumentId,
                 work.PlannedIntakeOn,
                 work.PlannedReleaseOn,
                 work.PlannedInspectionOn,
@@ -162,6 +174,8 @@ namespace MechanicBuddy.Http.Api.Controllers
                         w.estimatesenton,
                         w.insurerdecisionon,
                         w.audatexestimatenumber,
+                        w.estimatestatus,
+                        w.estimateacceptedon,
                         w.assignmentofclaimsigned,
                         w.powerofattorneysigned,
                         w.clientpaysvat,
@@ -230,6 +244,12 @@ namespace MechanicBuddy.Http.Api.Controllers
                     WHERE clientpaysvat = TRUE
                 UNION ALL SELECT 'unsettled_cases', COUNT(*)::int FROM work_data
                     WHERE COALESCE(settlementstatus, 'unsettled') <> 'settled'
+                UNION ALL SELECT 'estimate_missing', COUNT(*)::int FROM work_data
+                    WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND COALESCE(TRIM(audatexestimatenumber), '') = ''
+                UNION ALL SELECT 'estimate_waiting_approval', COUNT(*)::int FROM work_data
+                    WHERE COALESCE(estimatestatus, '') = 'sent'
+                UNION ALL SELECT 'estimate_accepted_ready', COUNT(*)::int FROM work_data
+                    WHERE COALESCE(estimatestatus, '') = 'accepted' AND damagestatus NOT IN ('repair', 'paint_shop', 'quality_control', 'ready_for_pickup', 'released', 'settled', 'rejected')
                 UNION ALL SELECT 'today_schedule', COUNT(*)::int FROM (
                     SELECT id FROM work_data WHERE (plannedintakeon AT TIME ZONE 'Europe/Warsaw')::date = (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
                     UNION ALL SELECT id FROM work_data WHERE (plannedinspectionon AT TIME ZONE 'Europe/Warsaw')::date = (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
@@ -258,6 +278,10 @@ namespace MechanicBuddy.Http.Api.Controllers
                     UNION ALL SELECT id FROM work_data WHERE clientpaysvat = TRUE
                     UNION ALL SELECT id FROM work_data WHERE COALESCE(settlementstatus, 'unsettled') <> 'settled'
                     UNION ALL SELECT id FROM work_data WHERE clientpaysvat = TRUE AND paymentreceivedon IS NULL
+                    UNION ALL SELECT id FROM work_data WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND COALESCE(TRIM(audatexestimatenumber), '') = ''
+                    UNION ALL SELECT id FROM work_data WHERE estimatesenton IS NOT NULL AND COALESCE(estimatestatus, '') = 'sent' AND estimateacceptedon IS NULL AND estimatesenton < CURRENT_TIMESTAMP - INTERVAL '3 days'
+                    UNION ALL SELECT id FROM work_data WHERE COALESCE(estimatestatus, '') IN ('rejected', 'needs_correction')
+                    UNION ALL SELECT id FROM work_data WHERE COALESCE(estimatestatus, '') = 'accepted' AND damagestatus NOT IN ('repair', 'paint_shop', 'quality_control', 'ready_for_pickup', 'released', 'settled', 'rejected')
                 ) manager_attention").ToArray();
 
             var insurers = session.Connection.Query<DashboardTileDto>(baseWorkCte + @"
@@ -283,6 +307,15 @@ namespace MechanicBuddy.Http.Api.Controllers
                 SELECT id, worknr, clientname, regnr, damagestatus, 'insurer_decision_overdue', estimatesenton
                 FROM work_data WHERE estimatesenton IS NOT NULL AND insurerdecisionon IS NULL AND estimatesenton < CURRENT_TIMESTAMP - INTERVAL '3 days'
                 UNION ALL
+                SELECT id, worknr, clientname, regnr, damagestatus, 'estimate_sent_overdue', estimatesenton
+                FROM work_data WHERE estimatesenton IS NOT NULL AND COALESCE(estimatestatus, '') = 'sent' AND estimateacceptedon IS NULL AND estimatesenton < CURRENT_TIMESTAMP - INTERVAL '3 days'
+                UNION ALL
+                SELECT id, worknr, clientname, regnr, damagestatus, 'estimate_rejected_or_correction', NULL::timestamptz
+                FROM work_data WHERE COALESCE(estimatestatus, '') IN ('rejected', 'needs_correction')
+                UNION ALL
+                SELECT id, worknr, clientname, regnr, damagestatus, 'estimate_accepted_ready', estimateacceptedon
+                FROM work_data WHERE COALESCE(estimatestatus, '') = 'accepted' AND damagestatus NOT IN ('repair', 'paint_shop', 'quality_control', 'ready_for_pickup', 'released', 'settled', 'rejected')
+                UNION ALL
                 SELECT id, worknr, clientname, regnr, damagestatus, 'inspection_missing_after_two_days', plannedinspectionon
                 FROM work_data WHERE damagestatus IN ('new', 'inspection_pending') AND plannedinspectionon IS NULL AND startedon < CURRENT_TIMESTAMP - INTERVAL '2 days'
                 UNION ALL
@@ -306,6 +339,7 @@ namespace MechanicBuddy.Http.Api.Controllers
                 UNION ALL
                 SELECT id, worknr, clientname, regnr, damagestatus, 'missing_power_of_attorney', NULL::timestamptz
                 FROM work_data WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND powerofattorneysigned = FALSE
+                UNION ALL
                 SELECT id, worknr, clientname, regnr, damagestatus, 'unsettled_case', NULL::timestamptz
                 FROM work_data WHERE COALESCE(settlementstatus, 'unsettled') <> 'settled'
                 UNION ALL
@@ -349,6 +383,9 @@ namespace MechanicBuddy.Http.Api.Controllers
                         w.claimhandlername,
                         w.estimatesenton,
                         w.insurerdecisionon,
+                        w.audatexestimatenumber,
+                        w.estimatestatus,
+                        w.estimateacceptedon,
                         w.assignmentofclaimsigned,
                         w.powerofattorneysigned,
                         w.clientpaysvat,
@@ -403,8 +440,20 @@ namespace MechanicBuddy.Http.Api.Controllers
                     SELECT id, worknr, clientname, regnr, damagestatus, 'missing_claim_handler', NULL::timestamptz
                     FROM work_data WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND COALESCE(TRIM(claimhandlername), '') = ''
                     UNION ALL
+                    SELECT id, worknr, clientname, regnr, damagestatus, 'missing_estimate', NULL::timestamptz
+                    FROM work_data WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND COALESCE(TRIM(audatexestimatenumber), '') = ''
+                    UNION ALL
                     SELECT id, worknr, clientname, regnr, damagestatus, 'insurer_decision_overdue', estimatesenton
                     FROM work_data WHERE estimatesenton IS NOT NULL AND insurerdecisionon IS NULL AND estimatesenton < CURRENT_TIMESTAMP - INTERVAL '3 days'
+                    UNION ALL
+                    SELECT id, worknr, clientname, regnr, damagestatus, 'estimate_sent_overdue', estimatesenton
+                    FROM work_data WHERE estimatesenton IS NOT NULL AND COALESCE(estimatestatus, '') = 'sent' AND estimateacceptedon IS NULL AND estimatesenton < CURRENT_TIMESTAMP - INTERVAL '3 days'
+                    UNION ALL
+                    SELECT id, worknr, clientname, regnr, damagestatus, 'estimate_rejected_or_correction', NULL::timestamptz
+                    FROM work_data WHERE COALESCE(estimatestatus, '') IN ('rejected', 'needs_correction')
+                    UNION ALL
+                    SELECT id, worknr, clientname, regnr, damagestatus, 'estimate_accepted_ready', estimateacceptedon
+                    FROM work_data WHERE COALESCE(estimatestatus, '') = 'accepted' AND damagestatus NOT IN ('repair', 'paint_shop', 'quality_control', 'ready_for_pickup', 'released', 'settled', 'rejected')
                     UNION ALL
                     SELECT id, worknr, clientname, regnr, damagestatus, 'approval_overdue', changedon
                     FROM work_data WHERE damagestatus = 'approval_pending' AND changedon < CURRENT_TIMESTAMP - INTERVAL '3 days'
@@ -561,6 +610,18 @@ namespace MechanicBuddy.Http.Api.Controllers
                 model.EstimateSentOn,
                 model.InsurerDecisionOn,
                 model.SupplementPaidOn,
+                model.EstimateSystem,
+                model.EstimateVersion,
+                model.EstimatePreparedOn,
+                model.EstimateNetAmount,
+                model.EstimateVatAmount,
+                model.EstimateGrossAmount,
+                model.EstimateLaborMechanicalRbg,
+                model.EstimateLaborPaintRbg,
+                model.EstimateStatus,
+                model.EstimateAcceptedOn,
+                model.EstimateNotes,
+                model.EstimateDocumentId,
                 model.AssignmentOfClaimSignedOn,
                 model.PowerOfAttorneySigned,
                 model.PowerOfAttorneySignedOn,
@@ -654,6 +715,18 @@ namespace MechanicBuddy.Http.Api.Controllers
                 model.EstimateSentOn,
                 model.InsurerDecisionOn,
                 model.SupplementPaidOn,
+                model.EstimateSystem,
+                model.EstimateVersion,
+                model.EstimatePreparedOn,
+                model.EstimateNetAmount,
+                model.EstimateVatAmount,
+                model.EstimateGrossAmount,
+                model.EstimateLaborMechanicalRbg,
+                model.EstimateLaborPaintRbg,
+                model.EstimateStatus,
+                model.EstimateAcceptedOn,
+                model.EstimateNotes,
+                model.EstimateDocumentId,
                 model.AssignmentOfClaimSignedOn,
                 model.PowerOfAttorneySigned,
                 model.PowerOfAttorneySignedOn,
@@ -879,6 +952,9 @@ from (
    w.claimnumber,
    w.insurer,
    w.damagetype,
+   w.audatexestimatenumber,
+   w.estimatestatus,
+   w.estimatesenton,
    w.assignmentofclaimsigned,
    w.powerofattorneysigned,
    w.clientpaysvat,

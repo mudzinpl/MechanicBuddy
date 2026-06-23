@@ -80,6 +80,18 @@ namespace MechanicBuddy.Core.Domain
                 EstimateSentOn,
                 InsurerDecisionOn,
                 SupplementPaidOn,
+                EstimateSystem,
+                EstimateVersion,
+                EstimatePreparedOn,
+                EstimateNetAmount,
+                EstimateVatAmount,
+                EstimateGrossAmount,
+                EstimateLaborMechanicalRbg,
+                EstimateLaborPaintRbg,
+                EstimateStatus,
+                EstimateAcceptedOn,
+                EstimateNotes,
+                EstimateDocumentId,
                 AssignmentOfClaimSignedOn,
                 PowerOfAttorneySigned,
                 PowerOfAttorneySignedOn,
@@ -158,6 +170,18 @@ namespace MechanicBuddy.Core.Domain
             DateTime? estimateSentOn = null,
             DateTime? insurerDecisionOn = null,
             DateTime? supplementPaidOn = null,
+            string estimateSystem = null,
+            string estimateVersion = null,
+            DateTime? estimatePreparedOn = null,
+            decimal? estimateNetAmount = null,
+            decimal? estimateVatAmount = null,
+            decimal? estimateGrossAmount = null,
+            decimal? estimateLaborMechanicalRbg = null,
+            decimal? estimateLaborPaintRbg = null,
+            string estimateStatus = null,
+            DateTime? estimateAcceptedOn = null,
+            string estimateNotes = null,
+            Guid? estimateDocumentId = null,
             DateTime? assignmentOfClaimSignedOn = null,
             bool powerOfAttorneySigned = false,
             DateTime? powerOfAttorneySignedOn = null,
@@ -184,6 +208,18 @@ namespace MechanicBuddy.Core.Domain
             EstimateSentOn = estimateSentOn;
             InsurerDecisionOn = insurerDecisionOn;
             SupplementPaidOn = supplementPaidOn;
+            EstimateSystem = estimateSystem;
+            EstimateVersion = estimateVersion;
+            EstimatePreparedOn = estimatePreparedOn;
+            EstimateNetAmount = estimateNetAmount;
+            EstimateVatAmount = estimateVatAmount;
+            EstimateGrossAmount = estimateGrossAmount;
+            EstimateLaborMechanicalRbg = estimateLaborMechanicalRbg;
+            EstimateLaborPaintRbg = estimateLaborPaintRbg;
+            EstimateStatus = string.IsNullOrWhiteSpace(estimateStatus) ? EstimateStatus : estimateStatus;
+            EstimateAcceptedOn = estimateAcceptedOn;
+            EstimateNotes = estimateNotes;
+            EstimateDocumentId = estimateDocumentId;
             AssignmentOfClaimSignedOn = assignmentOfClaimSignedOn;
             PowerOfAttorneySigned = powerOfAttorneySigned;
             PowerOfAttorneySignedOn = powerOfAttorneySignedOn;
@@ -241,6 +277,18 @@ namespace MechanicBuddy.Core.Domain
         public virtual DateTime? EstimateSentOn { get; protected set; }
         public virtual DateTime? InsurerDecisionOn { get; protected set; }
         public virtual DateTime? SupplementPaidOn { get; protected set; }
+        public virtual string EstimateSystem { get; protected set; }
+        public virtual string EstimateVersion { get; protected set; }
+        public virtual DateTime? EstimatePreparedOn { get; protected set; }
+        public virtual decimal? EstimateNetAmount { get; protected set; }
+        public virtual decimal? EstimateVatAmount { get; protected set; }
+        public virtual decimal? EstimateGrossAmount { get; protected set; }
+        public virtual decimal? EstimateLaborMechanicalRbg { get; protected set; }
+        public virtual decimal? EstimateLaborPaintRbg { get; protected set; }
+        public virtual string EstimateStatus { get; protected set; }
+        public virtual DateTime? EstimateAcceptedOn { get; protected set; }
+        public virtual string EstimateNotes { get; protected set; }
+        public virtual Guid? EstimateDocumentId { get; protected set; }
         public virtual DateTime? AssignmentOfClaimSignedOn { get; protected set; }
         public virtual bool PowerOfAttorneySigned { get; protected set; }
         public virtual DateTime? PowerOfAttorneySignedOn { get; protected set; }

@@ -28,6 +28,9 @@ namespace MechanicBuddy.Http.Api.Controllers
         {
             "vehicle_photos",
             "audatex_estimates",
+            "audanet_estimates",
+            "manual_calculations",
+            "insurer_verifications",
             "insurer_decisions",
             "claim_assignments",
             "authorizations",
