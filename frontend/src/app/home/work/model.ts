@@ -39,6 +39,7 @@ export interface IWorkReplacementVehicle {
     replacementVehicleId: string;
     replacementVehicleName: string;
     issuedOn: string | null;
+    plannedReturnOn: string | null;
     returnedOn: string | null;
     mileageOut: number | null;
     mileageIn: number | null;

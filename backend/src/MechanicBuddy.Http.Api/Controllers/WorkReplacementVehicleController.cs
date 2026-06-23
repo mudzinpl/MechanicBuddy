@@ -30,6 +30,7 @@ namespace MechanicBuddy.Http.Api.Controllers
                     r.replacementvehicleid,
                     CONCAT_WS(' ', v.producer, v.model, NULLIF('(' || v.regnr || ')', '()')) AS replacementvehiclename,
                     r.issuedon,
+                    r.plannedreturnon,
                     r.returnedon,
                     r.mileageout,
                     r.mileagein,
@@ -63,20 +64,21 @@ namespace MechanicBuddy.Http.Api.Controllers
 
             var id = session.Connection.ExecuteScalar<Guid>(@"
                 INSERT INTO domain.work_replacement_vehicle (
-                    workid, replacementvehicleid, issuedon, mileageout, fuelout,
+                    workid, replacementvehicleid, issuedon, plannedreturnon, mileageout, fuelout,
                     conditionout, notes, status, createdon, changedon)
                 VALUES (
-                    @WorkId, @ReplacementVehicleId, @IssuedOn, @MileageOut, @FuelOut,
+                    @WorkId, @ReplacementVehicleId, @IssuedOn, @PlannedReturnOn, @MileageOut, @FuelOut,
                     @ConditionOut, @Notes, @Status, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
                 RETURNING id", new
                 {
                     WorkId = workId,
-                    model.ReplacementVehicleId,
-                    model.IssuedOn,
-                    model.MileageOut,
-                    model.FuelOut,
-                    model.ConditionOut,
-                    model.Notes,
+                    ReplacementVehicleId = model.ReplacementVehicleId,
+                    IssuedOn = model.IssuedOn,
+                    PlannedReturnOn = model.PlannedReturnOn,
+                    MileageOut = model.MileageOut,
+                    FuelOut = model.FuelOut,
+                    ConditionOut = model.ConditionOut,
+                    Notes = model.Notes,
                     Status = status
                 });
 
@@ -136,6 +138,7 @@ namespace MechanicBuddy.Http.Api.Controllers
     {
         public Guid ReplacementVehicleId { get; set; }
         public DateTime? IssuedOn { get; set; }
+        public DateTime? PlannedReturnOn { get; set; }
         public int? MileageOut { get; set; }
         public string FuelOut { get; set; }
         public string ConditionOut { get; set; }
@@ -158,6 +161,7 @@ namespace MechanicBuddy.Http.Api.Controllers
         public Guid ReplacementVehicleId { get; set; }
         public string ReplacementVehicleName { get; set; }
         public DateTime? IssuedOn { get; set; }
+        public DateTime? PlannedReturnOn { get; set; }
         public DateTime? ReturnedOn { get; set; }
         public int? MileageOut { get; set; }
         public int? MileageIn { get; set; }

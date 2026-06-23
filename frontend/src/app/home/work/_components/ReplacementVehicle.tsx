@@ -56,6 +56,7 @@ export default function ReplacementVehicle({
                         <VehiclesCombobox name="replacementVehicleId"></VehiclesCombobox>
                     </div>
                     <FormInput name="issuedOn" type="datetime-local" label="Data wydania"></FormInput>
+                    <FormInput name="plannedReturnOn" type="datetime-local" label="Termin zwrotu"></FormInput>
                     <FormInput name="mileageOut" type="number" label="Przebieg przy wydaniu"></FormInput>
                     <FormInput name="fuelOut" label="Paliwo przy wydaniu"></FormInput>
                     <FormTextArea name="conditionOut" label="Stan przy wydaniu"></FormTextArea>
@@ -72,6 +73,7 @@ export default function ReplacementVehicle({
                     <div className="rounded-lg border border-gray-200 p-3">
                         <p className="font-medium text-gray-900">{rental.replacementVehicleName}</p>
                         {rental.issuedOn && <p><span className="font-medium text-gray-700">Wydano:</span> {formatDate(rental.issuedOn)}</p>}
+                        {rental.plannedReturnOn && <p><span className="font-medium text-gray-700">Termin zwrotu:</span> {formatDate(rental.plannedReturnOn)}</p>}
                         {rental.returnedOn && <p><span className="font-medium text-gray-700">Zwrócono:</span> {formatDate(rental.returnedOn)}</p>}
                         {rental.mileageOut !== null && <p><span className="font-medium text-gray-700">Przebieg przy wydaniu:</span> {rental.mileageOut}</p>}
                         {rental.mileageIn !== null && <p><span className="font-medium text-gray-700">Przebieg przy zwrocie:</span> {rental.mileageIn}</p>}

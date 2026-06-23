@@ -67,6 +67,7 @@ namespace MechanicBuddy.Http.Api.Controllers
                     r.replacementvehicleid,
                     CONCAT_WS(' ', v.producer, v.model, NULLIF('(' || v.regnr || ')', '()')) AS replacementvehiclename,
                     r.issuedon,
+                    r.plannedreturnon,
                     r.returnedon,
                     r.mileageout,
                     r.mileagein,
@@ -142,20 +143,36 @@ namespace MechanicBuddy.Http.Api.Controllers
                         w.audatexestimatenumber,
                         w.assignmentofclaimsigned,
                         w.clientpaysvat,
+                        w.startedon,
                         w.changedon,
                         w.plannedintakeon,
                         w.plannedreleaseon,
                         w.plannedinspectionon,
                         CONCAT_WS(' ', p.firstname, p.lastname, l.name) AS clientname,
                         v.regnr,
-                        EXISTS (
-                            SELECT 1 FROM domain.work_replacement_vehicle rv
-                            WHERE rv.workid = w.id AND rv.status IN ('planned', 'issued')
-                        ) AS hasactivereplacementvehicle
+                        active_rv.issuedon AS replacementissuedon,
+                        active_rv.plannedreturnon AS replacementplannedreturnon,
+                        active_rv.replacementvehiclename,
+                        active_rv.status AS replacementstatus,
+                        active_rv.id IS NOT NULL AS hasactivereplacementvehicle
                     FROM domain.work w
                     LEFT JOIN domain.legalclient l ON l.id = w.clientid
                     LEFT JOIN domain.privateclient p ON p.id = w.clientid
                     LEFT JOIN domain.vehicle v ON v.id = w.vehicleid
+                    LEFT JOIN LATERAL (
+                        SELECT
+                            rv.id,
+                            rv.issuedon,
+                            rv.plannedreturnon,
+                            rv.status,
+                            CONCAT_WS(' ', rvv.producer, rvv.model, NULLIF('(' || rvv.regnr || ')', '()')) AS replacementvehiclename
+                        FROM domain.work_replacement_vehicle rv
+                        INNER JOIN domain.vehicle rvv ON rvv.id = rv.replacementvehicleid
+                        WHERE rv.workid = w.id
+                          AND rv.status = 'issued'
+                        ORDER BY rv.changedon DESC
+                        LIMIT 1
+                    ) active_rv ON TRUE
                 )";
 
             var tiles = session.Connection.Query<DashboardTileDto>(baseWorkCte + @"
@@ -170,7 +187,29 @@ namespace MechanicBuddy.Http.Api.Controllers
                     WHERE damagestatus = 'settled'
                       AND changedon >= (DATE_TRUNC('month', CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw') AT TIME ZONE 'Europe/Warsaw')
                 UNION ALL SELECT 'active_replacement_vehicles', COUNT(*)::int FROM work_data
-                    WHERE hasactivereplacementvehicle = TRUE").ToArray();
+                    WHERE hasactivereplacementvehicle = TRUE
+                UNION ALL SELECT 'today_schedule', COUNT(*)::int FROM (
+                    SELECT id FROM work_data WHERE (plannedintakeon AT TIME ZONE 'Europe/Warsaw')::date = (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
+                    UNION ALL SELECT id FROM work_data WHERE (plannedinspectionon AT TIME ZONE 'Europe/Warsaw')::date = (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
+                    UNION ALL SELECT id FROM work_data WHERE (plannedreleaseon AT TIME ZONE 'Europe/Warsaw')::date = (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
+                    UNION ALL SELECT id FROM work_data WHERE (replacementplannedreturnon AT TIME ZONE 'Europe/Warsaw')::date = (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
+                ) today_schedule
+                UNION ALL SELECT 'overdue_schedule', COUNT(*)::int FROM (
+                    SELECT id FROM work_data WHERE plannedintakeon IS NOT NULL AND (plannedintakeon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date AND damagestatus NOT IN ('released', 'settled', 'rejected')
+                    UNION ALL SELECT id FROM work_data WHERE plannedinspectionon IS NOT NULL AND (plannedinspectionon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date AND damagestatus NOT IN ('inspected', 'released', 'settled', 'rejected')
+                    UNION ALL SELECT id FROM work_data WHERE plannedreleaseon IS NOT NULL AND (plannedreleaseon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date AND damagestatus NOT IN ('released', 'settled', 'rejected')
+                    UNION ALL SELECT id FROM work_data WHERE replacementplannedreturnon IS NOT NULL AND (replacementplannedreturnon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date AND replacementstatus = 'issued'
+                ) overdue_schedule
+                UNION ALL SELECT 'replacement_returns_due', COUNT(*)::int FROM work_data
+                    WHERE replacementstatus = 'issued'
+                      AND (replacementplannedreturnon IS NULL OR (replacementplannedreturnon AT TIME ZONE 'Europe/Warsaw')::date <= (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date)
+                UNION ALL SELECT 'manager_attention', COUNT(DISTINCT id)::int FROM (
+                    SELECT id FROM work_data WHERE damagestatus IN ('new', 'inspection_pending') AND plannedinspectionon IS NULL AND startedon < CURRENT_TIMESTAMP - INTERVAL '2 days'
+                    UNION ALL SELECT id FROM work_data WHERE damagestatus = 'approval_pending' AND changedon < CURRENT_TIMESTAMP - INTERVAL '3 days'
+                    UNION ALL SELECT id FROM work_data WHERE damagestatus IN ('repair', 'paint_shop') AND changedon < CURRENT_TIMESTAMP - INTERVAL '7 days'
+                    UNION ALL SELECT id FROM work_data WHERE replacementstatus = 'issued' AND replacementplannedreturnon IS NULL
+                    UNION ALL SELECT id FROM work_data WHERE plannedreleaseon IS NOT NULL AND (plannedreleaseon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date AND damagestatus NOT IN ('released', 'settled', 'rejected')
+                ) manager_attention").ToArray();
 
             var attention = session.Connection.Query<DashboardWorkItemDto>(baseWorkCte + @"
                 SELECT id, worknr, clientname, regnr, damagestatus, 'missing_claim_number' AS kind, NULL::timestamptz AS scheduledon
@@ -182,11 +221,20 @@ namespace MechanicBuddy.Http.Api.Controllers
                 SELECT id, worknr, clientname, regnr, damagestatus, 'missing_estimate', NULL::timestamptz
                 FROM work_data WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND COALESCE(TRIM(audatexestimatenumber), '') = ''
                 UNION ALL
+                SELECT id, worknr, clientname, regnr, damagestatus, 'inspection_missing_after_two_days', plannedinspectionon
+                FROM work_data WHERE damagestatus IN ('new', 'inspection_pending') AND plannedinspectionon IS NULL AND startedon < CURRENT_TIMESTAMP - INTERVAL '2 days'
+                UNION ALL
                 SELECT id, worknr, clientname, regnr, damagestatus, 'approval_overdue', NULL::timestamptz
                 FROM work_data WHERE damagestatus = 'approval_pending' AND changedon < CURRENT_TIMESTAMP - INTERVAL '3 days'
                 UNION ALL
                 SELECT id, worknr, clientname, regnr, damagestatus, 'repair_overdue', NULL::timestamptz
                 FROM work_data WHERE damagestatus IN ('repair', 'paint_shop') AND changedon < CURRENT_TIMESTAMP - INTERVAL '7 days'
+                UNION ALL
+                SELECT id, worknr, clientname, regnr, damagestatus, 'replacement_without_return_date', replacementissuedon
+                FROM work_data WHERE replacementstatus = 'issued' AND replacementplannedreturnon IS NULL
+                UNION ALL
+                SELECT id, worknr, clientname, regnr, damagestatus, 'planned_release_overdue', plannedreleaseon
+                FROM work_data WHERE plannedreleaseon IS NOT NULL AND (plannedreleaseon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date AND damagestatus NOT IN ('released', 'settled', 'rejected')
                 UNION ALL
                 SELECT id, worknr, clientname, regnr, damagestatus, 'vat_payment', NULL::timestamptz
                 FROM work_data WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND clientpaysvat = TRUE
@@ -208,9 +256,99 @@ namespace MechanicBuddy.Http.Api.Controllers
                 SELECT id, worknr, clientname, regnr, damagestatus, 'inspection', plannedinspectionon
                 FROM work_data
                 WHERE (plannedinspectionon AT TIME ZONE 'Europe/Warsaw')::date = (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
+                UNION ALL
+                SELECT id, worknr, clientname, regnr, damagestatus, 'replacement_return', replacementplannedreturnon
+                FROM work_data
+                WHERE (replacementplannedreturnon AT TIME ZONE 'Europe/Warsaw')::date = (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
                 ORDER BY scheduledon, worknr").ToArray();
 
             return new { Tiles = tiles, Attention = attention, Today = today };
+        }
+
+        [HttpGet("calendar")]
+        public dynamic Calendar()
+        {
+            const string baseCalendarCte = @"
+                WITH work_data AS (
+                    SELECT
+                        w.id,
+                        w.number::text AS worknr,
+                        COALESCE(NULLIF(TRIM(w.damagestatus), ''), 'new') AS damagestatus,
+                        w.startedon,
+                        w.changedon,
+                        w.plannedintakeon,
+                        w.plannedreleaseon,
+                        w.plannedinspectionon,
+                        CONCAT_WS(' ', p.firstname, p.lastname, l.name) AS clientname,
+                        v.regnr,
+                        active_rv.issuedon AS replacementissuedon,
+                        active_rv.plannedreturnon AS replacementplannedreturnon,
+                        active_rv.status AS replacementstatus
+                    FROM domain.work w
+                    LEFT JOIN domain.legalclient l ON l.id = w.clientid
+                    LEFT JOIN domain.privateclient p ON p.id = w.clientid
+                    LEFT JOIN domain.vehicle v ON v.id = w.vehicleid
+                    LEFT JOIN LATERAL (
+                        SELECT rv.issuedon, rv.plannedreturnon, rv.status
+                        FROM domain.work_replacement_vehicle rv
+                        WHERE rv.workid = w.id
+                          AND rv.status = 'issued'
+                        ORDER BY rv.changedon DESC
+                        LIMIT 1
+                    ) active_rv ON TRUE
+                ),
+                calendar_items AS (
+                    SELECT id, worknr, clientname, regnr, damagestatus, 'intake' AS kind, plannedintakeon AS scheduledon
+                    FROM work_data WHERE plannedintakeon IS NOT NULL
+                    UNION ALL
+                    SELECT id, worknr, clientname, regnr, damagestatus, 'inspection', plannedinspectionon
+                    FROM work_data WHERE plannedinspectionon IS NOT NULL
+                    UNION ALL
+                    SELECT id, worknr, clientname, regnr, damagestatus, 'release', plannedreleaseon
+                    FROM work_data WHERE plannedreleaseon IS NOT NULL
+                    UNION ALL
+                    SELECT id, worknr, clientname, regnr, damagestatus, 'replacement_return', replacementplannedreturnon
+                    FROM work_data WHERE replacementplannedreturnon IS NOT NULL AND replacementstatus = 'issued'
+                ),
+                alert_items AS (
+                    SELECT id, worknr, clientname, regnr, damagestatus, 'inspection_missing_after_two_days' AS kind, startedon AS scheduledon
+                    FROM work_data WHERE damagestatus IN ('new', 'inspection_pending') AND plannedinspectionon IS NULL AND startedon < CURRENT_TIMESTAMP - INTERVAL '2 days'
+                    UNION ALL
+                    SELECT id, worknr, clientname, regnr, damagestatus, 'approval_overdue', changedon
+                    FROM work_data WHERE damagestatus = 'approval_pending' AND changedon < CURRENT_TIMESTAMP - INTERVAL '3 days'
+                    UNION ALL
+                    SELECT id, worknr, clientname, regnr, damagestatus, 'repair_overdue', changedon
+                    FROM work_data WHERE damagestatus IN ('repair', 'paint_shop') AND changedon < CURRENT_TIMESTAMP - INTERVAL '7 days'
+                    UNION ALL
+                    SELECT id, worknr, clientname, regnr, damagestatus, 'replacement_without_return_date', replacementissuedon
+                    FROM work_data WHERE replacementstatus = 'issued' AND replacementplannedreturnon IS NULL
+                    UNION ALL
+                    SELECT id, worknr, clientname, regnr, damagestatus, 'planned_release_overdue', plannedreleaseon
+                    FROM work_data WHERE plannedreleaseon IS NOT NULL AND (plannedreleaseon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date AND damagestatus NOT IN ('released', 'settled', 'rejected')
+                )";
+
+            var today = session.Connection.Query<DashboardWorkItemDto>(baseCalendarCte + @"
+                SELECT * FROM calendar_items
+                WHERE (scheduledon AT TIME ZONE 'Europe/Warsaw')::date = (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
+                ORDER BY scheduledon, worknr").ToArray();
+
+            var upcoming = session.Connection.Query<DashboardWorkItemDto>(baseCalendarCte + @"
+                SELECT * FROM calendar_items
+                WHERE (scheduledon AT TIME ZONE 'Europe/Warsaw')::date > (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
+                  AND (scheduledon AT TIME ZONE 'Europe/Warsaw')::date <= ((CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date + INTERVAL '7 days')::date
+                ORDER BY scheduledon, worknr").ToArray();
+
+            var overdue = session.Connection.Query<DashboardWorkItemDto>(baseCalendarCte + @"
+                SELECT * FROM calendar_items
+                WHERE (scheduledon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
+                  AND damagestatus NOT IN ('released', 'settled', 'rejected')
+                ORDER BY scheduledon, worknr").ToArray();
+
+            var alerts = session.Connection.Query<DashboardWorkItemDto>(baseCalendarCte + @"
+                SELECT * FROM alert_items
+                ORDER BY scheduledon NULLS LAST, worknr").ToArray();
+
+            return new { Today = today, Upcoming = upcoming, Overdue = overdue, Alerts = alerts };
         }
 
         [HttpGet("{id}/activities/{currentId?}")]

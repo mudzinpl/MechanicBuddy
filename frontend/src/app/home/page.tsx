@@ -47,14 +47,21 @@ const tileDefinitions = [
   { key: 'on_hold', label: 'Wstrzymane', href: '/home/work?damageStatus=on_hold', icon: PauseCircleIcon, color: 'text-red-700 bg-red-50' },
   { key: 'settled_this_month', label: 'Rozliczone w tym miesiącu', href: '/home/work?damageStatus=settled', icon: BanknotesIcon, color: 'text-emerald-700 bg-emerald-50' },
   { key: 'active_replacement_vehicles', label: 'Aktywne pojazdy zastępcze', href: '/home/work', icon: TruckIcon, color: 'text-sky-700 bg-sky-50' },
+  { key: 'today_schedule', label: 'Dzisiejsze terminy', href: '/home/calendar', icon: CalendarDaysIcon, color: 'text-indigo-700 bg-indigo-50' },
+  { key: 'overdue_schedule', label: 'Zaległe terminy', href: '/home/calendar', icon: ExclamationTriangleIcon, color: 'text-red-700 bg-red-50' },
+  { key: 'replacement_returns_due', label: 'Pojazdy zastępcze do zwrotu', href: '/home/calendar', icon: TruckIcon, color: 'text-amber-700 bg-amber-50' },
+  { key: 'manager_attention', label: 'Sprawy wymagające reakcji', href: '/home/calendar', icon: ClockIcon, color: 'text-orange-700 bg-orange-50' },
 ] as const;
 
 const attentionDefinitions = [
   { key: 'missing_claim_number', label: 'Brak numeru szkody' },
   { key: 'missing_insurer', label: 'Brak ubezpieczyciela' },
   { key: 'missing_estimate', label: 'Brak kosztorysu Audanet / Audatex' },
+  { key: 'inspection_missing_after_two_days', label: 'Brak oględzin po 2 dniach od zgłoszenia' },
   { key: 'approval_overdue', label: 'Oczekuje na akceptację dłużej niż 3 dni' },
   { key: 'repair_overdue', label: 'Pojazd w naprawie dłużej niż 7 dni' },
+  { key: 'replacement_without_return_date', label: 'Pojazd zastępczy wydany bez terminu zwrotu' },
+  { key: 'planned_release_overdue', label: 'Przekroczony planowany termin wydania' },
   { key: 'vat_payment', label: 'Dopłata VAT klienta' },
   { key: 'missing_assignment', label: 'Brak podpisanej cesji' },
 ] as const;
@@ -63,6 +70,7 @@ const todayDefinitions = [
   { key: 'intake', label: 'Przyjęcia pojazdów', empty: 'Brak przyjęć na dziś' },
   { key: 'release', label: 'Wydania pojazdów', empty: 'Brak wydań na dziś' },
   { key: 'inspection', label: 'Oględziny', empty: 'Brak oględzin na dziś' },
+  { key: 'replacement_return', label: 'Zwroty pojazdów zastępczych', empty: 'Brak zwrotów na dziś' },
 ] as const;
 
 function WorkLink({ item }: { item: DashboardWorkItem }) {
