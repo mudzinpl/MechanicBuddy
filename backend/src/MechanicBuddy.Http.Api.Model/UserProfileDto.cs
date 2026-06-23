@@ -46,6 +46,11 @@ namespace MechanicBuddy.Http.Api.Models
         public Guid EmployeeId { get; set; }
 
         /// <summary>
+        /// APPRA workshop role used for application permissions.
+        /// </summary>
+        public string AppRole { get; set; }
+
+        /// <summary>
         /// Profile image stored as a byte array
         /// </summary>
         public byte[] ProfileImage { get; set; }
