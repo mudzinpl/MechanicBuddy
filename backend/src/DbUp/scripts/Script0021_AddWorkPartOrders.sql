@@ -1,3 +1,5 @@
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+
 CREATE TABLE IF NOT EXISTS domain.work_part_order (
     id uuid PRIMARY KEY DEFAULT uuid_generate_v4(),
     workid uuid NOT NULL REFERENCES domain.work(id) ON DELETE CASCADE,
