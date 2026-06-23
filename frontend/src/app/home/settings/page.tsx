@@ -52,6 +52,15 @@ export default async function Page() {
                     <DescriptionItem label='Treść wiadomości e-mail' className="whitespace-pre-line" value={options.pricing.estimate.emailContent}></DescriptionItem> 
                 </dl>
             </div>
+            <div className="pt-8 px-0">
+                <h3 className="text-base/7 font-semibold text-gray-900">Integracje</h3>
+                <p className="mt-1 max-w-2xl text-sm/6 text-gray-500">Konfiguracja przyszłych połączeń z Fakturownią, pocztą e-mail, Audanet / Audatex, dostawcami części i bankiem.</p>
+                <div className="mt-4">
+                    <Link href="/home/settings/integrations" className="text-sm/6 font-semibold text-indigo-600 hover:text-indigo-500">
+                        Przejdź do integracji
+                    </Link>
+                </div>
+            </div>
              <div className="mt-6 flex items-center justify-end gap-x-6">
                 <Link href={`/home/settings/edit`}
                     type="button"
