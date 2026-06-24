@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using NHibernate;
 using System;
+using System.Linq;
 
 namespace MechanicBuddy.Http.Api.Controllers
 {
