@@ -92,6 +92,9 @@ export default async function Page(
         workNr,
         status,
         hasActiveReplacementVehicle,
+        replacementVehicleName,
+        replacementVehicleStatus,
+        replacementVehiclePlannedReturnOn,
         assignmentOfClaimSigned,
         powerOfAttorneySigned,
         clientPaysVat,
@@ -103,6 +106,9 @@ export default async function Page(
         status: string,
         workNr: string,
         hasActiveReplacementVehicle: boolean,
+        replacementVehicleName?: string,
+        replacementVehicleStatus?: string,
+        replacementVehiclePlannedReturnOn?: string,
         assignmentOfClaimSigned: boolean,
         powerOfAttorneySigned: boolean,
         clientPaysVat: boolean,
@@ -120,15 +126,21 @@ export default async function Page(
           clientPaysVat ? 'Dopłata VAT' : '',
           (settlementStatus || 'unsettled') !== 'settled' ? 'Nierozliczone' : '',
         ].filter(Boolean);
+        const replacementVehicleLabel = replacementVehicleStatus === 'issued'
+          ? 'Aktywny pojazd zastępczy'
+          : 'Pojazd zastępczy';
+        const replacementReturnLabel = replacementVehiclePlannedReturnOn
+          ? `Zwrot ${moment(replacementVehiclePlannedReturnOn).locale('pl').format('DD.MM.YYYY')}`
+          : '';
 
         return (
           <Link href={'/home/work/' + id}>
             <div>
               <h5 className="inline-flex items-center gap-1.5">Zlecenie nr {workNr}
                 {' '} {!isInvoiceView && <WorkStatusBadge status={status} ></WorkStatusBadge>}
-                {hasActiveReplacementVehicle && <span title="Aktywny pojazd zastępczy" className="inline-flex items-center rounded-full bg-sky-50 px-2 py-0.5 text-xs font-semibold text-sky-700">
+                {hasActiveReplacementVehicle && <span title={replacementVehicleName || replacementVehicleLabel} className="inline-flex items-center rounded-full bg-sky-50 px-2 py-0.5 text-xs font-semibold text-sky-700">
                   <TruckIcon className="mr-1 size-3" aria-hidden="true" />
-                  Zastępczy
+                  {replacementReturnLabel || replacementVehicleLabel}
                 </span>}
               </h5>
               {badges.length > 0 && <div className="mt-1 flex flex-wrap gap-1">

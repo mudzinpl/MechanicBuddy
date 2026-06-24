@@ -40,6 +40,11 @@ interface DashboardData {
   today: DashboardWorkItem[];
 }
 
+interface ReplacementVehicleDashboardData {
+  tiles: DashboardTile[];
+  attention: DashboardWorkItem[];
+}
+
 const tileDefinitions = [
   { key: 'new', label: 'Nowe zgłoszenia', href: '/home/work?damageStatus=new', icon: InboxIcon, color: 'text-blue-700 bg-blue-50' },
   { key: 'inspection_pending', label: 'Oczekuje na oględziny', href: '/home/work?damageStatus=inspection_pending', icon: EyeIcon, color: 'text-amber-700 bg-amber-50' },
@@ -65,6 +70,7 @@ const tileDefinitions = [
   { key: 'today_schedule', label: 'Dzisiejsze terminy', href: '/home/calendar', icon: CalendarDaysIcon, color: 'text-indigo-700 bg-indigo-50' },
   { key: 'overdue_schedule', label: 'Zaległe terminy', href: '/home/calendar', icon: ExclamationTriangleIcon, color: 'text-red-700 bg-red-50' },
   { key: 'replacement_returns_due', label: 'Pojazdy zastępcze do zwrotu', href: '/home/calendar', icon: TruckIcon, color: 'text-amber-700 bg-amber-50' },
+  { key: 'replacement_returns_overdue', label: 'Pojazdy zastępcze po terminie zwrotu', href: '/home/calendar', icon: ExclamationTriangleIcon, color: 'text-red-700 bg-red-50' },
   { key: 'manager_attention', label: 'Sprawy wymagające reakcji', href: '/home/calendar', icon: ClockIcon, color: 'text-orange-700 bg-orange-50' },
 ] as const;
 
@@ -92,6 +98,8 @@ const attentionDefinitions = [
   { key: 'approval_overdue', label: 'Oczekuje na akceptację dłużej niż 3 dni' },
   { key: 'repair_overdue', label: 'Pojazd w naprawie dłużej niż 7 dni' },
   { key: 'replacement_without_return_date', label: 'Pojazd zastępczy wydany bez terminu zwrotu' },
+  { key: 'replacement_return_overdue', label: 'Przekroczony termin zwrotu pojazdu zastępczego' },
+  { key: 'replacement_issued_over_14_days', label: 'Pojazd zastępczy wydany dłużej niż 14 dni' },
   { key: 'planned_release_overdue', label: 'Przekroczony planowany termin wydania' },
   { key: 'vat_payment', label: 'Dopłata VAT klienta' },
   { key: 'missing_assignment', label: 'Brak podpisanej cesji' },
@@ -145,9 +153,11 @@ export default async function Page() {
   const partsAttention = await partsResponse.json() as DashboardWorkItem[];
   const tasksResponse = await httpGet('work/task-alerts');
   const tasksAttention = await tasksResponse.json() as DashboardWorkItem[];
-  const counts = new Map((data.tiles || []).map(tile => [tile.key, tile.count]));
+  const replacementVehicleResponse = await httpGet('work/replacement-vehicle-dashboard');
+  const replacementVehicleData = await replacementVehicleResponse.json() as ReplacementVehicleDashboardData;
+  const counts = new Map([...(data.tiles || []), ...(replacementVehicleData.tiles || [])].map(tile => [tile.key, tile.count]));
   const insurers = data.insurers || [];
-  const attention = [...(data.attention || []), ...(releaseAttention || []), ...(checklistAttention || []), ...(tasksAttention || []), ...(partsAttention || []), ...(communicationAttention || [])];
+  const attention = [...(data.attention || []), ...(replacementVehicleData.attention || []), ...(releaseAttention || []), ...(checklistAttention || []), ...(tasksAttention || []), ...(partsAttention || []), ...(communicationAttention || [])];
   const today = data.today || [];
 
   return (
