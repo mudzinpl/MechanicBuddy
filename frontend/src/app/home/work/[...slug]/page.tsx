@@ -34,8 +34,20 @@ export default async function Page({
     const isEditing = action == 'edit';
     const current = activities.current;
 
-    const activity = activities?.items?.find(x => x.id == current.id);
-    if(!activity) throw new Error('Activity expected');
+    const activity = current ? activities?.items?.find(x => x.id == current.id) : undefined;
+    if(!current || !activity) {
+        return (
+            <main className='pl-0 lg:pl-62 2xl:pr-108'>
+                <div className="px-4 xl:py-10 xl:px-8 xl:py-6">
+                    <Card header={<CardHeader title="Brak aktywności zlecenia" />}>
+                        <p className="text-sm text-gray-600">
+                            To zlecenie nie ma poprawnie utworzonej aktywności naprawy lub oferty. Odtwórz dane demonstracyjne APPRA albo skontaktuj się z administratorem.
+                        </p>
+                    </Card>
+                </div>
+            </main>
+        );
+    }
     const activityName = activity.name;
     const activityNumber = activity.number;
  
@@ -103,4 +115,3 @@ export default async function Page({
         </div>
     )
 }
-
