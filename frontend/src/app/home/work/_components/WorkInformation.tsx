@@ -38,9 +38,16 @@ export function WorkInformation({
     const vehicleSummary = [work.vehicleProducer, work.vehicleModel, work.vehicleVin, work.vehicleRegNr].filter(x => x).join(', ');
     const clientSummary = [work.clientName, work.clientPhone, work.clientEmail].filter(x => x).join(', ');
     const formatDate = (value?: string | null) => value ? moment(value).locale('pl').format('DD.MM.YYYY') : '';
+    const formatDateTime = (value?: string | null) => value ? moment(value).locale('pl').format('DD.MM.YYYY HH:mm') : '';
     const formatCurrency = (value?: number | null) => typeof value === 'number'
         ? new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(value).replace(/\u00A0/g, ' ')
         : '';
+    const replacementVehicleStatusLabels: Record<string, string> = {
+        planned: 'Planowany',
+        issued: 'Wydany',
+        returned: 'Zwrócony',
+        cancelled: 'Anulowany',
+    };
     const hasClaimDetails = Boolean(
         work.claimNumber ||
         work.insurer ||
@@ -114,6 +121,12 @@ export function WorkInformation({
         ['Data wezwania do dopłaty', formatDate(work.paymentDemandOn)],
         ['Data zapłaty', formatDate(work.paymentReceivedOn)],
     ].filter(([, value]) => value);
+    const replacementVehicle = work.replacementVehicle;
+    const replacementVehicleDetails = replacementVehicle ? [
+        ['Status', replacementVehicleStatusLabels[replacementVehicle.status] ?? replacementVehicle.status],
+        ['Data wydania', formatDateTime(replacementVehicle.issuedOn)],
+        ['Planowana data zwrotu', formatDateTime(replacementVehicle.plannedReturnOn)],
+    ].filter(([, value]) => value) : [];
 
     const deleteInvoiceRef = React.useRef<BaseDialogHandle>(null);
     const createInvoiceRef = React.useRef<BaseDialogHandle>(null);
@@ -270,6 +283,21 @@ export function WorkInformation({
                         </dt>
                         <dd className="text-sm/6 text-gray-500">
                             <time dateTime="2023-01-31">{vehicleSummary}</time>
+                        </dd>
+                    </div>}
+                    {replacementVehicle && <div className="mt-4 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-4">
+                        <dt className="flex-none">
+                            <span className="sr-only">Pojazd zastępczy</span>
+                            <TruckIcon aria-hidden="true" className="h-6 w-5 text-sky-500" />
+                        </dt>
+                        <dd className="text-sm/6 text-gray-500">
+                            <p className="font-semibold text-gray-900">Pojazd zastępczy</p>
+                            {replacementVehicle.replacementVehicleName && <p className="font-medium text-gray-700">{replacementVehicle.replacementVehicleName}</p>}
+                            {replacementVehicleDetails.map(([label, value]) => (
+                                <p key={label}>
+                                    <span className="font-medium text-gray-700">{label}:</span> {value}
+                                </p>
+                            ))}
                         </dd>
                     </div>}
                     {work.mechanics?.length > 0 &&
