@@ -23,6 +23,8 @@ namespace MechanicBuddy.Http.Api.Controllers
         [HttpGet("command-center-dashboard")]
         public dynamic Dashboard()
         {
+            var hasWorkPartOrders = session.Connection.ExecuteScalar<bool>("SELECT to_regclass('domain.work_part_order') IS NOT NULL");
+
             const string baseWorkCte = @"
                 WITH work_data AS (
                     SELECT
@@ -53,21 +55,39 @@ namespace MechanicBuddy.Http.Api.Controllers
                     LEFT JOIN domain.vehicle v ON v.id = w.vehicleid
                 )";
 
-            var kpis = session.Connection.Query<CommandCenterTileDto>(baseWorkCte + @"
+            var partsWaitingKpiSql = hasWorkPartOrders
+                ? @"UNION ALL SELECT 'parts_waiting', COUNT(DISTINCT workid)::int, NULL::numeric
+                FROM domain.work_part_order WHERE status IN ('to_order', 'ordered', 'in_delivery')"
+                : @"UNION ALL SELECT 'parts_waiting', 0::int, NULL::numeric";
+
+            var overduePartItemsSql = hasWorkPartOrders
+                ? @"UNION ALL SELECT po.workid FROM domain.work_part_order po
+                      WHERE po.status IN ('ordered', 'in_delivery')
+                        AND po.planneddeliveryon IS NOT NULL
+                        AND (po.planneddeliveryon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date"
+                : string.Empty;
+
+            var attentionPartsOverdueSql = hasWorkPartOrders
+                ? @"UNION ALL
+                SELECT w.id, w.worknr, w.clientname, w.regnr, w.damagestatus, 'parts_delivery_overdue', po.planneddeliveryon
+                FROM domain.work_part_order po
+                INNER JOIN work_data w ON w.id = po.workid
+                WHERE po.status IN ('ordered', 'in_delivery')
+                  AND po.planneddeliveryon IS NOT NULL
+                  AND (po.planneddeliveryon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date"
+                : string.Empty;
+
+            var kpis = session.Connection.Query<CommandCenterTileDto>(baseWorkCte + $@"
                 SELECT 'active_work' AS key, COUNT(*)::int AS count, NULL::numeric AS amount
                 FROM work_data WHERE damagestatus NOT IN ('released', 'settled', 'rejected')
                 UNION ALL SELECT 'ready_for_pickup', COUNT(*)::int, NULL::numeric
                 FROM work_data WHERE damagestatus = 'ready_for_pickup'
-                UNION ALL SELECT 'parts_waiting', COUNT(DISTINCT workid)::int, NULL::numeric
-                FROM domain.work_part_order WHERE status IN ('to_order', 'ordered', 'in_delivery')
+                {partsWaitingKpiSql}
                 UNION ALL SELECT 'overdue', COUNT(DISTINCT id)::int, NULL::numeric FROM (
                     SELECT id FROM work_data WHERE plannedreleaseon IS NOT NULL
                       AND (plannedreleaseon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
                       AND damagestatus NOT IN ('released', 'settled', 'rejected')
-                    UNION ALL SELECT po.workid FROM domain.work_part_order po
-                      WHERE po.status IN ('ordered', 'in_delivery')
-                        AND po.planneddeliveryon IS NOT NULL
-                        AND (po.planneddeliveryon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
+                    {overduePartItemsSql}
                     UNION ALL SELECT wt.workid FROM domain.work_task wt
                       WHERE wt.status NOT IN ('completed', 'cancelled')
                         AND wt.dueon IS NOT NULL
@@ -88,7 +108,7 @@ namespace MechanicBuddy.Http.Api.Controllers
                   AND dueon IS NOT NULL
                   AND (dueon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date").ToArray();
 
-            var attention = session.Connection.Query<CommandCenterWorkItemDto>(baseWorkCte + @"
+            var attention = session.Connection.Query<CommandCenterWorkItemDto>(baseWorkCte + $@"
                 SELECT id, worknr, clientname, regnr, damagestatus, 'insurer_decision_overdue' AS kind, estimatesenton AS scheduledon
                 FROM work_data WHERE estimatesenton IS NOT NULL AND insurerdecisionon IS NULL AND estimatesenton < CURRENT_TIMESTAMP - INTERVAL '3 days'
                 UNION ALL
@@ -100,13 +120,7 @@ namespace MechanicBuddy.Http.Api.Controllers
                 UNION ALL
                 SELECT id, worknr, clientname, regnr, damagestatus, 'missing_estimate', NULL::timestamptz
                 FROM work_data WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND COALESCE(TRIM(audatexestimatenumber), '') = ''
-                UNION ALL
-                SELECT w.id, w.worknr, w.clientname, w.regnr, w.damagestatus, 'parts_delivery_overdue', po.planneddeliveryon
-                FROM domain.work_part_order po
-                INNER JOIN work_data w ON w.id = po.workid
-                WHERE po.status IN ('ordered', 'in_delivery')
-                  AND po.planneddeliveryon IS NOT NULL
-                  AND (po.planneddeliveryon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
+                {attentionPartsOverdueSql}
                 UNION ALL
                 SELECT w.id, w.worknr, w.clientname, w.regnr, w.damagestatus, 'replacement_return_overdue', rv.plannedreturnon
                 FROM domain.work_replacement_vehicle rv
