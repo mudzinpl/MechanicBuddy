@@ -295,11 +295,12 @@ export default async function Page() {
             <div className="grid grid-cols-1 gap-3 p-4 sm:grid-cols-2">
               {financeDefinitions.map(item => {
                 const tile = finance.get(item.key);
+                const isAmount = 'amount' in item && item.amount;
                 return (
                   <Link key={item.key} href="/home/work" className={`rounded-md border px-4 py-3 ${toneClasses[item.tone]}`}>
                     <p className="text-sm font-medium">{item.label}</p>
-                    <p className="mt-1 text-2xl font-bold text-gray-900">{item.amount ? formatMoney(tile?.amount) : (tile?.count || 0)}</p>
-                    {item.amount && <p className="mt-1 text-xs text-gray-500">Spraw: {tile?.count || 0}</p>}
+                    <p className="mt-1 text-2xl font-bold text-gray-900">{isAmount ? formatMoney(tile?.amount) : (tile?.count || 0)}</p>
+                    {isAmount && <p className="mt-1 text-xs text-gray-500">Spraw: {tile?.count || 0}</p>}
                   </Link>
                 );
               })}
