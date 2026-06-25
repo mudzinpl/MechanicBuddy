@@ -40,6 +40,8 @@ interface CommandCenterData {
   finance: CommandCenterTile[];
 }
 
+type DashboardTone = 'blue' | 'green' | 'yellow' | 'red';
+
 const toneClasses = {
   blue: 'border-blue-200 bg-blue-50 text-blue-700',
   green: 'border-green-200 bg-green-50 text-green-700',
@@ -91,7 +93,7 @@ const processDefinitions = [
   { key: 'quality_control', label: 'Kontrola jakości', tone: 'yellow' },
   { key: 'ready_for_pickup', label: 'Gotowe do wydania', tone: 'green' },
   { key: 'released', label: 'Wydane', tone: 'green' },
-] as const;
+] as const satisfies readonly { key: string; label: string; tone: DashboardTone }[];
 
 const replacementDefinitions = [
   { key: 'active', label: 'Aktywne', tone: 'blue' },
