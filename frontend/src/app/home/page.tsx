@@ -2,12 +2,17 @@ import { httpGet } from '@/_lib/server/query-api';
 import {
   BanknotesIcon,
   CalendarDaysIcon,
+  CameraIcon,
   CheckCircleIcon,
   ClockIcon,
   ClipboardDocumentListIcon,
   CubeIcon,
+  DocumentPlusIcon,
   ExclamationTriangleIcon,
   EyeIcon,
+  MagnifyingGlassIcon,
+  PhoneIcon,
+  PlusCircleIcon,
   ShieldCheckIcon,
   TruckIcon,
   WrenchScrewdriverIcon,
@@ -56,6 +61,17 @@ const toneColorMap: Record<DashboardTone, string> = {
   yellow: 'bg-amber-500',
   red: 'bg-red-500',
 };
+
+const quickActionDefinitions = [
+  { label: 'Nowa szkoda', description: 'Utwórz nowe zlecenie szkody.', href: '/home/work/new', icon: PlusCircleIcon, tone: 'blue' },
+  { label: 'Przyjęcie pojazdu', description: 'Przejdź do utworzenia zlecenia i danych przyjęcia pojazdu.', href: '/home/work/new', icon: TruckIcon, tone: 'green' },
+  { label: 'Dodaj dokumenty', description: 'Otwórz listę zleceń i wybierz sprawę, do której chcesz dodać dokumenty.', href: '/home/work', icon: CameraIcon, tone: 'yellow' },
+  { label: 'Dodaj kosztorys', description: 'Otwórz zlecenie i uzupełnij sekcję kosztorysu.', href: '/home/work', icon: DocumentPlusIcon, tone: 'blue' },
+  { label: 'Wydaj pojazd zastępczy', description: 'Otwórz zlecenie i przejdź do sekcji pojazdu zastępczego.', href: '/home/work', icon: TruckIcon, tone: 'blue' },
+  { label: 'Dodaj kontakt', description: 'Otwórz zlecenie i dopisz kontakt w historii komunikacji.', href: '/home/work', icon: PhoneIcon, tone: 'green' },
+  { label: 'Rozliczenie', description: 'Otwórz sprawę i przejdź do rozliczeń, faktur lub dopłat.', href: '/home/work', icon: BanknotesIcon, tone: 'yellow' },
+  { label: 'Wyszukaj', description: 'Przejdź do listy zleceń i wyszukaj sprawę.', href: '/home/work', icon: MagnifyingGlassIcon, tone: 'blue' },
+] as const;
 
 const kpiDefinitions = [
   { key: 'active_work', label: 'Aktywne zlecenia', href: '/home/work?status=inprogress', icon: WrenchScrewdriverIcon, tone: 'blue' },
@@ -142,6 +158,29 @@ function EmptyState({ text }: { text: string }) {
   return <p className="rounded-md bg-gray-50 px-3 py-4 text-sm text-gray-500">{text}</p>;
 }
 
+function QuickActionCard({ definition }: { definition: typeof quickActionDefinitions[number] }) {
+  const Icon = definition.icon;
+
+  return (
+    <Link
+      href={definition.href}
+      title={definition.description}
+      aria-label={`${definition.label}. ${definition.description}`}
+      className="group rounded-lg bg-white p-4 shadow-sm ring-1 ring-gray-900/5 transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600"
+    >
+      <div className="flex items-start gap-3">
+        <span className={`rounded-lg border p-2 ${toneClasses[definition.tone]}`}>
+          <Icon className="size-5" aria-hidden="true" />
+        </span>
+        <div className="min-w-0">
+          <p className="text-sm font-semibold text-gray-900">{definition.label}</p>
+          <p className="mt-1 line-clamp-2 text-xs text-gray-500">{definition.description}</p>
+        </div>
+      </div>
+    </Link>
+  );
+}
+
 function KpiCard({ definition, tile }: { definition: typeof kpiDefinitions[number], tile?: CommandCenterTile }) {
   const Icon = definition.icon;
   const count = tile?.count || 0;
@@ -213,6 +252,18 @@ export default async function Page() {
             Terminy
           </Link>
         </div>
+
+        <section className="mb-6" aria-labelledby="quick-actions-heading">
+          <div className="mb-3 flex items-center justify-between gap-3">
+            <div>
+              <h2 id="quick-actions-heading" className="text-lg font-semibold text-gray-900">Szybkie akcje</h2>
+              <p className="text-sm text-gray-500">Najczęściej wykonywane czynności dostępne od razu po zalogowaniu.</p>
+            </div>
+          </div>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+            {quickActionDefinitions.map(item => <QuickActionCard key={item.label} definition={item} />)}
+          </div>
+        </section>
 
         <section aria-labelledby="kpi-heading">
           <h2 id="kpi-heading" className="sr-only">Najważniejsze wskaźniki</h2>
