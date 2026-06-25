@@ -50,6 +50,13 @@ const toneClasses = {
   slate: 'border-slate-200 bg-slate-50 text-slate-700',
 } as const;
 
+const toneColorMap: Record<DashboardTone, string> = {
+  blue: 'bg-blue-500',
+  green: 'bg-green-500',
+  yellow: 'bg-amber-500',
+  red: 'bg-red-500',
+};
+
 const kpiDefinitions = [
   { key: 'active_work', label: 'Aktywne zlecenia', href: '/home/work?status=inprogress', icon: WrenchScrewdriverIcon, tone: 'blue' },
   { key: 'ready_for_pickup', label: 'Gotowe do wydania', href: '/home/work?damageStatus=ready_for_pickup', icon: CheckCircleIcon, tone: 'green' },
@@ -263,7 +270,7 @@ export default async function Page() {
               {processDefinitions.map(item => {
                 const count = process.get(item.key)?.count || 0;
                 const width = processTotal > 0 ? Math.max((count / processTotal) * 100, count > 0 ? 2 : 0) : 0;
-                const color = item.tone === 'green' ? 'bg-green-500' : item.tone === 'yellow' ? 'bg-amber-500' : item.tone === 'red' ? 'bg-red-500' : 'bg-blue-500';
+                const color = toneColorMap[item.tone as DashboardTone] ?? 'bg-blue-500';
                 return <div key={item.key} className={color} style={{ width: `${width}%` }} title={`${item.label}: ${count}`} />;
               })}
             </div>
