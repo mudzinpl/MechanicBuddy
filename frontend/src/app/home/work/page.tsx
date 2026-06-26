@@ -19,12 +19,34 @@ import Select from "@/_components/Select";
 import FormLabel from "@/_components/FormLabel";
 import DamageStatusBadge from "./_components/activity/badges/DamageStatusBadge";
 
+const workAreaCopy: Record<string, { title: string; description: string }> = {
+  documents: {
+    title: 'Dokumenty zleceń',
+    description: 'Sprawdź dokumentację przypisaną do zleceń, braki oraz liczbę załączników.',
+  },
+  communication: {
+    title: 'Komunikacja ze zleceń',
+    description: 'Kontroluj kontakt z klientem, opiekunem szkody i historię korespondencji.',
+  },
+  tasks: {
+    title: 'Zadania warsztatowe',
+    description: 'Śledź zadania przypisane do zleceń i sprawy wymagające reakcji.',
+  },
+  settlements: {
+    title: 'Rozliczenia zleceń',
+    description: 'Sprawdź status rozliczeń, dopłat, faktur i nierozliczonych spraw.',
+  },
+};
+
 export default async function Page(
   { searchParams }: { searchParams: Promise<Record<string, string>> }) {
 
   const options = (await searchParams);
 
   const isInvoiceView = options.issued == 'on';
+  const workArea = workAreaCopy[options['module'] ?? ''];
+  const searchTitle = workArea?.title ?? 'Znajdź zlecenia';
+  const searchDescription = workArea?.description;
 
   const secondColumn = isInvoiceView ? {
     dataField: 'issuance',
@@ -244,7 +266,7 @@ export default async function Page(
 
           <Card header={
             
-            <SearchCardHeader title="Znajdź zlecenia" pageName="work">
+            <SearchCardHeader title={searchTitle} description={searchDescription} pageName="work">
             </SearchCardHeader>}  >
 
             <Search
