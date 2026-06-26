@@ -44,7 +44,11 @@ function isActiveNavigationItem(href: string, currentPath: string | null, curren
     }
 
     if (hrefQuery) {
-        return currentPath === hrefPath && currentQuery === hrefQuery;
+        return currentPath === hrefPath && new URLSearchParams(currentQuery).get(hrefQuery.split('=')[0]) === hrefQuery.split('=')[1];
+    }
+
+    if (hrefPath === '/home/vehicles' && new URLSearchParams(currentQuery).get('replacement') === 'true') {
+        return false;
     }
 
     return currentPath === hrefPath || currentPath.startsWith(`${hrefPath}/`);
