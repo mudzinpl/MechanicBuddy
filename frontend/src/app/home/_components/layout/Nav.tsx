@@ -49,8 +49,8 @@ export default function Nav({
                 style={{ color: 'var(--portal-sidebar-text, #9ca3af)' }}
                 aria-label="Przejdź do Dashboardu"
             >
-                <span className="flex size-8 items-center justify-center rounded-md bg-white/10 text-base font-bold text-white">M</span>
-                <span>MechanicBuddy</span>
+                <span className="flex size-8 items-center justify-center rounded-md bg-white/10 text-base font-bold text-white">A</span>
+                <span>APPRA</span>
             </a>
             <nav className="flex flex-1 flex-col">
                 <ul role="list" className="flex flex-1 flex-col gap-y-7">

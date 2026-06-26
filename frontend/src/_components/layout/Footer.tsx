@@ -9,7 +9,7 @@ export function Footer() {
       <Container>
         <div className="py-16">
           <div className="flex justify-center">
-            <span className="text-xl font-bold text-slate-900">MechanicBuddy</span>
+            <span className="text-xl font-bold text-slate-900">APPRA</span>
           </div>
           <nav className="mt-10 text-sm" aria-label="szybkie linki">
             <div className="-my-1 flex justify-center gap-x-6">
@@ -20,7 +20,7 @@ export function Footer() {
         </div>
         <div className="flex flex-col items-center border-t border-slate-400/10 py-10 sm:flex-row-reverse sm:justify-between">
           <div className="flex gap-x-6">
-            <Link href="https://github.com/d4m13n-de/MechanicBuddy" className="group" aria-label="MechanicBuddy na GitHubie">
+            <Link href="https://github.com/d4m13n-de/MechanicBuddy" className="group" aria-label="APPRA na GitHubie">
               <svg
                 className="h-6 w-6 fill-slate-500 group-hover:fill-slate-700"
                 aria-hidden="true"
@@ -31,7 +31,7 @@ export function Footer() {
             </Link>
           </div>
           <p className="mt-6 text-sm text-slate-500 sm:mt-0">
-            Copyright &copy; {new Date().getFullYear()} MechanicBuddy. Wszelkie prawa zastrzeżone.
+            Copyright &copy; {new Date().getFullYear()} APPRA. Wszelkie prawa zastrzeżone.
           </p>
         </div>
       </Container>
