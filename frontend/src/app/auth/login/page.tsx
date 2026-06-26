@@ -131,8 +131,8 @@ export default function LoginPage() {
         <div className="relative hidden w-0 flex-1 lg:block bg-slate-800">
           <div className="absolute inset-0 flex items-center justify-center">
             <div className="text-center">
-              <div className="text-6xl font-bold text-slate-700">SA</div>
-              <div className="text-slate-600 mt-2">SerwisAPPRA</div>
+              <div className="text-6xl font-bold text-slate-700">A</div>
+              <div className="text-slate-600 mt-2">APPRA</div>
             </div>
           </div>
         </div>
