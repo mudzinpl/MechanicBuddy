@@ -153,8 +153,6 @@ export const damageTypes = [
   'OC',
   'AC',
   'Gotówka',
-  'Flota',
-  'Assistance',
 ] as const;
 
 export const settlementStatuses = [
@@ -180,9 +178,7 @@ export const invoiceSourceSystems = [
 
 export const estimateSystems = [
   { value: 'audanet', label: 'Audanet' },
-  { value: 'audatex', label: 'Audatex' },
   { value: 'manual', label: 'Ręczny' },
-  { value: 'other', label: 'Inny' },
 ] as const;
 
 export const estimateStatuses = [
