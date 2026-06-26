@@ -29,9 +29,9 @@ export default async function authorizationMiddleware(request: NextRequest,respo
     return NextResponse.redirect(new URL('/auth/change-password', request.nextUrl))
   }
 
-  // If user doesn't need to change password but is on the change password page, redirect to home
+  // If user doesn't need to change password but is on the change password page, redirect to dashboard
   if (jwt && !mustChangePassword && isChangePasswordRoute) {
-    return NextResponse.redirect(new URL('/home/work', request.nextUrl))
+    return NextResponse.redirect(new URL('/home', request.nextUrl))
   }
 
   // 5. Redirect to /home if the user is authenticated (skip in development to allow viewing landing page)
@@ -41,7 +41,7 @@ export default async function authorizationMiddleware(request: NextRequest,respo
   if (
     !isProtectedRoute && !isChangePasswordRoute && !isAuthRoute && jwt && !(isDevMode && isLandingPage)
   ) {
-    return NextResponse.redirect(new URL('/home/work', request.nextUrl))
+    return NextResponse.redirect(new URL('/home', request.nextUrl))
   }
 
   return response
