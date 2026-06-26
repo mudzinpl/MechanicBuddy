@@ -21,7 +21,7 @@ const segmentLabels: Record<string, string> = {
   'audit-logs': 'Dziennik zdarzeń',
 }
 
-const currentModuleLabels: Record<string, string> = {
+const querySectionLabels: Record<string, string> = {
   documents: 'Dokumenty',
   communication: 'Komunikacja',
   tasks: 'Zadania',
@@ -54,9 +54,9 @@ export default function Breadcrumbs() {
     crumbs.push({ label: getEntityLabel(segment, segments[index - 1]), href })
   })
 
-  const currentModule = searchParams.get('module')
-  if (currentModule && currentModuleLabels[currentModule]) {
-    crumbs.push({ label: currentModuleLabels[currentModule], href: `${pathname}?module=${currentModule}` })
+  const currentSectionKey = searchParams.get('module')
+  if (currentSectionKey && querySectionLabels[currentSectionKey]) {
+    crumbs.push({ label: querySectionLabels[currentSectionKey], href: `${pathname}?module=${currentSectionKey}` })
   }
 
   const replacement = searchParams.get('replacement')
