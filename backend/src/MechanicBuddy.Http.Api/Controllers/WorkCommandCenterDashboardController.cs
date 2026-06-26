@@ -23,7 +23,13 @@ namespace MechanicBuddy.Http.Api.Controllers
         [HttpGet("command-center-dashboard")]
         public dynamic Dashboard()
         {
-            var hasWorkPartOrders = session.Connection.ExecuteScalar<bool>("SELECT to_regclass('domain.work_part_order') IS NOT NULL");
+            var tables = session.Connection.QuerySingle<DashboardTableAvailabilityDto>(@"
+                SELECT
+                    to_regclass('domain.work_part_order') IS NOT NULL AS ""HasWorkPartOrders"",
+                    to_regclass('domain.work_task') IS NOT NULL AS ""HasWorkTasks"",
+                    to_regclass('domain.work_replacement_vehicle') IS NOT NULL AS ""HasWorkReplacementVehicles"",
+                    to_regclass('domain.work_quality_checklist_item') IS NOT NULL AS ""HasWorkQualityChecklistItems""
+            ");
 
             const string baseWorkCte = @"
                 WITH work_data AS (
@@ -55,19 +61,45 @@ namespace MechanicBuddy.Http.Api.Controllers
                     LEFT JOIN domain.vehicle v ON v.id = w.vehicleid
                 )";
 
-            var partsWaitingKpiSql = hasWorkPartOrders
+            var partsWaitingKpiSql = tables.HasWorkPartOrders
                 ? @"UNION ALL SELECT 'parts_waiting', COUNT(DISTINCT workid)::int, NULL::numeric
                 FROM domain.work_part_order WHERE status IN ('to_order', 'ordered', 'in_delivery')"
                 : @"UNION ALL SELECT 'parts_waiting', 0::int, NULL::numeric";
 
-            var overduePartItemsSql = hasWorkPartOrders
+            var activeReplacementVehiclesKpiSql = tables.HasWorkReplacementVehicles
+                ? @"UNION ALL SELECT 'active_replacement_vehicles', COUNT(DISTINCT workid)::int, NULL::numeric
+                FROM domain.work_replacement_vehicle WHERE status = 'issued'"
+                : @"UNION ALL SELECT 'active_replacement_vehicles', 0::int, NULL::numeric";
+
+            var taskOverdueKpiSql = tables.HasWorkTasks
+                ? @"UNION ALL SELECT 'task_overdue', COUNT(*)::int, NULL::numeric
+                FROM domain.work_task WHERE status NOT IN ('completed', 'cancelled')
+                  AND dueon IS NOT NULL
+                  AND (dueon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date"
+                : @"UNION ALL SELECT 'task_overdue', 0::int, NULL::numeric";
+
+            var overduePartItemsSql = tables.HasWorkPartOrders
                 ? @"UNION ALL SELECT po.workid FROM domain.work_part_order po
                       WHERE po.status IN ('ordered', 'in_delivery')
                         AND po.planneddeliveryon IS NOT NULL
                         AND (po.planneddeliveryon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date"
                 : string.Empty;
 
-            var attentionPartsOverdueSql = hasWorkPartOrders
+            var overdueTaskItemsSql = tables.HasWorkTasks
+                ? @"UNION ALL SELECT wt.workid FROM domain.work_task wt
+                      WHERE wt.status NOT IN ('completed', 'cancelled')
+                        AND wt.dueon IS NOT NULL
+                        AND (wt.dueon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date"
+                : string.Empty;
+
+            var overdueReplacementItemsSql = tables.HasWorkReplacementVehicles
+                ? @"UNION ALL SELECT rv.workid FROM domain.work_replacement_vehicle rv
+                      WHERE rv.status = 'issued'
+                        AND rv.plannedreturnon IS NOT NULL
+                        AND (rv.plannedreturnon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date"
+                : string.Empty;
+
+            var attentionPartsOverdueSql = tables.HasWorkPartOrders
                 ? @"UNION ALL
                 SELECT w.id, w.worknr, w.clientname, w.regnr, w.damagestatus, 'parts_delivery_overdue', po.planneddeliveryon
                 FROM domain.work_part_order po
@@ -76,6 +108,78 @@ namespace MechanicBuddy.Http.Api.Controllers
                   AND po.planneddeliveryon IS NOT NULL
                   AND (po.planneddeliveryon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date"
                 : string.Empty;
+
+            var attentionReplacementOverdueSql = tables.HasWorkReplacementVehicles
+                ? @"UNION ALL
+                SELECT w.id, w.worknr, w.clientname, w.regnr, w.damagestatus, 'replacement_return_overdue', rv.plannedreturnon
+                FROM domain.work_replacement_vehicle rv
+                INNER JOIN work_data w ON w.id = rv.workid
+                WHERE rv.status = 'issued'
+                  AND rv.plannedreturnon IS NOT NULL
+                  AND (rv.plannedreturnon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date"
+                : string.Empty;
+
+            var attentionTaskOverdueSql = tables.HasWorkTasks
+                ? @"UNION ALL
+                SELECT w.id, w.worknr, w.clientname, w.regnr, w.damagestatus, 'task_overdue', wt.dueon
+                FROM domain.work_task wt
+                INNER JOIN work_data w ON w.id = wt.workid
+                WHERE wt.status NOT IN ('completed', 'cancelled')
+                  AND wt.dueon IS NOT NULL
+                  AND (wt.dueon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date"
+                : string.Empty;
+
+            var attentionChecklistSql = tables.HasWorkQualityChecklistItems
+                ? @"UNION ALL
+                SELECT id, worknr, clientname, regnr, damagestatus, 'checklist_incomplete_ready', NULL::timestamptz
+                FROM work_data w
+                WHERE damagestatus = 'ready_for_pickup'
+                  AND EXISTS (
+                      SELECT 1 FROM domain.work_quality_checklist_item qi
+                      WHERE qi.workid = w.id AND qi.iscompleted = FALSE
+                  )"
+                : string.Empty;
+
+            var todayReplacementSql = tables.HasWorkReplacementVehicles
+                ? @"UNION ALL
+                SELECT w.id, w.worknr, w.clientname, w.regnr, w.damagestatus, 'replacement_return', rv.plannedreturnon
+                FROM domain.work_replacement_vehicle rv
+                INNER JOIN work_data w ON w.id = rv.workid
+                WHERE rv.status = 'issued'
+                  AND rv.plannedreturnon IS NOT NULL
+                  AND (rv.plannedreturnon AT TIME ZONE 'Europe/Warsaw')::date = (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date"
+                : string.Empty;
+
+            var todayTaskSql = tables.HasWorkTasks
+                ? @"UNION ALL
+                SELECT w.id, w.worknr, w.clientname, w.regnr, w.damagestatus, 'task_due', wt.dueon
+                FROM domain.work_task wt
+                INNER JOIN work_data w ON w.id = wt.workid
+                WHERE wt.status NOT IN ('completed', 'cancelled')
+                  AND wt.dueon IS NOT NULL
+                  AND (wt.dueon AT TIME ZONE 'Europe/Warsaw')::date = (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date"
+                : string.Empty;
+
+            var replacementTilesSql = tables.HasWorkReplacementVehicles
+                ? @"
+                SELECT 'active' AS key, COUNT(*)::int AS count, NULL::numeric AS amount
+                FROM domain.work_replacement_vehicle WHERE status = 'issued'
+                UNION ALL SELECT 'due_today', COUNT(*)::int, NULL::numeric
+                FROM domain.work_replacement_vehicle
+                WHERE status = 'issued' AND plannedreturnon IS NOT NULL
+                  AND (plannedreturnon AT TIME ZONE 'Europe/Warsaw')::date = (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
+                UNION ALL SELECT 'overdue', COUNT(*)::int, NULL::numeric
+                FROM domain.work_replacement_vehicle
+                WHERE status = 'issued' AND plannedreturnon IS NOT NULL
+                  AND (plannedreturnon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
+                UNION ALL SELECT 'without_return_date', COUNT(*)::int, NULL::numeric
+                FROM domain.work_replacement_vehicle
+                WHERE status = 'issued' AND plannedreturnon IS NULL"
+                : @"
+                SELECT 'active' AS key, 0::int AS count, NULL::numeric AS amount
+                UNION ALL SELECT 'due_today', 0::int, NULL::numeric
+                UNION ALL SELECT 'overdue', 0::int, NULL::numeric
+                UNION ALL SELECT 'without_return_date', 0::int, NULL::numeric";
 
             var kpis = session.Connection.Query<CommandCenterTileDto>(baseWorkCte + $@"
                 SELECT 'active_work' AS key, COUNT(*)::int AS count, NULL::numeric AS amount
@@ -88,25 +192,15 @@ namespace MechanicBuddy.Http.Api.Controllers
                       AND (plannedreleaseon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
                       AND damagestatus NOT IN ('released', 'settled', 'rejected')
                     {overduePartItemsSql}
-                    UNION ALL SELECT wt.workid FROM domain.work_task wt
-                      WHERE wt.status NOT IN ('completed', 'cancelled')
-                        AND wt.dueon IS NOT NULL
-                        AND (wt.dueon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
-                    UNION ALL SELECT rv.workid FROM domain.work_replacement_vehicle rv
-                      WHERE rv.status = 'issued'
-                        AND rv.plannedreturnon IS NOT NULL
-                        AND (rv.plannedreturnon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
+                    {overdueTaskItemsSql}
+                    {overdueReplacementItemsSql}
                 ) overdue_items
                 UNION ALL SELECT 'missing_estimate', COUNT(*)::int, NULL::numeric
                 FROM work_data WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND COALESCE(TRIM(audatexestimatenumber), '') = ''
                 UNION ALL SELECT 'unsettled', COUNT(*)::int, NULL::numeric
                 FROM work_data WHERE COALESCE(settlementstatus, 'unsettled') <> 'settled'
-                UNION ALL SELECT 'active_replacement_vehicles', COUNT(DISTINCT workid)::int, NULL::numeric
-                FROM domain.work_replacement_vehicle WHERE status = 'issued'
-                UNION ALL SELECT 'task_overdue', COUNT(*)::int, NULL::numeric
-                FROM domain.work_task WHERE status NOT IN ('completed', 'cancelled')
-                  AND dueon IS NOT NULL
-                  AND (dueon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date").ToArray();
+                {activeReplacementVehiclesKpiSql}
+                {taskOverdueKpiSql}").ToArray();
 
             var attention = session.Connection.Query<CommandCenterWorkItemDto>(baseWorkCte + $@"
                 SELECT id, worknr, clientname, regnr, damagestatus, 'insurer_decision_overdue' AS kind, estimatesenton AS scheduledon
@@ -121,37 +215,18 @@ namespace MechanicBuddy.Http.Api.Controllers
                 SELECT id, worknr, clientname, regnr, damagestatus, 'missing_estimate', NULL::timestamptz
                 FROM work_data WHERE damagestatus NOT IN ('released', 'settled', 'rejected') AND COALESCE(TRIM(audatexestimatenumber), '') = ''
                 {attentionPartsOverdueSql}
-                UNION ALL
-                SELECT w.id, w.worknr, w.clientname, w.regnr, w.damagestatus, 'replacement_return_overdue', rv.plannedreturnon
-                FROM domain.work_replacement_vehicle rv
-                INNER JOIN work_data w ON w.id = rv.workid
-                WHERE rv.status = 'issued'
-                  AND rv.plannedreturnon IS NOT NULL
-                  AND (rv.plannedreturnon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
+                {attentionReplacementOverdueSql}
                 UNION ALL
                 SELECT id, worknr, clientname, regnr, damagestatus, 'payment_overdue', paymentdueon
                 FROM work_data WHERE COALESCE(invoicepaymentstatus, 'not_issued') NOT IN ('paid', 'disputed')
                   AND paymentdueon IS NOT NULL
                   AND (paymentdueon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
-                UNION ALL
-                SELECT w.id, w.worknr, w.clientname, w.regnr, w.damagestatus, 'task_overdue', wt.dueon
-                FROM domain.work_task wt
-                INNER JOIN work_data w ON w.id = wt.workid
-                WHERE wt.status NOT IN ('completed', 'cancelled')
-                  AND wt.dueon IS NOT NULL
-                  AND (wt.dueon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
-                UNION ALL
-                SELECT id, worknr, clientname, regnr, damagestatus, 'checklist_incomplete_ready', NULL::timestamptz
-                FROM work_data w
-                WHERE damagestatus = 'ready_for_pickup'
-                  AND EXISTS (
-                      SELECT 1 FROM domain.work_quality_checklist_item qi
-                      WHERE qi.workid = w.id AND qi.iscompleted = FALSE
-                  )
+                {attentionTaskOverdueSql}
+                {attentionChecklistSql}
                 ORDER BY scheduledon NULLS LAST, worknr DESC
                 LIMIT 200").ToArray();
 
-            var today = session.Connection.Query<CommandCenterWorkItemDto>(baseWorkCte + @"
+            var today = session.Connection.Query<CommandCenterWorkItemDto>(baseWorkCte + $@"
                 SELECT id, worknr, clientname, regnr, damagestatus, 'intake' AS kind, plannedintakeon AS scheduledon
                 FROM work_data WHERE (plannedintakeon AT TIME ZONE 'Europe/Warsaw')::date = (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
                 UNION ALL
@@ -160,25 +235,13 @@ namespace MechanicBuddy.Http.Api.Controllers
                 UNION ALL
                 SELECT id, worknr, clientname, regnr, damagestatus, 'release', plannedreleaseon
                 FROM work_data WHERE (plannedreleaseon AT TIME ZONE 'Europe/Warsaw')::date = (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
-                UNION ALL
-                SELECT w.id, w.worknr, w.clientname, w.regnr, w.damagestatus, 'replacement_return', rv.plannedreturnon
-                FROM domain.work_replacement_vehicle rv
-                INNER JOIN work_data w ON w.id = rv.workid
-                WHERE rv.status = 'issued'
-                  AND rv.plannedreturnon IS NOT NULL
-                  AND (rv.plannedreturnon AT TIME ZONE 'Europe/Warsaw')::date = (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
+                {todayReplacementSql}
                 UNION ALL
                 SELECT id, worknr, clientname, regnr, damagestatus, 'payment_due', paymentdueon
                 FROM work_data WHERE COALESCE(invoicepaymentstatus, 'not_issued') NOT IN ('paid', 'disputed')
                   AND paymentdueon IS NOT NULL
                   AND (paymentdueon AT TIME ZONE 'Europe/Warsaw')::date = (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
-                UNION ALL
-                SELECT w.id, w.worknr, w.clientname, w.regnr, w.damagestatus, 'task_due', wt.dueon
-                FROM domain.work_task wt
-                INNER JOIN work_data w ON w.id = wt.workid
-                WHERE wt.status NOT IN ('completed', 'cancelled')
-                  AND wt.dueon IS NOT NULL
-                  AND (wt.dueon AT TIME ZONE 'Europe/Warsaw')::date = (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
+                {todayTaskSql}
                 ORDER BY scheduledon, worknr").ToArray();
 
             var process = session.Connection.Query<CommandCenterTileDto>(baseWorkCte + @"
@@ -193,20 +256,7 @@ namespace MechanicBuddy.Http.Api.Controllers
                 UNION ALL SELECT 'ready_for_pickup', COUNT(*)::int, NULL::numeric FROM work_data WHERE damagestatus = 'ready_for_pickup'
                 UNION ALL SELECT 'released', COUNT(*)::int, NULL::numeric FROM work_data WHERE damagestatus = 'released'").ToArray();
 
-            var replacements = session.Connection.Query<CommandCenterTileDto>(@"
-                SELECT 'active' AS key, COUNT(*)::int AS count, NULL::numeric AS amount
-                FROM domain.work_replacement_vehicle WHERE status = 'issued'
-                UNION ALL SELECT 'due_today', COUNT(*)::int, NULL::numeric
-                FROM domain.work_replacement_vehicle
-                WHERE status = 'issued' AND plannedreturnon IS NOT NULL
-                  AND (plannedreturnon AT TIME ZONE 'Europe/Warsaw')::date = (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
-                UNION ALL SELECT 'overdue', COUNT(*)::int, NULL::numeric
-                FROM domain.work_replacement_vehicle
-                WHERE status = 'issued' AND plannedreturnon IS NOT NULL
-                  AND (plannedreturnon AT TIME ZONE 'Europe/Warsaw')::date < (CURRENT_TIMESTAMP AT TIME ZONE 'Europe/Warsaw')::date
-                UNION ALL SELECT 'without_return_date', COUNT(*)::int, NULL::numeric
-                FROM domain.work_replacement_vehicle
-                WHERE status = 'issued' AND plannedreturnon IS NULL").ToArray();
+            var replacements = session.Connection.Query<CommandCenterTileDto>(replacementTilesSql).ToArray();
 
             var finance = session.Connection.Query<CommandCenterTileDto>(baseWorkCte + @"
                 SELECT 'underpayment_total' AS key, COUNT(*)::int AS count, COALESCE(SUM(underpaymentamount), 0)::numeric AS amount
@@ -231,6 +281,14 @@ namespace MechanicBuddy.Http.Api.Controllers
                 Replacements = replacements,
                 Finance = finance
             };
+        }
+
+        private sealed class DashboardTableAvailabilityDto
+        {
+            public bool HasWorkPartOrders { get; set; }
+            public bool HasWorkTasks { get; set; }
+            public bool HasWorkReplacementVehicles { get; set; }
+            public bool HasWorkQualityChecklistItems { get; set; }
         }
 
         private sealed class CommandCenterTileDto
