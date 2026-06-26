@@ -53,7 +53,7 @@ export async function changePasswordOnLogin(
 
   // Redirect outside try-catch to avoid catching Next.js redirect error
   if (success) {
-    redirect('/home/work');
+    redirect('/home');
   }
 
   return { error: "" };

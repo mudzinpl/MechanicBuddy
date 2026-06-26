@@ -36,8 +36,8 @@ export async function authenticate(prevState: { error: string }, formData: FormD
       redirect('/auth/change-password');
     }
 
-    // Otherwise redirect to home
-    redirect('/home/work');
+    // Otherwise redirect to dashboard
+    redirect('/home');
   }
   console.log("jwt missing");
   return { error: "Logowanie nie powiodło się", }
