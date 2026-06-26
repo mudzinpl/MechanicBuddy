@@ -18,7 +18,7 @@ const segmentLabels: Record<string, string> = {
   users: 'Użytkownicy',
   landing: 'Strona publiczna',
   visibility: 'Widoczność',
-  audit-logs: 'Dziennik zdarzeń',
+  'audit-logs': 'Dziennik zdarzeń',
 }
 
 const moduleLabels: Record<string, string> = {
@@ -54,9 +54,9 @@ export default function Breadcrumbs() {
     crumbs.push({ label: getEntityLabel(segment, segments[index - 1]), href })
   })
 
-  const module = searchParams.get('module')
-  if (module && moduleLabels[module]) {
-    crumbs.push({ label: moduleLabels[module], href: `${pathname}?module=${module}` })
+  const currentModule = searchParams.get('module')
+  if (currentModule && moduleLabels[currentModule]) {
+    crumbs.push({ label: moduleLabels[currentModule], href: `${pathname}?module=${currentModule}` })
   }
 
   const replacement = searchParams.get('replacement')
