@@ -3,6 +3,7 @@ import ProfileMenu from "./ProfileMenu"
 import { InboxIcon,
     CalendarDaysIcon,
     Cog6ToothIcon,
+    HomeIcon,
     QueueListIcon,
     TruckIcon,
     UsersIcon,
@@ -15,6 +16,7 @@ type NavigationSection = Parameters<typeof canAccessMainSection>[1];
 
 const navigationIconClass = "size-6 shrink-0";
 const navigation: { name: string; href: string; section: NavigationSection; icon: React.ReactNode }[] = [
+    { name: 'Dashboard', href: '/home', section: 'dashboard', icon: <HomeIcon aria-hidden="true" className={navigationIconClass}></HomeIcon> },
     { name: 'Zlecenia', href: '/home/work', section: 'work', icon: <QueueListIcon aria-hidden="true" className={navigationIconClass}></QueueListIcon> },
     { name: 'Terminy', href: '/home/calendar', section: 'calendar', icon: <CalendarDaysIcon aria-hidden="true" className={navigationIconClass}></CalendarDaysIcon> },
     { name: 'Klienci', href: '/home/clients', section: 'clients', icon: <UsersIcon aria-hidden="true" className={navigationIconClass}></UsersIcon>  },
@@ -41,7 +43,15 @@ export default function Nav({
 
     return (
         <>
-            <div className="h-8 shrink-0"></div>
+            <a
+                href="/home"
+                className="mt-6 flex items-center gap-x-3 rounded-md px-2 py-2 text-sm font-semibold hover:text-white"
+                style={{ color: 'var(--portal-sidebar-text, #9ca3af)' }}
+                aria-label="Przejdź do Dashboardu"
+            >
+                <span className="flex size-8 items-center justify-center rounded-md bg-white/10 text-base font-bold text-white">M</span>
+                <span>MechanicBuddy</span>
+            </a>
             <nav className="flex flex-1 flex-col">
                 <ul role="list" className="flex flex-1 flex-col gap-y-7">
                     <li>
