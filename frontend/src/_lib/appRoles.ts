@@ -33,9 +33,9 @@ export function canAccessMainSection(role: string | null | undefined, section: '
 
     const permissions: Record<AppRole, string[]> = {
         administrator: ['dashboard', 'work', 'calendar', 'clients', 'vehicles', 'inventory', 'requests', 'settings'],
-        manager: ['dashboard', 'work', 'calendar', 'clients', 'vehicles', 'requests'],
+        manager: ['dashboard', 'work', 'calendar', 'clients', 'vehicles', 'inventory', 'requests'],
         board: ['dashboard', 'work'],
-        office: ['dashboard', 'work', 'calendar', 'clients', 'vehicles', 'requests'],
+        office: ['dashboard', 'work', 'calendar', 'clients', 'vehicles', 'inventory', 'requests'],
         technician: ['work'],
         assessor: ['work', 'calendar'],
         readonly: ['dashboard', 'work'],

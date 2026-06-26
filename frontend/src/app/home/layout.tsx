@@ -2,6 +2,7 @@
 
 
 import { cookies } from 'next/headers';
+import Breadcrumbs from './_components/layout/Breadcrumbs'
 import Nav from './_components/layout/Nav'
 import NavDialog from './_components/layout/NavDialog'
 import ToastMessages from '@/_components/ToastMessages'
@@ -103,6 +104,7 @@ export default async function Layout({ children }: { children: React.ReactNode }
                     </div>
                      <NavDialog imageUrl={imageUrl} fullName={fullName} appRole={appRole}></NavDialog>
                     <main style={{ backgroundColor: 'var(--portal-content-bg, #f9fafb)' }}>
+                        <Breadcrumbs />
                         {children}
                     </main>
                   </div>
