@@ -1,15 +1,20 @@
 'use client'
 import ProfileMenu from "./ProfileMenu"
-import { InboxIcon,
+import {
+    BanknotesIcon,
     CalendarDaysIcon,
+    ChatBubbleLeftRightIcon,
+    ClipboardDocumentListIcon,
     Cog6ToothIcon,
+    CubeIcon,
+    DocumentTextIcon,
     HomeIcon,
     QueueListIcon,
     TruckIcon,
     UsersIcon,
   } from '@heroicons/react/24/outline'
 import clsx from "clsx";
-import { usePathname } from "next/navigation"
+import { usePathname, useSearchParams } from "next/navigation"
 import { canAccessMainSection } from "@/_lib/appRoles";
 
 type NavigationSection = Parameters<typeof canAccessMainSection>[1];
@@ -21,10 +26,29 @@ const navigation: { name: string; href: string; section: NavigationSection; icon
     { name: 'Terminy', href: '/home/calendar', section: 'calendar', icon: <CalendarDaysIcon aria-hidden="true" className={navigationIconClass}></CalendarDaysIcon> },
     { name: 'Klienci', href: '/home/clients', section: 'clients', icon: <UsersIcon aria-hidden="true" className={navigationIconClass}></UsersIcon>  },
     { name: 'Pojazdy', href: '/home/vehicles', section: 'vehicles', icon: <TruckIcon aria-hidden="true" className={navigationIconClass}></TruckIcon>  },
-    { name: 'Magazyn', href: '/home/inventory', section: 'inventory', icon: <Cog6ToothIcon aria-hidden="true" className={navigationIconClass}></Cog6ToothIcon>  },
-    { name: 'Zapytania', href: '/home/requests', section: 'requests', icon: <InboxIcon aria-hidden="true" className={navigationIconClass}></InboxIcon>  },
+    { name: 'Pojazdy zastępcze', href: '/home/vehicles?replacement=true', section: 'vehicles', icon: <TruckIcon aria-hidden="true" className={navigationIconClass}></TruckIcon>  },
+    { name: 'Części i zamówienia', href: '/home/inventory', section: 'inventory', icon: <CubeIcon aria-hidden="true" className={navigationIconClass}></CubeIcon>  },
+    { name: 'Dokumenty', href: '/home/work?module=documents', section: 'work', icon: <DocumentTextIcon aria-hidden="true" className={navigationIconClass}></DocumentTextIcon> },
+    { name: 'Komunikacja', href: '/home/work?module=communication', section: 'work', icon: <ChatBubbleLeftRightIcon aria-hidden="true" className={navigationIconClass}></ChatBubbleLeftRightIcon> },
+    { name: 'Zadania', href: '/home/work?module=tasks', section: 'work', icon: <ClipboardDocumentListIcon aria-hidden="true" className={navigationIconClass}></ClipboardDocumentListIcon> },
+    { name: 'Rozliczenia', href: '/home/work?module=settlements', section: 'work', icon: <BanknotesIcon aria-hidden="true" className={navigationIconClass}></BanknotesIcon> },
 ]
 
+function isActiveNavigationItem(href: string, currentPath: string | null, currentQuery: string) {
+    if (!currentPath) return false;
+
+    const [hrefPath, hrefQuery] = href.split('?');
+
+    if (hrefPath === '/home') {
+        return currentPath === '/home';
+    }
+
+    if (hrefQuery) {
+        return currentPath === hrefPath && currentQuery === hrefQuery;
+    }
+
+    return currentPath === hrefPath || currentPath.startsWith(`${hrefPath}/`);
+}
 
 export default function Nav({
     onSmallScreen,
@@ -38,6 +62,7 @@ export default function Nav({
     appRole: string,
 }) {
     const currentPath = usePathname();
+    const currentQuery = useSearchParams().toString();
     const visibleNavigation = navigation.filter((item) => canAccessMainSection(appRole, item.section));
     const canOpenSettings = canAccessMainSection(appRole, 'settings');
 
@@ -56,21 +81,24 @@ export default function Nav({
                 <ul role="list" className="flex flex-1 flex-col gap-y-7">
                     <li>
                         <ul role="list" className="-mx-2 space-y-1">
-                            {visibleNavigation.map((item) => (
+                            {visibleNavigation.map((item) => {
+                                const isActive = isActiveNavigationItem(item.href, currentPath, currentQuery);
+
+                                return (
                                 <li key={item.name}>
                                     <a
                                         href={item.href}
                                         className={clsx(
-                                               (item.href !=='/home'  &&currentPath?.startsWith(item.href) || item.href =='/home'&& currentPath === '/home') //home is ambigous
+                                               isActive
                                                 ? 'text-white'
                                                 : 'hover:text-white',
                                             'group flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold',
                                         )}
                                         style={{
-                                            backgroundColor: (item.href !=='/home' && currentPath?.startsWith(item.href) || item.href =='/home'&& currentPath === '/home')
+                                            backgroundColor: isActive
                                                 ? 'var(--portal-sidebar-active-bg, #1f2937)'
                                                 : 'transparent',
-                                            color: (item.href !=='/home' && currentPath?.startsWith(item.href) || item.href =='/home'&& currentPath === '/home')
+                                            color: isActive
                                                 ? 'var(--portal-sidebar-active-text, #ffffff)'
                                                 : 'var(--portal-sidebar-text, #9ca3af)',
                                         }}
@@ -79,7 +107,7 @@ export default function Nav({
                                         {item.name}
                                     </a>
                                 </li>
-                            ))}
+                            )})}
                         </ul>
                     </li>
                     {!onSmallScreen && <li className="mt-auto flex flex-col mb-5">
