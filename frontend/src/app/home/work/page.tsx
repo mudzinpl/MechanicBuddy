@@ -277,34 +277,33 @@ export default async function Page(
                 return (item['status'] === 'closed' ? 'line-through' : '')
               }}
               columns={columns}> 
-              <div className=" 3xl:flex">
-                 <div className="  grid grid-cols-1  md:grid-cols-12 md:grid-flow-row md:gap-x-2 3xl:grid-flow-col  3xl:grid-cols-24   p-0 3xl:gap-x-2  gap-y-2  "> 
-                      <div className="3xl:col-span-6 md:col-span-7 "   >
-                        <SearchStatusFilter issued={options.issued === 'on'} status={options.status}></SearchStatusFilter>
-                        <SearchInput searchParams={searchParams} placeholder="numer, klient, VIN lub nr rejestracyjny pojazdu" ></SearchInput> 
-                      </div> 
-                      <div className="3xl:col-span-4  md:col-span-5 ">
-                         <FormInput name="saleable" label="Produkt lub usługa" placeholder="kod lub nazwa ..." defaultValue={options.saleable}  ></FormInput>
-                      </div>
-                      <div className="3xl:col-span-6 md:col-span-5">
-                        <FormLabel name="damageStatus" label="Status procesu"></FormLabel>
-                        <div className="mt-2 grid grid-cols-1">
-                          <Select name="damageStatus" defaultValue={options.damageStatus || ''}>
-                            <option value="">Wszystkie statusy</option>
-                            {damageStatuses.map(status => (
-                              <option key={status.value} value={status.value}>{status.label}</option>
-                            ))}
-                          </Select>
-                        </div>
-                      </div>
-                      <div  className="3xl:col-span-8 md:col-span-12" >
-                      <SearchParams options={options}></SearchParams>
-                      </div>
-                      
+              <div className="flex flex-col gap-4">
+                <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 2xl:grid-cols-12">
+                  <div className="min-w-0 2xl:col-span-4">
+                    <SearchStatusFilter issued={options.issued === 'on'} status={options.status}></SearchStatusFilter>
+                    <SearchInput searchParams={searchParams} placeholder="numer, klient, VIN lub nr rejestracyjny pojazdu" ></SearchInput> 
                   </div> 
-                  <div className="mx-2 text-right mt-8">
-                        <PrimaryButton   id="btnSubmit">Szukaj</PrimaryButton>
-                   </div>
+                  <div className="min-w-0 2xl:col-span-3">
+                    <FormInput name="saleable" label="Produkt lub usługa" placeholder="kod lub nazwa ..." defaultValue={options.saleable}  ></FormInput>
+                  </div>
+                  <div className="min-w-0 2xl:col-span-3">
+                    <FormLabel name="damageStatus" label="Status procesu"></FormLabel>
+                    <div className="mt-2 grid grid-cols-1">
+                      <Select name="damageStatus" defaultValue={options.damageStatus || ''}>
+                        <option value="">Wszystkie statusy</option>
+                        {damageStatuses.map(status => (
+                          <option key={status.value} value={status.value}>{status.label}</option>
+                        ))}
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="min-w-0 lg:col-span-2 2xl:col-span-12">
+                    <SearchParams options={options}></SearchParams>
+                  </div>
+                </div> 
+                <div className="flex justify-end">
+                  <PrimaryButton id="btnSubmit">Szukaj</PrimaryButton>
+                </div>
               </div>
                 
             </Search>
