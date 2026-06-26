@@ -21,7 +21,7 @@ const segmentLabels: Record<string, string> = {
   'audit-logs': 'Dziennik zdarzeń',
 }
 
-const moduleLabels: Record<string, string> = {
+const currentModuleLabels: Record<string, string> = {
   documents: 'Dokumenty',
   communication: 'Komunikacja',
   tasks: 'Zadania',
@@ -55,8 +55,8 @@ export default function Breadcrumbs() {
   })
 
   const currentModule = searchParams.get('module')
-  if (currentModule && moduleLabels[currentModule]) {
-    crumbs.push({ label: moduleLabels[currentModule], href: `${pathname}?module=${currentModule}` })
+  if (currentModule && currentModuleLabels[currentModule]) {
+    crumbs.push({ label: currentModuleLabels[currentModule], href: `${pathname}?module=${currentModule}` })
   }
 
   const replacement = searchParams.get('replacement')
