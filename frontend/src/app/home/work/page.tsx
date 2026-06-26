@@ -38,6 +38,26 @@ const workAreaCopy: Record<string, { title: string; description: string }> = {
   },
 };
 
+const criticalBadges = new Set(['Brak cesji', 'Brak pełnomocnictwa', 'Brak kosztorysu', 'Brak dokumentów']);
+const actionBadges = new Set(['Dopłata VAT', 'Nierozliczone', 'Oczekuje na decyzję', 'Oczekuje na części', 'Kosztorys wysłany']);
+const positiveBadges = new Set(['Kosztorys zaakceptowany', 'Gotowe do wydania', 'Rozliczone']);
+
+function getWorkBadgeClass(badge: string) {
+  if (criticalBadges.has(badge)) {
+    return 'bg-red-50 text-red-700 ring-red-600/20';
+  }
+
+  if (actionBadges.has(badge)) {
+    return 'bg-orange-50 text-orange-700 ring-orange-600/20';
+  }
+
+  if (positiveBadges.has(badge)) {
+    return 'bg-green-50 text-green-700 ring-green-600/20';
+  }
+
+  return 'bg-gray-50 text-gray-700 ring-gray-500/10';
+}
+
 export default async function Page(
   { searchParams }: { searchParams: Promise<Record<string, string>> }) {
 
@@ -113,6 +133,7 @@ export default async function Page(
         id,
         workNr,
         status,
+        damageStatus,
         hasActiveReplacementVehicle,
         replacementVehicleName,
         replacementVehicleStatus,
@@ -122,10 +143,12 @@ export default async function Page(
         clientPaysVat,
         settlementStatus,
         audatexEstimateNumber,
-        estimateStatus
+        estimateStatus,
+        documentCount
       }: {
         id: string,
         status: string,
+        damageStatus?: string,
         workNr: string,
         hasActiveReplacementVehicle: boolean,
         replacementVehicleName?: string,
@@ -136,16 +159,21 @@ export default async function Page(
         clientPaysVat: boolean,
         settlementStatus?: string,
         audatexEstimateNumber?: string,
-        estimateStatus?: string
+        estimateStatus?: string,
+        documentCount?: number
       }) => {
         const badges = [
           !audatexEstimateNumber ? 'Brak kosztorysu' : '',
+          documentCount === 0 ? 'Brak dokumentów' : '',
           estimateStatus === 'sent' ? 'Kosztorys wysłany' : '',
-          estimateStatus === 'sent' ? 'Oczekuje na akceptację' : '',
+          estimateStatus === 'sent' ? 'Oczekuje na decyzję' : '',
           estimateStatus === 'accepted' ? 'Kosztorys zaakceptowany' : '',
+          damageStatus === 'parts_pending' ? 'Oczekuje na części' : '',
+          damageStatus === 'ready_for_pickup' ? 'Gotowe do wydania' : '',
           !assignmentOfClaimSigned ? 'Brak cesji' : '',
           !powerOfAttorneySigned ? 'Brak pełnomocnictwa' : '',
           clientPaysVat ? 'Dopłata VAT' : '',
+          (settlementStatus || 'unsettled') === 'settled' ? 'Rozliczone' : '',
           (settlementStatus || 'unsettled') !== 'settled' ? 'Nierozliczone' : '',
         ].filter(Boolean);
         const replacementVehicleLabel = replacementVehicleStatus === 'issued'
@@ -167,7 +195,7 @@ export default async function Page(
               </h5>
               {badges.length > 0 && <div className="mt-1 flex flex-wrap gap-1">
                 {badges.map(badge => (
-                  <span key={badge} className="inline-flex rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
+                  <span key={badge} className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ring-inset ${getWorkBadgeClass(badge)}`}>
                     {badge}
                   </span>
                 ))}
