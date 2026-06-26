@@ -65,6 +65,7 @@ export default function Nav({
     const currentQuery = useSearchParams().toString();
     const visibleNavigation = navigation.filter((item) => canAccessMainSection(appRole, item.section));
     const canOpenSettings = canAccessMainSection(appRole, 'settings');
+    const isSettingsActive = isActiveNavigationItem('/home/settings', currentPath, currentQuery);
 
     return (
         <>
@@ -113,9 +114,13 @@ export default function Nav({
                     {!onSmallScreen && <li className="mt-auto flex flex-col mb-5">
                         {canOpenSettings && <a
                             href="/home/settings"
-                            className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold hover:text-white"
+                            className={clsx(
+                                isSettingsActive ? 'text-white' : 'hover:text-white',
+                                'group -mx-2 flex gap-x-3 rounded-md p-2 text-sm/6 font-semibold',
+                            )}
                             style={{
-                                color: 'var(--portal-sidebar-text, #9ca3af)',
+                                backgroundColor: isSettingsActive ? 'var(--portal-sidebar-active-bg, #1f2937)' : 'transparent',
+                                color: isSettingsActive ? 'var(--portal-sidebar-active-text, #ffffff)' : 'var(--portal-sidebar-text, #9ca3af)',
                             }}
                         >
                             <Cog6ToothIcon aria-hidden="true" className="size-6 shrink-0" />
