@@ -8,26 +8,26 @@ export default function SearchParams({
     options: any // eslint-disable-line @typescript-eslint/no-explicit-any
 }){
     return (
-        <div className="grid sm:grid-flow-col gap-2">
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-4">
         
             {options.issued === 'on' && <>
-                <div className="col-span-1  ">
+                <div className="min-w-0">
                         <FormInput name="invoiceFrom" label="Faktury od" defaultValue={options.invoiceFrom} type="date" ></FormInput>
                       </div>
 
-                      <div className="col-span-1 ">
+                      <div className="min-w-0">
                         <FormInput name="invoiceTo" label="Faktury do" defaultValue={options.invoiceTo} type="date" ></FormInput>
                       </div>
                   </>  }
-                  <div className="col-span-1  ">
+                  <div className="min-w-0">
                     <FormInput name="workFrom" label="Zlecenia od" defaultValue={options.workFrom} type="date" ></FormInput>
                   </div>
 
-                  <div className="col-span-1  ">
+                  <div className="min-w-0">
                     <FormInput name="workTo" label="Zlecenia do" defaultValue={options.workTo} type="date" ></FormInput>
                   </div>
 
-                  <div className="col-span-1  ">
+                  <div className="min-w-0">
                     <FormLabel name='clientiId' label='Klient'></FormLabel>
                     <ClientsCombobox
                       name='clientiId'
@@ -37,7 +37,7 @@ export default function SearchParams({
                       }}>
                     </ClientsCombobox>
                   </div>
-                  <div className="col-span-1 ">
+                  <div className="min-w-0">
                     <FormLabel name='vehicleId' label='Pojazd'></FormLabel>
                     <VehiclesCombobox name='vehicleId'
                       defaultValue={{

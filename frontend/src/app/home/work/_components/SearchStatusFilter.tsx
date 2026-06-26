@@ -15,8 +15,8 @@ export default function SearchStatusFilter({
   }
 
   return (
-    <div className=" flex gap-x-2 mb-2">
-      <div className="flex  items-center gap-x-2 ">
+    <div className="mb-2 flex flex-wrap items-center gap-x-4 gap-y-2">
+      <div className="flex min-w-fit items-center gap-x-2 whitespace-nowrap">
         <input type="hidden" id="issued" name="issued" value={(issued ? "on" : "off")}></input>
         <FormSwitch
           defaultChecked={issued}
@@ -32,16 +32,16 @@ export default function SearchStatusFilter({
         </FormSwitch>
         <label className="block text-sm/6 font-medium text-gray-900">{(issued ? 'Zakończone' : 'Niezakończone')}</label>
       </div>
-      <div className="flex   items-center  gap-x-2 ">
+      <div className="flex min-w-fit items-center gap-x-2 whitespace-nowrap">
         <FormRadio id="all" label="Wszystkie" name="status" onChange={submitFormOnChange} defaultChecked={(!status || status === 'all')} value="all" ></FormRadio>
       </div>
-      {!issued && <div className="flex  items-center  gap-x-2 ">
+      {!issued && <div className="flex min-w-fit items-center gap-x-2 whitespace-nowrap">
         <FormRadio id="inprogress" label="W toku" name="status" onChange={submitFormOnChange} defaultChecked={(status === 'inprogress')} value="inprogress" ></FormRadio>
       </div>}
-      {!issued && <div className="flex   items-center  gap-x-2 ">
+      {!issued && <div className="flex min-w-fit items-center gap-x-2 whitespace-nowrap">
         <FormRadio id="closed" label="Zamknięte" name="status" onChange={submitFormOnChange} defaultChecked={(status === 'closed')} value="closed" ></FormRadio>
       </div>}
-      {issued && <div className="flex   items-center  gap-x-2 ">
+      {issued && <div className="flex min-w-fit items-center gap-x-2 whitespace-nowrap">
         <FormRadio id="overdue" label="Faktura przeterminowana" name="status" onChange={submitFormOnChange} defaultChecked={(status === 'overdue')} value="overdue" ></FormRadio>
       </div>}
     </div>
