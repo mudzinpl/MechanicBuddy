@@ -20,7 +20,7 @@ export function Hero() {
         dla serwisów samochodowych.
       </h1>
       <p className="mx-auto mt-6 max-w-2xl text-lg tracking-tight text-slate-700">
-        MechanicBuddy to kompleksowe rozwiązanie dla serwisów samochodowych. Zarządzaj zleceniami, klientami, pojazdami i magazynem, wystawiaj profesjonalne faktury oraz usprawniaj pracę całego warsztatu.
+        APPRA to kompleksowe rozwiązanie dla serwisów samochodowych. Zarządzaj zleceniami, klientami, pojazdami i magazynem, wystawiaj profesjonalne faktury oraz usprawniaj pracę całego warsztatu.
       </p>
       <div className="mt-10 flex justify-center gap-x-6">
         <Button href="/auth/login" color="blue">
