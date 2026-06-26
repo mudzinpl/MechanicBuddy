@@ -62,6 +62,12 @@ const toneColorMap: Record<DashboardTone, string> = {
   red: 'bg-red-500',
 };
 
+const interactiveTileClass = 'transition hover:-translate-y-0.5 hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600';
+const workHref = '/home/work';
+const settlementsHref = '/home/work?module=settlements';
+const tasksHref = '/home/work?module=tasks';
+const replacementVehiclesHref = '/home/vehicles?replacement=true';
+
 const quickActionDefinitions = [
   { label: 'Nowa szkoda', description: 'Utwórz nowe zlecenie szkody.', href: '/home/work/new', icon: PlusCircleIcon, tone: 'blue' },
   { label: 'Przyjęcie pojazdu', description: 'Przejdź do utworzenia zlecenia i danych przyjęcia pojazdu.', href: '/home/work/new', icon: TruckIcon, tone: 'green' },
@@ -74,14 +80,14 @@ const quickActionDefinitions = [
 ] as const;
 
 const kpiDefinitions = [
-  { key: 'active_work', label: 'Aktywne zlecenia', href: '/home/work?status=inprogress', icon: WrenchScrewdriverIcon, tone: 'blue' },
+  { key: 'active_work', label: 'Aktywne zlecenia', href: workHref, icon: WrenchScrewdriverIcon, tone: 'blue' },
   { key: 'ready_for_pickup', label: 'Gotowe do wydania', href: '/home/work?damageStatus=ready_for_pickup', icon: CheckCircleIcon, tone: 'green' },
   { key: 'parts_waiting', label: 'Czekają na części', href: '/home/work?damageStatus=parts_pending', icon: CubeIcon, tone: 'yellow' },
-  { key: 'overdue', label: 'Po terminie', href: '/home/calendar', icon: ExclamationTriangleIcon, tone: 'red' },
-  { key: 'missing_estimate', label: 'Bez kosztorysu', href: '/home/work', icon: ClipboardDocumentListIcon, tone: 'red' },
-  { key: 'unsettled', label: 'Nierozliczone', href: '/home/work', icon: BanknotesIcon, tone: 'yellow' },
-  { key: 'active_replacement_vehicles', label: 'Aktywne pojazdy zastępcze', href: '/home/work', icon: TruckIcon, tone: 'blue' },
-  { key: 'task_overdue', label: 'Zadania po terminie', href: '/home/calendar', icon: ClockIcon, tone: 'red' },
+  { key: 'overdue', label: 'Po terminie', href: workHref, icon: ExclamationTriangleIcon, tone: 'red' },
+  { key: 'missing_estimate', label: 'Bez kosztorysu', href: workHref, icon: ClipboardDocumentListIcon, tone: 'red' },
+  { key: 'unsettled', label: 'Nierozliczone', href: settlementsHref, icon: BanknotesIcon, tone: 'yellow' },
+  { key: 'active_replacement_vehicles', label: 'Aktywne pojazdy zastępcze', href: replacementVehiclesHref, icon: TruckIcon, tone: 'blue' },
+  { key: 'task_overdue', label: 'Zadania po terminie', href: tasksHref, icon: ClockIcon, tone: 'red' },
 ] as const;
 
 const attentionDefinitions = [
@@ -106,31 +112,31 @@ const todayDefinitions = [
 ] as const;
 
 const processDefinitions = [
-  { key: 'new', label: 'Nowa szkoda', tone: 'blue' },
-  { key: 'inspection_pending', label: 'Oczekuje na oględziny', tone: 'yellow' },
-  { key: 'estimate_done', label: 'Kosztorys wykonany', tone: 'blue' },
-  { key: 'approval_pending', label: 'Oczekuje na decyzję', tone: 'yellow' },
-  { key: 'parts_ordered', label: 'Części zamówione', tone: 'yellow' },
-  { key: 'repair', label: 'Naprawa w toku', tone: 'blue' },
-  { key: 'paint_shop', label: 'Lakiernia', tone: 'blue' },
-  { key: 'quality_control', label: 'Kontrola jakości', tone: 'yellow' },
-  { key: 'ready_for_pickup', label: 'Gotowe do wydania', tone: 'green' },
-  { key: 'released', label: 'Wydane', tone: 'green' },
-] as const satisfies readonly { key: string; label: string; tone: DashboardTone }[];
+  { key: 'new', label: 'Nowa szkoda', tone: 'blue', href: '/home/work?damageStatus=new' },
+  { key: 'inspection_pending', label: 'Oczekuje na oględziny', tone: 'yellow', href: '/home/work?damageStatus=inspection_pending' },
+  { key: 'estimate_done', label: 'Kosztorys wykonany', tone: 'blue', href: workHref },
+  { key: 'approval_pending', label: 'Oczekuje na decyzję', tone: 'yellow', href: '/home/work?damageStatus=approval_pending' },
+  { key: 'parts_ordered', label: 'Części zamówione', tone: 'yellow', href: '/home/work?damageStatus=parts_pending' },
+  { key: 'repair', label: 'Naprawa w toku', tone: 'blue', href: '/home/work?damageStatus=repair' },
+  { key: 'paint_shop', label: 'Lakiernia', tone: 'blue', href: '/home/work?damageStatus=paint_shop' },
+  { key: 'quality_control', label: 'Kontrola jakości', tone: 'yellow', href: '/home/work?damageStatus=quality_control' },
+  { key: 'ready_for_pickup', label: 'Gotowe do wydania', tone: 'green', href: '/home/work?damageStatus=ready_for_pickup' },
+  { key: 'released', label: 'Wydane', tone: 'green', href: '/home/work?damageStatus=released' },
+] as const satisfies readonly { key: string; label: string; tone: DashboardTone; href: string }[];
 
 const replacementDefinitions = [
-  { key: 'active', label: 'Aktywne', tone: 'blue' },
-  { key: 'due_today', label: 'Do zwrotu dzisiaj', tone: 'yellow' },
-  { key: 'overdue', label: 'Po terminie', tone: 'red' },
-  { key: 'without_return_date', label: 'Bez daty zwrotu', tone: 'yellow' },
+  { key: 'active', label: 'Aktywne', tone: 'blue', href: replacementVehiclesHref },
+  { key: 'due_today', label: 'Do zwrotu dzisiaj', tone: 'yellow', href: replacementVehiclesHref },
+  { key: 'overdue', label: 'Po terminie', tone: 'red', href: replacementVehiclesHref },
+  { key: 'without_return_date', label: 'Bez daty zwrotu', tone: 'yellow', href: replacementVehiclesHref },
 ] as const;
 
 const financeDefinitions = [
-  { key: 'underpayment_total', label: 'Suma niedopłat', tone: 'red', amount: true },
-  { key: 'overdue_payments', label: 'Zaległe płatności', tone: 'red' },
-  { key: 'not_issued_invoices', label: 'Faktury niewystawione', tone: 'yellow' },
-  { key: 'disputed_cases', label: 'Sprawy sporne', tone: 'red' },
-  { key: 'vat_payments', label: 'Dopłaty VAT', tone: 'blue' },
+  { key: 'underpayment_total', label: 'Suma niedopłat', tone: 'red', amount: true, href: settlementsHref },
+  { key: 'overdue_payments', label: 'Zaległe płatności', tone: 'red', href: settlementsHref },
+  { key: 'not_issued_invoices', label: 'Faktury niewystawione', tone: 'yellow', href: settlementsHref },
+  { key: 'disputed_cases', label: 'Sprawy sporne', tone: 'red', href: settlementsHref },
+  { key: 'vat_payments', label: 'Dopłaty VAT', tone: 'blue', href: settlementsHref },
 ] as const;
 
 function countMap(items: CommandCenterTile[]) {
@@ -186,7 +192,7 @@ function KpiCard({ definition, tile }: { definition: typeof kpiDefinitions[numbe
   const count = tile?.count || 0;
 
   return (
-    <Link href={definition.href} className="rounded-lg bg-white p-4 shadow-sm ring-1 ring-gray-900/5 hover:shadow-md">
+    <Link href={definition.href} className={`rounded-lg bg-white p-4 shadow-sm ring-1 ring-gray-900/5 ${interactiveTileClass}`}>
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="text-sm font-medium text-gray-500">{definition.label}</p>
@@ -204,7 +210,7 @@ function WorkLink({ item }: { item: CommandCenterWorkItem }) {
   const description = [item.clientName, item.regNr].filter(Boolean).join(' · ');
 
   return (
-    <Link href={`/home/work/${item.id}`} className="flex items-center justify-between gap-4 rounded-md px-3 py-2 hover:bg-gray-50">
+    <Link href={`/home/work/${item.id}`} className="flex items-center justify-between gap-4 rounded-md px-3 py-2 transition hover:bg-gray-50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
       <div className="min-w-0">
         <p className="text-sm font-semibold text-gray-900">Zlecenie nr {item.workNr}</p>
         <p className="truncate text-xs text-gray-500">{description || 'Brak danych klienta i pojazdu'}</p>
@@ -327,8 +333,7 @@ export default async function Page() {
             </div>
             <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-5">
               {processDefinitions.map(item => (
-                <Link key={item.key} href={item.key === 'estimate_done' ? '/home/work' : `/home/work?damageStatus=${item.key === 'parts_ordered' ? 'parts_pending' : item.key}`}
-                  className="rounded-md border border-gray-100 px-3 py-2 hover:bg-gray-50">
+                <Link key={item.key} href={item.href} className={`rounded-md border border-gray-100 px-3 py-2 ${interactiveTileClass}`}>
                   <p className="text-sm font-medium text-gray-700">{item.label}</p>
                   <p className="mt-1 text-2xl font-bold text-gray-900">{process.get(item.key)?.count || 0}</p>
                 </Link>
@@ -342,7 +347,7 @@ export default async function Page() {
             <SectionHeader icon={TruckIcon} title="Pojazdy zastępcze" description="Aktywne najmy i ryzyka zwrotu." />
             <div className="grid grid-cols-1 gap-3 p-4 sm:grid-cols-2">
               {replacementDefinitions.map(item => (
-                <Link key={item.key} href="/home/work" className={`rounded-md border px-4 py-3 ${toneClasses[item.tone]}`}>
+                <Link key={item.key} href={item.href} className={`rounded-md border px-4 py-3 ${toneClasses[item.tone]} ${interactiveTileClass}`}>
                   <p className="text-sm font-medium">{item.label}</p>
                   <p className="mt-1 text-3xl font-bold text-gray-900">{replacements.get(item.key)?.count || 0}</p>
                 </Link>
@@ -357,7 +362,7 @@ export default async function Page() {
                 const tile = finance.get(item.key);
                 const isAmount = 'amount' in item && item.amount;
                 return (
-                  <Link key={item.key} href="/home/work" className={`rounded-md border px-4 py-3 ${toneClasses[item.tone]}`}>
+                  <Link key={item.key} href={item.href} className={`rounded-md border px-4 py-3 ${toneClasses[item.tone]} ${interactiveTileClass}`}>
                     <p className="text-sm font-medium">{item.label}</p>
                     <p className="mt-1 text-2xl font-bold text-gray-900">{isAmount ? formatMoney(tile?.amount) : (tile?.count || 0)}</p>
                     {isAmount && <p className="mt-1 text-xs text-gray-500">Spraw: {tile?.count || 0}</p>}
