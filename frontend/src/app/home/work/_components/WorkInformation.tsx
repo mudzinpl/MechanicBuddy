@@ -2,7 +2,7 @@
 
 'use client'
 import { damageStatuses, getDamageStatusLabel, getEstimateStatusLabel, getEstimateSystemLabel, getSettlementStatusLabel, IWorkData, statusNames } from '../model';
-import { BanknotesIcon, ClipboardDocumentListIcon, ClockIcon, DocumentTextIcon, ShieldCheckIcon, TruckIcon, UserCircleIcon, WrenchScrewdriverIcon } from '@heroicons/react/20/solid';
+import { BanknotesIcon, ClipboardDocumentListIcon, ClockIcon, DocumentTextIcon, ExclamationTriangleIcon, ShieldCheckIcon, TruckIcon, UserCircleIcon, WrenchScrewdriverIcon } from '@heroicons/react/20/solid';
 import moment from 'moment';
 import React from 'react';
 import { startAnActivity } from '../actions/startAnActivity';
@@ -24,6 +24,46 @@ import { Field, Label } from '@headlessui/react';
 import { changeDamageStatus, changeWorkStatus } from '../actions/changeWorkStatus';
 import FormTextArea from '@/_components/FormTextArea';
 
+type DetailRow = [string, React.ReactNode];
+
+function DetailRows({ rows }: { rows: DetailRow[] }) {
+    return (
+        <dl className="space-y-1 text-sm/6">
+            {rows.map(([label, value]) => (
+                <div key={label} className="grid grid-cols-5 gap-2">
+                    <dt className="col-span-2 font-medium text-gray-700">{label}</dt>
+                    <dd className="col-span-3 text-gray-500">{value}</dd>
+                </div>
+            ))}
+        </dl>
+    );
+}
+
+function DetailSection({
+    title,
+    icon: Icon,
+    defaultOpen = true,
+    children,
+}: {
+    title: string,
+    icon: React.ComponentType<React.SVGProps<SVGSVGElement>>,
+    defaultOpen?: boolean,
+    children: React.ReactNode
+}) {
+    return (
+        <details open={defaultOpen} className="group border-t border-gray-900/5 px-6 py-4">
+            <summary className="flex cursor-pointer list-none items-center gap-x-3 text-sm font-semibold text-gray-900">
+                <Icon aria-hidden="true" className="h-5 w-5 text-gray-400" />
+                <span>{title}</span>
+                <span className="ml-auto text-xs font-medium text-gray-400 group-open:hidden">Pokaż</span>
+                <span className="ml-auto text-xs font-medium text-gray-400 hidden group-open:inline">Ukryj</span>
+            </summary>
+            <div className="mt-3 text-sm/6 text-gray-500">
+                {children}
+            </div>
+        </details>
+    );
+}
 
 export function WorkInformation({
     work,
@@ -32,6 +72,8 @@ export function WorkInformation({
     work: IWorkData,
     hasRepairJobWithProductsOrServices: boolean
 }) {
+
+
 
     const editPath = '/home/work/edit/' + work.id;
  
@@ -93,7 +135,7 @@ export function WorkInformation({
         ['Planowane przyjęcie', formatDate(work.plannedIntakeOn)],
         ['Planowane wydanie', formatDate(work.plannedReleaseOn)],
         ['Data oględzin', formatDate(work.plannedInspectionOn)],
-    ].filter(([, value]) => value);
+    ].filter(([, value]) => value) as DetailRow[];
     const estimateDetails = [
         ['Numer kosztorysu', work.audatexEstimateNumber],
         ['System', getEstimateSystemLabel(work.estimateSystem)],
@@ -107,7 +149,7 @@ export function WorkInformation({
         ['Status kosztorysu', getEstimateStatusLabel(work.estimateStatus)],
         ['Data wysłania do ubezpieczyciela', formatDate(work.estimateSentOn)],
         ['Data akceptacji', formatDate(work.estimateAcceptedOn)],
-    ].filter(([, value]) => value);
+    ].filter(([, value]) => value) as DetailRow[];
     const settlementDetails = [
         ['Cesja podpisana', work.assignmentOfClaimSigned ? 'Tak' : 'Nie'],
         ['Data podpisania cesji', formatDate(work.assignmentOfClaimSignedOn)],
@@ -120,13 +162,31 @@ export function WorkInformation({
         ['Status rozliczenia', getSettlementStatusLabel(work.settlementStatus)],
         ['Data wezwania do dopłaty', formatDate(work.paymentDemandOn)],
         ['Data zapłaty', formatDate(work.paymentReceivedOn)],
-    ].filter(([, value]) => value);
+    ].filter(([, value]) => value) as DetailRow[];
     const replacementVehicle = work.replacementVehicle;
     const replacementVehicleDetails = replacementVehicle ? [
         ['Status', replacementVehicleStatusLabels[replacementVehicle.status] ?? replacementVehicle.status],
         ['Data wydania', formatDateTime(replacementVehicle.issuedOn)],
         ['Planowana data zwrotu', formatDateTime(replacementVehicle.plannedReturnOn)],
-    ].filter(([, value]) => value) : [];
+    ].filter(([, value]) => value) as DetailRow[] : [];
+    const missingItems = [
+        !work.assignmentOfClaimSigned ? 'Brak cesji' : '',
+        !work.powerOfAttorneySigned ? 'Brak pełnomocnictwa' : '',
+        !work.audatexEstimateNumber ? 'Brak kosztorysu' : '',
+        !work.insurerDecisionOn ? 'Brak decyzji ubezpieczyciela' : '',
+        !work.settlementStatus ? 'Brak statusu rozliczenia' : '',
+    ].filter(Boolean);
+    const summaryRows = [
+        ['Numer', work.number],
+        ['Utworzono', formatDateTime(work.startedOn?.toString())],
+        ['Status zlecenia', <WorkStatusBadge key="status" status={work.status}></WorkStatusBadge>],
+        ['Status procesu', getDamageStatusLabel(work.damageStatus)],
+        ['Mechanicy', work.mechanics?.length > 0 ? work.mechanics.map((item) => item.name).join(', ') : 'Nie przypisano'],
+    ].filter(([, value]) => value) as DetailRow[];
+    const clientVehicleRows = [
+        ['Klient', clientSummary || 'Brak danych klienta'],
+        ['Pojazd', vehicleSummary || 'Brak danych pojazdu'],
+    ] as DetailRow[];
 
     const deleteInvoiceRef = React.useRef<BaseDialogHandle>(null);
     const createInvoiceRef = React.useRef<BaseDialogHandle>(null);
@@ -247,188 +307,34 @@ export function WorkInformation({
             <ConfirmDialog ref={deleteWorkRef} onConfirm={async ()=>{
                 await deleteWork(work.id) ;
             }} ></ConfirmDialog>
-            <div className="lg:col-start-3 lg:row-end-1">
-                <h2 className="sr-only">Podsumowanie</h2>
-                <dl className="flex flex-wrap">
-                    <div className="flex-auto xl:pt-6 xl:pl-6">
-                        <dt className="text-base font-semibold text-gray-900 mr-2">Zlecenie nr {work.number}{' '}
-                            <WorkStatusBadge   status={work.status}></WorkStatusBadge> 
-                        </dt>
-                        <dd className="text-sm/6 text-gray-500">
-                            <time dateTime="2023-01-31">{moment(work.startedOn).locale('pl').format('DD.MM.YYYY HH:mm')}</time>
-                        </dd>
+            <div className="lg:col-start-3 lg:row-end-1 overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-gray-900/5">
+                <div className="flex items-start justify-between gap-3 px-6 py-5">
+                    <div>
+                        <h2 className="text-base font-semibold text-gray-900">Zlecenie nr {work.number}</h2>
+                        <p className="mt-1 text-sm text-gray-500">
+                            {formatDateTime(work.startedOn?.toString())}
+                        </p>
                     </div>
-                     
-                    <div className="flex-none  col-span-2 self-end px-2 xl:px-6 pt-4">
-                        <dt className="sr-only"></dt>
-                        <dd className="inline-flex  ">
-                            <HamburgerMenu options={workMenuOptions}></HamburgerMenu>
-                        </dd>
-                    </div>
-                    <div className="mt-6 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-6"></div>
-                    {clientSummary &&
-                        <div className="mt-4 flex w-full flex-none gap-x-4 xl:px-6">
-                            <dt className="flex-none">
-                                <span className="sr-only">Klient</span>
-                                <UserCircleIcon aria-hidden="true" className="h-6  w-5 text-gray-400" />
-                            </dt>
-                            <dd className="text-sm/6 font-medium text-gray-900">
-                                <span>{clientSummary}</span>
-                            </dd> </div>
-                    }
+                    <HamburgerMenu options={workMenuOptions}></HamburgerMenu>
+                </div>
 
-                    {vehicleSummary && <div className="mt-4 flex w-full flex-none gap-x-4 xl:px-6">
-                        <dt className="flex-none">
-                            <TruckIcon aria-hidden="true" className="h-6 w-5 text-gray-400" />
-                        </dt>
-                        <dd className="text-sm/6 text-gray-500">
-                            <time dateTime="2023-01-31">{vehicleSummary}</time>
-                        </dd>
-                    </div>}
-                    {replacementVehicle && <div className="mt-4 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-4">
-                        <dt className="flex-none">
-                            <span className="sr-only">Pojazd zastępczy</span>
-                            <TruckIcon aria-hidden="true" className="h-6 w-5 text-sky-500" />
-                        </dt>
-                        <dd className="text-sm/6 text-gray-500">
-                            <p className="font-semibold text-gray-900">Pojazd zastępczy</p>
-                            {replacementVehicle.replacementVehicleName && <p className="font-medium text-gray-700">{replacementVehicle.replacementVehicleName}</p>}
-                            {replacementVehicleDetails.map(([label, value]) => (
-                                <p key={label}>
-                                    <span className="font-medium text-gray-700">{label}:</span> {value}
-                                </p>
-                            ))}
-                        </dd>
-                    </div>}
-                    {work.mechanics?.length > 0 &&
-                        <div className="mt-4 flex w-full flex-none gap-x-4 xl:px-6">
-                            <dt className="flex-none">
-                                <span className="sr-only">Status</span>
-                                <WrenchScrewdriverIcon aria-hidden="true" className="h-6 w-5 text-gray-400" />
-                            </dt>
-                            <dd className="text-sm/6 text-gray-500">{work.mechanics.map((item) => item.name).join(', ')}</dd>
+                {missingItems.length > 0 && <div className="border-t border-red-100 bg-red-50 px-6 py-4">
+                    <div className="flex items-start gap-x-3">
+                        <ExclamationTriangleIcon aria-hidden="true" className="mt-0.5 h-5 w-5 flex-none text-red-500" />
+                        <div>
+                            <p className="text-sm font-semibold text-red-900">Wymaga uzupełnienia</p>
+                            <ul className="mt-2 list-disc space-y-1 pl-5 text-sm text-red-800">
+                                {missingItems.map(item => <li key={item}>{item}</li>)}
+                            </ul>
                         </div>
-                    }
-                    {work.notes && <div className="mt-4 flex w-full flex-none gap-x-4 xl:px-6">
-                        <dt className="flex-none">
-                            <span className="sr-only">Notatki</span>
-                            <DocumentTextIcon aria-hidden="true" className="h-6 w-5 text-gray-400" />
-                        </dt>
-                        <dd className="text-sm/6 text-gray-500 whitespace-pre-line">{work.notes}</dd>
-                    </div>}
-                    {hasClaimDetails && <div className="mt-4 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-4">
-                        <dt className="flex-none">
-                            <span className="sr-only">Ubezpieczyciel i szkoda</span>
-                            <ShieldCheckIcon aria-hidden="true" className="h-6 w-5 text-gray-400" />
-                        </dt>
-                        <dd className="text-sm/6 text-gray-500">
-                            <p className="font-semibold text-gray-900">Ubezpieczyciel i szkoda</p>
-                            {claimDetails.map(([label, value]) => (
-                                <p key={label}>
-                                    <span className="font-medium text-gray-700">{label}:</span> {value}
-                                </p>
-                            ))}
-                            {work.insurerNotes && <p className="mt-2 whitespace-pre-line">
-                                <span className="font-medium text-gray-700">Uwagi do ubezpieczyciela:</span>{' '}
-                                {work.insurerNotes}
-                            </p>}
-                            {!work.issuance && <div className="mt-3 max-w-xs">
-                                <label htmlFor="damage-status-change" className="block text-sm font-medium text-gray-700">
-                                    Zmień status procesu
-                                </label>
-                                <select
-                                    id="damage-status-change"
-                                    value={work.damageStatus || 'new'}
-                                    onChange={(event) => openDamageStatusDialog(event.target.value)}
-                                    className="mt-1 block w-full rounded-md border-0 bg-white py-2 pr-8 pl-3 text-sm text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset focus:ring-2 focus:ring-indigo-600"
-                                >
-                                    {damageStatuses.map(status => (
-                                        <option key={status.value} value={status.value}>{status.label}</option>
-                                    ))}
-                                </select>
-                            </div>}
-                        </dd>
-                    </div>}
-                    {hasEstimateDetails && <div className="mt-4 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-4">
-                        <dt className="flex-none">
-                            <span className="sr-only">Kosztorysy</span>
-                            <ClipboardDocumentListIcon aria-hidden="true" className="h-6 w-5 text-gray-400" />
-                        </dt>
-                        <dd className="text-sm/6 text-gray-500">
-                            <p className="font-semibold text-gray-900">Kosztorysy</p>
-                            {estimateDetails.map(([label, value]) => (
-                                <p key={label}>
-                                    <span className="font-medium text-gray-700">{label}:</span> {value}
-                                </p>
-                            ))}
-                            {work.estimateNotes && <p className="mt-2 whitespace-pre-line">
-                                <span className="font-medium text-gray-700">Uwagi:</span>{' '}
-                                {work.estimateNotes}
-                            </p>}
-                        </dd>
-                    </div>}
-                    <div className="mt-4 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-4">
-                        <dt className="flex-none">
-                            <span className="sr-only">Cesja i rozliczenia</span>
-                            <BanknotesIcon aria-hidden="true" className="h-6 w-5 text-gray-400" />
-                        </dt>
-                        <dd className="text-sm/6 text-gray-500">
-                            <p className="font-semibold text-gray-900">Cesja i rozliczenia</p>
-                            {settlementDetails.map(([label, value]) => (
-                                <p key={label}>
-                                    <span className="font-medium text-gray-700">{label}:</span> {value}
-                                </p>
-                            ))}
-                            {work.settlementNotes && <p className="mt-2 whitespace-pre-line">
-                                <span className="font-medium text-gray-700">Uwagi do rozliczenia:</span>{' '}
-                                {work.settlementNotes}
-                            </p>}
-                        </dd>
                     </div>
-                    <div className="mt-4 flex w-full flex-none gap-x-4 border-t border-gray-900/5 px-6 pt-4">
-                        <dt className="flex-none">
-                            <span className="sr-only">Historia statusów</span>
-                            <ClockIcon aria-hidden="true" className="h-6 w-5 text-gray-400" />
-                        </dt>
-                        <dd className="w-full text-sm/6 text-gray-500">
-                            <p className="font-semibold text-gray-900">Historia statusów</p>
-                            {(work.statusHistory?.length ?? 0) > 0 ? (
-                                <div className="mt-2 space-y-3">
-                                    {work.statusHistory?.map((item) => (
-                                        <div key={item.id} className="border-l-2 border-gray-200 pl-3">
-                                            <p className="font-medium text-gray-900">
-                                                {moment(item.changedOn).locale('pl').format('DD.MM.YYYY HH:mm')}
-                                            </p>
-                                            <p>
-                                                <span className="font-medium text-gray-700">Pracownik:</span>{' '}
-                                                {item.changedByName || 'Nieznany'}
-                                            </p>
-                                            <p>
-                                                <span className="font-medium text-gray-700">Status:</span>{' '}
-                                                {getStatusName(item.oldStatus)} → {getStatusName(item.newStatus)}
-                                            </p>
-                                            {item.comment && <p className="whitespace-pre-line">
-                                                <span className="font-medium text-gray-700">Komentarz:</span>{' '}
-                                                {item.comment}
-                                            </p>}
-                                        </div>
-                                    ))}
-                                </div>
-                            ) : (
-                                <p className="mt-2">Brak historii statusów</p>
-                            )}
-                        </dd>
-                    </div>
-                    <div className="mt-6 flex gap-x-2 xl:px-6   ">  
-                        {work.issuance && <>
-                            
-                        <PricingDownloadLink name='Faktura' id={work.id} hidePaperClip={false} number={work.issuance.invoiceNumber}></PricingDownloadLink>
-                        <IssuanceBadges issueance={work.issuance}   ></IssuanceBadges></> } 
-                    </div>
+                </div>}
 
-                    <div className="mt-6 flex w-full xl:px-6 ">
-                        <dt className=" flex-auto">
-                       {!work.issuance && work.status!=='closed'&&<Field className="flex mt-1 items-center"> 
+                <DetailSection title="Podsumowanie zlecenia" icon={ClipboardDocumentListIcon}>
+                    <DetailRows rows={summaryRows} />
+                    {work.notes && <p className="mt-3 whitespace-pre-line rounded-md bg-gray-50 px-3 py-2 text-gray-500">{work.notes}</p>}
+                    <div className="mt-4 flex w-full items-center justify-between gap-3">
+                        {!work.issuance && work.status !== 'closed' && <Field className="flex items-center"> 
                             <FormSwitch 
                                name='inprogress' 
                                defaultChecked={work.status === 'inprogress'} 
@@ -437,23 +343,113 @@ export function WorkInformation({
                                     await changeWorkStatus(work.id,status);
                                }}
                                >
-                               </FormSwitch>
+                            </FormSwitch>
                             <Label as="span" className="ml-3 text-sm"> 
                                 <span className="text-gray-500">W toku</span>
                             </Label>
-                            </Field> } 
-                        </dt>
-                        <dd>
-                            
+                        </Field>}
+                        <div className="ml-auto">
                             {work.issuance ?
                                 <ButtonGroup options={issuedButtonOptions}></ButtonGroup>:
                                 <ButtonGroup options={editButtonOptions}></ButtonGroup>
-                                }
-                        </dd>
+                            }
+                        </div>
                     </div>
+                </DetailSection>
 
-                </dl>
+                <DetailSection title="Klient i pojazd" icon={UserCircleIcon}>
+                    <DetailRows rows={clientVehicleRows} />
+                    {replacementVehicle && <div className="mt-4 rounded-md border border-sky-100 bg-sky-50 px-3 py-3">
+                        <p className="font-semibold text-sky-900">Pojazd zastępczy</p>
+                        {replacementVehicle.replacementVehicleName && <p className="font-medium text-sky-800">{replacementVehicle.replacementVehicleName}</p>}
+                        <div className="mt-2 text-sky-800">
+                            <DetailRows rows={replacementVehicleDetails} />
+                        </div>
+                    </div>}
+                </DetailSection>
 
+                <DetailSection title="Ubezpieczyciel i szkoda" icon={ShieldCheckIcon}>
+                    {hasClaimDetails ? <DetailRows rows={claimDetails} /> : <p>Brak danych szkody.</p>}
+                    {work.insurerNotes && <p className="mt-3 whitespace-pre-line rounded-md bg-gray-50 px-3 py-2">
+                        <span className="font-medium text-gray-700">Uwagi do ubezpieczyciela:</span>{' '}
+                        {work.insurerNotes}
+                    </p>}
+                    {!work.issuance && <div className="mt-4 max-w-xs">
+                        <label htmlFor="damage-status-change" className="block text-sm font-medium text-gray-700">
+                            Zmień status procesu
+                        </label>
+                        <select
+                            id="damage-status-change"
+                            value={work.damageStatus || 'new'}
+                            onChange={(event) => openDamageStatusDialog(event.target.value)}
+                            className="mt-1 block w-full rounded-md border-0 bg-white py-2 pr-8 pl-3 text-sm text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset focus:ring-2 focus:ring-indigo-600"
+                        >
+                            {damageStatuses.map(status => (
+                                <option key={status.value} value={status.value}>{status.label}</option>
+                            ))}
+                        </select>
+                    </div>}
+                </DetailSection>
+
+                <DetailSection title="Dokumenty / braki" icon={DocumentTextIcon} defaultOpen={missingItems.length > 0}>
+                    {missingItems.length > 0 ? (
+                        <ul className="list-disc space-y-1 pl-5">
+                            {missingItems.map(item => <li key={item}>{item}</li>)}
+                        </ul>
+                    ) : (
+                        <p>Nie wykryto podstawowych braków w danych zlecenia.</p>
+                    )}
+                </DetailSection>
+
+                <DetailSection title="Kosztorys" icon={ClipboardDocumentListIcon} defaultOpen={hasEstimateDetails || missingItems.includes('Brak kosztorysu')}>
+                    {hasEstimateDetails ? <DetailRows rows={estimateDetails} /> : <p>Brak kosztorysu.</p>}
+                    {work.estimateNotes && <p className="mt-3 whitespace-pre-line rounded-md bg-gray-50 px-3 py-2">
+                        <span className="font-medium text-gray-700">Uwagi:</span>{' '}
+                        {work.estimateNotes}
+                    </p>}
+                </DetailSection>
+
+                <DetailSection title="Rozliczenia" icon={BanknotesIcon}>
+                    <DetailRows rows={settlementDetails} />
+                    {work.settlementNotes && <p className="mt-3 whitespace-pre-line rounded-md bg-gray-50 px-3 py-2">
+                        <span className="font-medium text-gray-700">Uwagi do rozliczenia:</span>{' '}
+                        {work.settlementNotes}
+                    </p>}
+                    <div className="mt-4 flex gap-x-2">
+                        {work.issuance && <>
+                            <PricingDownloadLink name='Faktura' id={work.id} hidePaperClip={false} number={work.issuance.invoiceNumber}></PricingDownloadLink>
+                            <IssuanceBadges issueance={work.issuance}></IssuanceBadges>
+                        </>}
+                    </div>
+                </DetailSection>
+
+                <DetailSection title="Historia statusów" icon={ClockIcon} defaultOpen={false}>
+                    {(work.statusHistory?.length ?? 0) > 0 ? (
+                        <div className="space-y-3">
+                            {work.statusHistory?.map((item) => (
+                                <div key={item.id} className="border-l-2 border-gray-200 pl-3">
+                                    <p className="font-medium text-gray-900">
+                                        {moment(item.changedOn).locale('pl').format('DD.MM.YYYY HH:mm')}
+                                    </p>
+                                    <p>
+                                        <span className="font-medium text-gray-700">Pracownik:</span>{' '}
+                                        {item.changedByName || 'Nieznany'}
+                                    </p>
+                                    <p>
+                                        <span className="font-medium text-gray-700">Status:</span>{' '}
+                                        {getStatusName(item.oldStatus)} → {getStatusName(item.newStatus)}
+                                    </p>
+                                    {item.comment && <p className="whitespace-pre-line">
+                                        <span className="font-medium text-gray-700">Komentarz:</span>{' '}
+                                        {item.comment}
+                                    </p>}
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p>Brak historii statusów</p>
+                    )}
+                </DetailSection>
             </div>
         </>
 
