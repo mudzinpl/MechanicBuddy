@@ -7,15 +7,15 @@ config.autoAddCss = false
 
 import '@/_styles/tailwind.css'
 
-const siteName = 'MechanicBuddy'
-const siteDescription = 'Workshop management made simple. MechanicBuddy is the all-in-one solution for auto repair shops to track work orders, manage clients and vehicles, handle inventory, and generate professional invoices.'
+const siteName = 'APPRA'
+const siteDescription = 'APPRA to system zarządzania warsztatem, zleceniami, klientami, pojazdami, magazynem i rozliczeniami.'
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3025'
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
     template: `%s | ${siteName}`,
-    default: `${siteName} - Workshop Management for Auto Repair Shops`,
+    default: `${siteName} - zarządzanie warsztatem`,
   },
   description: siteDescription,
   keywords: [
@@ -27,7 +27,7 @@ export const metadata: Metadata = {
     'vehicle service',
     'invoicing software',
     'inventory management',
-    'MechanicBuddy',
+    'APPRA',
   ],
   authors: [{ name: siteName }],
   creator: siteName,
@@ -38,15 +38,15 @@ export const metadata: Metadata = {
   },
   openGraph: {
     type: 'website',
-    locale: 'en_US',
+    locale: 'pl_PL',
     url: siteUrl,
     siteName: siteName,
-    title: `${siteName} - Workshop Management Made Simple`,
+    title: `${siteName} - zarządzanie warsztatem`,
     description: siteDescription,
   },
   twitter: {
     card: 'summary_large_image',
-    title: `${siteName} - Workshop Management Made Simple`,
+    title: `${siteName} - zarządzanie warsztatem`,
     description: siteDescription,
   },
   icons: {
