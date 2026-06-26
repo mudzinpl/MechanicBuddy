@@ -129,8 +129,9 @@ namespace MechanicBuddy.Http.Api.Controllers
         }
 
         [HttpGet("page")]
-        public PagedResult<VehiclePageDto> GetPage(string searchText, string orderby, int limit, int offset, bool desc)
+        public PagedResult<VehiclePageDto> GetPage(string searchText, string orderby, int limit, int offset, bool desc, bool replacement = false)
         {
+            var replacementFilter = replacement ? " WHERE v.isreplacementvehicle = true" : string.Empty;
             return
                 repository
                   .PageQuery<VehiclePageDto>(orderby, limit, offset, desc)
@@ -144,7 +145,7 @@ namespace MechanicBuddy.Http.Api.Controllers
                         FROM domain.vehicle AS v
                                left join domain.vehicleregistration v0 on v.id = v0.vehicleid AND v0.datetimeto IS NULL
 	                           left join domain.legalclient l on l.id = v0.ownerid
-                               left join domain.privateclient p on p.id = v0.ownerid")
+                               left join domain.privateclient p on p.id = v0.ownerid" + replacementFilter)
                   .ToResult();
 
         }

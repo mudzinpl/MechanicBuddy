@@ -24,6 +24,7 @@ export default async function Search(
     columns = [],
     rowClass,
     idField = 'id',
+    emptyMessage = 'Nie znaleziono wyników',
     children,
   }: {
     searchParams: Promise<Record<string, string>>
@@ -32,6 +33,7 @@ export default async function Search(
     idField?: string | undefined,
     columns?: DataRowModel[],
     rowClass? (item:any):string // eslint-disable-line @typescript-eslint/no-explicit-any
+    emptyMessage?: string | undefined,
     children?: React.ReactNode
   }) {
 
@@ -116,7 +118,7 @@ export default async function Search(
       <div className="-mx-4 sm:mx-0 mt-4 flow-root">
         {data.items.length===0? 
          <div className="text-center"> 
-           <h3 className="mt-2 pb-6 text-sm font-semibold text-gray-900">Nie znaleziono wyników</h3> 
+           <h3 className="mt-2 pb-6 text-sm font-semibold text-gray-900">{emptyMessage}</h3> 
         </div>:
           <div className="overflow-hidden">
           <div className=" overflow-x-auto  ">
