@@ -18,7 +18,7 @@ const segmentLabels: Record<string, string> = {
   users: 'Użytkownicy',
   landing: 'Strona publiczna',
   visibility: 'Widoczność',
-  audit-logs: 'Dziennik zdarzeń',
+  'audit-logs': 'Dziennik zdarzeń',
 }
 
 const moduleLabels: Record<string, string> = {
