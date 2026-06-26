@@ -294,9 +294,9 @@ export default function WorkInput({
                             </div>
                         </div>
                         <div className="mt-4 border-t border-gray-900/10 pt-8">
-                            <h3 className="text-base font-semibold text-gray-900">Kosztorysy</h3>
+                            <h3 className="text-base font-semibold text-gray-900">Kosztorys naprawy</h3>
                             <p className="mt-1 text-sm text-gray-500">
-                                Dane kosztorysu naprawy, wersje, kwoty i status akceptacji.
+                                Podstawowe dane kosztorysu, kwoty i status akceptacji.
                             </p>
 
                             <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -308,7 +308,7 @@ export default function WorkInput({
                                 </FormInput>
 
                                 <div>
-                                    <FormLabel name='estimateSystem' label='System'></FormLabel>
+                                    <FormLabel name='estimateSystem' label='System kosztorysu'></FormLabel>
                                     <div className="mt-2 grid grid-cols-1">
                                         <Select name='estimateSystem' defaultValue={work?.estimateSystem || ''}>
                                             <option value=''>Nie wybrano</option>
@@ -321,7 +321,7 @@ export default function WorkInput({
 
                                 <FormInput
                                     name='estimateVersion'
-                                    label='Wersja kosztorysu'
+                                    label='Wersja'
                                     defaultValue={work?.estimateVersion ?? ''}
                                     placeholder='np. 1, 2, korekta'>
                                 </FormInput>
@@ -329,7 +329,7 @@ export default function WorkInput({
                                 <FormInput
                                     name='estimatePreparedOn'
                                     type='date'
-                                    label='Data sporządzenia'
+                                    label='Data przygotowania kosztorysu'
                                     defaultValue={toDateInputValue(work?.estimatePreparedOn)}>
                                 </FormInput>
 
@@ -337,21 +337,21 @@ export default function WorkInput({
                                     name='estimateNetAmount'
                                     type='number'
                                     step='0.01'
-                                    label='Wartość netto'
+                                    label='Kwota netto'
                                     defaultValue={work?.estimateNetAmount ?? ''}>
                                 </FormInput>
                                 <FormInput
                                     name='estimateVatAmount'
                                     type='number'
                                     step='0.01'
-                                    label='VAT'
+                                    label='Kwota VAT'
                                     defaultValue={work?.estimateVatAmount ?? ''}>
                                 </FormInput>
                                 <FormInput
                                     name='estimateGrossAmount'
                                     type='number'
                                     step='0.01'
-                                    label='Wartość brutto'
+                                    label='Kwota brutto'
                                     defaultValue={work?.estimateGrossAmount ?? ''}>
                                 </FormInput>
                                 <FormInput
@@ -384,18 +384,18 @@ export default function WorkInput({
                                 <FormInput
                                     name='estimateSentOn'
                                     type='date'
-                                    label='Data wysłania do ubezpieczyciela'
+                                    label='Data wysłania kosztorysu'
                                     defaultValue={toDateInputValue(work?.estimateSentOn)}>
                                 </FormInput>
                                 <FormInput
                                     name='estimateAcceptedOn'
                                     type='date'
-                                    label='Data akceptacji'
+                                    label='Data akceptacji kosztorysu'
                                     defaultValue={toDateInputValue(work?.estimateAcceptedOn)}>
                                 </FormInput>
 
                                 {estimateDocuments.length > 0 && <div className="sm:col-span-2">
-                                    <FormLabel name='estimateDocumentId' label='Dokument PDF kosztorysu'></FormLabel>
+                                    <FormLabel name='estimateDocumentId' label='Powiązany dokument PDF'></FormLabel>
                                     <div className="mt-2 grid grid-cols-1">
                                         <Select name='estimateDocumentId' defaultValue={work?.estimateDocumentId ?? ''}>
                                             <option value=''>Nie wybrano</option>
