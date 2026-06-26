@@ -12,18 +12,26 @@ export default async function Page(
 
   const options = await searchParams;
   const isReplacementView = options.replacement === 'true';
-  const title = isReplacementView ? 'Pojazdy zastępcze' : 'Pojazdy';
+  const title = isReplacementView ? 'Flota pojazdów zastępczych' : 'Pojazdy';
   const description = isReplacementView
-    ? 'Zarządzaj flotą zastępczą, wydaniami, zwrotami i dostępnością pojazdów.'
+    ? 'Tutaj będą widoczne pojazdy należące do floty zastępczej warsztatu.'
     : 'Baza pojazdów powiązanych z klientami i zleceniami.';
+  const emptyMessage = isReplacementView ? 'Brak dodanych pojazdów zastępczych.' : undefined;
 
   return <Main header={
     <SearchCardHeader title={title} description={description} pageName="vehicles">
     </SearchCardHeader>
   } narrow={false}>
+    {isReplacementView && <div className="mb-4 rounded-md border border-sky-100 bg-sky-50 px-4 py-3 text-sm text-sky-900">
+      <p className="font-semibold">Docelowo w tym miejscu obsłużysz flotę zastępczą warsztatu.</p>
+      <p className="mt-1 text-sky-800">
+        Widok obejmie dostępność pojazdu, wydanie i zwrot, aktualne zlecenie, liczbę dni najmu, historię użycia oraz rozliczenie usługi.
+      </p>
+    </div>}
      <form method="GET" > <Search
       searchParams={searchParams}
       resourceName="vehicles"
+      emptyMessage={emptyMessage}
       columns={[
 
         {
