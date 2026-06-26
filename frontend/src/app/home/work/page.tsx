@@ -165,7 +165,7 @@ export default async function Page(
                   {replacementReturnLabel || replacementVehicleLabel}
                 </span>}
               </h5>
-              {badges.length > 0 && <div className="mt-1 flex flex-wrap gap-1">
+              {badges.length > 0 && <div className="mt-0.5 flex flex-wrap gap-1">
                 {badges.map(badge => (
                   <span key={badge} className="inline-flex rounded-full bg-amber-50 px-2 py-0.5 text-xs font-medium text-amber-700">
                     {badge}
@@ -254,7 +254,17 @@ export default async function Page(
         );
       }
     }
-  ]
+  ];
+
+  const compactColumns = columns.map((column) => ({
+    ...column,
+    headerClasses: (index: number) => index === 0
+      ? 'py-2.5 pr-3 pl-4 text-left text-sm font-semibold text-gray-900 sm:pl-0'
+      : 'px-3 py-2.5 text-left text-sm font-semibold text-gray-900',
+    dataClasses: (_item: Record<string, unknown>, index: number) => index === 0
+      ? 'py-2 pr-3 pl-4 text-sm font-medium align-top text-gray-900 sm:pl-0'
+      : 'px-3 py-2 text-sm align-top text-gray-500',
+  }));
 
 
   return <main className=" lg:pl-62   ">
@@ -276,7 +286,7 @@ export default async function Page(
               rowClass={(item) => {
                 return (item['status'] === 'closed' ? 'line-through' : '')
               }}
-              columns={columns}> 
+              columns={compactColumns}> 
               <div className="flex flex-col gap-4">
                 <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 2xl:grid-cols-12">
                   <div className="min-w-0 2xl:col-span-4">
