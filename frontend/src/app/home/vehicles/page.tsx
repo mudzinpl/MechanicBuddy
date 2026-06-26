@@ -10,8 +10,15 @@ import Link from "next/link";
 export default async function Page(
   { searchParams }: { searchParams: Promise<Record<string, string>> }) {
 
+  const options = await searchParams;
+  const isReplacementView = options.replacement === 'true';
+  const title = isReplacementView ? 'Pojazdy zastępcze' : 'Pojazdy';
+  const description = isReplacementView
+    ? 'Zarządzaj flotą zastępczą, wydaniami, zwrotami i dostępnością pojazdów.'
+    : 'Baza pojazdów powiązanych z klientami i zleceniami.';
+
   return <Main header={
-    <SearchCardHeader title="Znajdź pojazdy" pageName="vehicles">
+    <SearchCardHeader title={title} description={description} pageName="vehicles">
     </SearchCardHeader>
   } narrow={false}>
      <form method="GET" > <Search
