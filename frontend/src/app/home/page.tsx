@@ -91,9 +91,16 @@ const kpiDefinitions = [
 ] as const;
 
 const attentionDefinitions = [
-  { key: 'insurer_decision_overdue', label: 'Brak decyzji ubezpieczyciela ponad 3 dni', icon: ShieldCheckIcon, tone: 'red' },
+  { key: 'no_client_contact_overdue', label: 'Brak kontaktu z klientem', icon: PhoneIcon, tone: 'yellow' },
+  { key: 'client_contact_overdue', label: 'Brak kontaktu z klientem', icon: PhoneIcon, tone: 'yellow' },
+  { key: 'missing_parts_order', label: 'Brak zamówionych części', icon: CubeIcon, tone: 'yellow' },
+  { key: 'insurer_decision_overdue', label: 'Brak decyzji TU > 3 dni', icon: ShieldCheckIcon, tone: 'red' },
+  { key: 'estimate_sent_overdue', label: 'Brak decyzji TU > 3 dni', icon: ShieldCheckIcon, tone: 'red' },
+  { key: 'approval_overdue', label: 'Brak decyzji TU > 3 dni', icon: ShieldCheckIcon, tone: 'red' },
+  { key: 'ready_for_pickup', label: 'Gotowe do wydania', icon: CheckCircleIcon, tone: 'blue' },
   { key: 'missing_assignment', label: 'Brak cesji', icon: ClipboardDocumentListIcon, tone: 'yellow' },
   { key: 'missing_power_of_attorney', label: 'Brak pełnomocnictwa', icon: ClipboardDocumentListIcon, tone: 'yellow' },
+  { key: 'missing_documents', label: 'Brak dokumentów', icon: ClipboardDocumentListIcon, tone: 'yellow' },
   { key: 'missing_estimate', label: 'Brak kosztorysu', icon: ClipboardDocumentListIcon, tone: 'red' },
   { key: 'parts_delivery_overdue', label: 'Opóźnione części', icon: CubeIcon, tone: 'red' },
   { key: 'replacement_return_overdue', label: 'Pojazd zastępczy po terminie zwrotu', icon: TruckIcon, tone: 'red' },
