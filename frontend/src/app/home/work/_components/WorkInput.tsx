@@ -43,6 +43,9 @@ export default function WorkInput({
     const [clientVehicles, setClientVehicles] = useState<IVehicleData[]>([]);
     const [selectedClientVehicleId, setSelectedClientVehicleId] = useState(work?.vehicleId ?? '');
     const [clientUndisclosed, setClientUndisclosed] = useState(!work ? false : !work.clientId);
+    const [createNewClient, setCreateNewClient] = useState(false);
+    const [createNewVehicle, setCreateNewVehicle] = useState(false);
+    const [newClientType, setNewClientType] = useState('private');
     const currentDamageStatus = work?.damageStatus || 'new';
     const hasKnownDamageStatus = damageStatuses.some(status => status.value === currentDamageStatus);
     const currentInsurer = work?.insurer || '';
@@ -111,7 +114,7 @@ export default function WorkInput({
                                         }}></FormSwitch>
                                 </span>
                             </FormLabel>
-                            {!clientUndisclosed &&
+                            {!clientUndisclosed && !createNewClient &&
                                 <ClientsCombobox name='clientId'
                                     onItemChange={(item) => {
                                         if (onlyClientVehicles && item) {
@@ -123,11 +126,27 @@ export default function WorkInput({
                                         value: work?.clientId ?? '',
                                     }}>
                                 </ClientsCombobox>}
+                            {!work && !clientUndisclosed && <Field className="mt-3 flex items-start">
+                                <FormSwitch
+                                    name='createNewClient'
+                                    checked={createNewClient}
+                                    onChange={(value) => {
+                                        setCreateNewClient(value);
+                                        if (value) {
+                                            setOnlyClientVehicles(false);
+                                        }
+                                    }}>
+                                </FormSwitch>
+                                <Label as="span" className="ml-3 text-sm text-gray-700">
+                                    Nowy klient
+                                    <span className="block text-xs text-gray-500">Dodaj klienta bez opuszczania formularza szkody.</span>
+                                </Label>
+                            </Field>}
 
                         </div>
                         <div className={fieldColumnClass}>
                             <FormLabel name='vehicleId' label='Pojazd'>
-                                {!clientUndisclosed && <span className="ml-2 float-right text-gray-500">
+                                {!clientUndisclosed && !createNewClient && <span className="ml-2 float-right text-gray-500">
                                     Szukaj we wszystkich pojazdach{' '}
                                     <FormSwitch
                                         name='onlyClientVehicles'
@@ -139,7 +158,7 @@ export default function WorkInput({
                                 </span>}
 
                             </FormLabel>
-                            <div className='flex flex-col gap-3 sm:flex-row'>
+                            {!createNewVehicle && <div className='flex flex-col gap-3 sm:flex-row'>
 
                                 <div className="grid grow grid-cols-1 focus-within:relative">
                                     <div className={clsx(onlyClientVehicles && "mt-2", "grid grid-cols-1")}>
@@ -150,6 +169,7 @@ export default function WorkInput({
                                                 onChange={(e) => {
                                                     setSelectedClientVehicleId(e.currentTarget.value);
                                                 }} >
+                                                <option value=''>Wybierz pojazd</option>
                                                 {clientVehicles?.map((item, index) => {
                                                     return (<option key={index} value={item.id}>{[item?.producer, item?.model].filter(x => x).join(' ') + (!item?.regNr ? '' : ` (${item.regNr})`)}</option>)
                                                 })}
@@ -166,9 +186,58 @@ export default function WorkInput({
                                 <div className='sm:w-40'>
                                     <FormInput type='number' placeholder='Wartość przebiegu' name='odo' defaultValue={work?.odo ?? 0}></FormInput>
                                 </div>
-                            </div>
+                            </div>}
+                            {!work && <Field className="mt-3 flex items-start">
+                                <FormSwitch
+                                    name='createNewVehicle'
+                                    checked={createNewVehicle}
+                                    onChange={(value) => {
+                                        setCreateNewVehicle(value);
+                                    }}>
+                                </FormSwitch>
+                                <Label as="span" className="ml-3 text-sm text-gray-700">
+                                    Nowy pojazd
+                                    <span className="block text-xs text-gray-500">Dodaj pojazd bez opuszczania formularza szkody.</span>
+                                </Label>
+                            </Field>}
 
                         </div>
+
+                        {!work && createNewClient && <div className="rounded-md border border-gray-200 bg-gray-50 p-4 sm:col-span-2">
+                            <h3 className="text-sm font-semibold text-gray-900">Nowy klient</h3>
+                            <p className="mt-1 text-sm text-gray-500">Dane zostaną zapisane razem ze szkodą i przypisane do zlecenia.</p>
+                            <div className="mt-4 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
+                                <FormInput name='newClientName' label='Imię i nazwisko / nazwa' placeholder='np. Jan Kowalski albo APPRA Sp. z o.o.'></FormInput>
+                                <div className={fieldColumnClass}>
+                                    <FormLabel name='newClientType' label='Typ klienta'></FormLabel>
+                                    <div className="mt-2 grid grid-cols-1">
+                                        <Select name='newClientType' value={newClientType} onChange={(event) => setNewClientType(event.currentTarget.value)}>
+                                            <option value='private'>Osoba</option>
+                                            <option value='company'>Firma</option>
+                                        </Select>
+                                    </div>
+                                </div>
+                                <FormInput name='newClientPhone' label='Telefon' placeholder='Numer telefonu'></FormInput>
+                                <FormInput name='newClientEmail' type='email' label='E-mail' placeholder='adres@email.pl'></FormInput>
+                                {newClientType === 'company' && <FormInput name='newClientRegNr' label='NIP' placeholder='NIP firmy'></FormInput>}
+                                <div className={clsx(newClientType !== 'company' && 'sm:col-span-2')}>
+                                    <FormInput name='newClientAddress' label='Adres' placeholder='Ulica, numer, miejscowość'></FormInput>
+                                </div>
+                            </div>
+                        </div>}
+
+                        {!work && createNewVehicle && <div className="rounded-md border border-gray-200 bg-gray-50 p-4 sm:col-span-2">
+                            <h3 className="text-sm font-semibold text-gray-900">Nowy pojazd</h3>
+                            <p className="mt-1 text-sm text-gray-500">Pojazd zostanie dodany do bazy i powiązany z wybranym albo nowym klientem.</p>
+                            <div className="mt-4 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
+                                <FormInput name='newVehicleProducer' label='Marka' placeholder='np. Toyota'></FormInput>
+                                <FormInput name='newVehicleModel' label='Model' placeholder='np. Corolla'></FormInput>
+                                <FormInput name='newVehicleRegNr' label='Numer rejestracyjny' placeholder='np. WA12345'></FormInput>
+                                <FormInput name='newVehicleVin' label='VIN' placeholder='Numer VIN'></FormInput>
+                                <FormInput name='newVehicleOdo' type='number' label='Przebieg' placeholder='Wartość przebiegu'></FormInput>
+                            </div>
+                        </div>}
+
                         <div className="sm:col-span-2">
                             <WorkInputMechanics mechanics={mechanics} work={work}></WorkInputMechanics>
                         </div>
