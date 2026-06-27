@@ -1,6 +1,4 @@
 import { type Metadata } from 'next'
-import { Inter, Lexend } from 'next/font/google'
-import clsx from 'clsx'
 import { config } from '@fortawesome/fontawesome-svg-core'
 import '@fortawesome/fontawesome-svg-core/styles.css'
 config.autoAddCss = false
@@ -71,17 +69,10 @@ export const metadata: Metadata = {
   category: 'software',
 }
 
-const inter = Inter({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-inter',
-})
-
-const lexend = Lexend({
-  subsets: ['latin'],
-  display: 'swap',
-  variable: '--font-lexend',
-})
+const fontVariables = {
+  '--font-inter': 'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  '--font-lexend': 'Lexend, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+} as React.CSSProperties
 
 export default function DefaultLayout({
   children,
@@ -90,11 +81,7 @@ export default function DefaultLayout({
 }) {
  
   return (
-    <html className={clsx(
-      'h-full xl:bg-gray-50  ',
-      inter.variable,
-      lexend.variable,
-    )}>
+    <html className="h-full xl:bg-gray-50" style={fontVariables}>
       <head>
         <link rel="icon" href="/icon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
