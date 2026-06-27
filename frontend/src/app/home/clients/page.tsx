@@ -51,10 +51,6 @@ function getNumber(item: ClientRow, keys: string[]) {
   return Number.isFinite(parsed) ? parsed : undefined;
 }
 
-function hasValue(item: ClientRow, keys: string[]) {
-  return firstValue(item, keys) !== undefined;
-}
-
 function isCompanyClient(item: ClientRow) {
   const type = getString(item, ["type", "clientType", "customerType", "kind"]).toLowerCase();
   const name = getString(item, ["name", "displayName", "companyName"]);
