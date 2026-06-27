@@ -35,6 +35,12 @@ interface ChecklistItem {
   sortOrder: number;
 }
 
+interface FlowAlert {
+  label: string;
+  description: string;
+  tone: 'red' | 'amber' | 'blue' | 'gray';
+}
+
 const repairSteps = [
   { key: 'intake', label: 'Przyjęcie' },
   { key: 'inspection_pending', label: 'Oględziny' },
@@ -105,6 +111,13 @@ const emptyQualityChecklist = [
   'Czystość pojazdu',
 ];
 
+const flowAlertClasses = {
+  red: 'border-red-200 bg-red-50 text-red-900',
+  amber: 'border-amber-200 bg-amber-50 text-amber-900',
+  blue: 'border-blue-200 bg-blue-50 text-blue-900',
+  gray: 'border-gray-200 bg-gray-50 text-gray-800',
+} as const;
+
 function formatCurrency(value?: number | null) {
   return typeof value === 'number'
     ? new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(value).replace(/\u00A0/g, ' ')
@@ -155,6 +168,79 @@ function getReleaseNextStep(missingItems: string[]) {
   }
 
   return 'Przygotuj protokół wydania.';
+}
+
+function daysSince(value?: string | null) {
+  if (!value) return null;
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return null;
+  return Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
+}
+
+function buildFlowAlerts(work: IWorkData, parts: WorkPartOrder[], documents: IWorkDocument[], communication: IWorkCommunicationEntry[]) {
+  const alerts: FlowAlert[] = [];
+  const sentEstimateDays = daysSince(work.estimateSentOn);
+  const latestContactDays = communication.length > 0
+    ? Math.min(...communication.map(entry => daysSince(entry.occurredOn || entry.createdOn)).filter((value): value is number => value !== null))
+    : null;
+  const needsParts = ['accepted', 'parts_pending', 'repair', 'paint_shop', 'quality_control'].includes(work.damageStatus || '') || work.estimateStatus === 'accepted' || Boolean(work.estimateAcceptedOn);
+  const readyToRelease = ['ready_for_pickup', 'released', 'settled'].includes(work.damageStatus || '');
+
+  if (latestContactDays !== null && latestContactDays > 7) {
+    alerts.push({ label: 'Brak kontaktu z klientem', description: `Ostatni kontakt zapisano ${latestContactDays} dni temu.`, tone: 'amber' });
+  }
+
+  if (needsParts && parts.length === 0) {
+    alerts.push({ label: 'Brak zamówionych części', description: 'Sprawa wygląda na gotową do etapu części, ale nie ma przypisanych zamówień.', tone: 'amber' });
+  }
+
+  if (sentEstimateDays !== null && sentEstimateDays > 3 && !work.insurerDecisionOn && !work.estimateAcceptedOn) {
+    alerts.push({ label: 'Brak decyzji TU > 3 dni', description: `Kosztorys wysłano ${sentEstimateDays} dni temu.`, tone: 'red' });
+  }
+
+  if (readyToRelease) {
+    alerts.push({ label: 'Gotowe do wydania', description: 'Status sprawy wskazuje przygotowanie wydania albo zakończenie naprawy.', tone: 'blue' });
+  }
+
+  if (!work.assignmentOfClaimSigned) {
+    alerts.push({ label: 'Brak cesji', description: 'Uzupełnij dokument formalny przed zamknięciem sprawy.', tone: 'amber' });
+  }
+
+  if (!work.powerOfAttorneySigned) {
+    alerts.push({ label: 'Brak pełnomocnictwa', description: 'Sprawdź komplet dokumentów do obsługi szkody.', tone: 'amber' });
+  }
+
+  if (documents.length === 0) {
+    alerts.push({ label: 'Brak dokumentów', description: 'Do sprawy nie dodano jeszcze dokumentów szkody.', tone: 'amber' });
+  }
+
+  return alerts;
+}
+
+function FlowAlertsPanel({ alerts }: { alerts: FlowAlert[] }) {
+  return (
+    <div className="rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-xs">
+      <div className="mb-3 flex items-center gap-2">
+        <ExclamationTriangleIcon className="size-5 text-amber-500" aria-hidden="true" />
+        <div>
+          <p className="text-sm font-semibold text-gray-900">Przepływ sprawy</p>
+          <p className="text-xs text-gray-500">Proste alerty na podstawie danych zlecenia.</p>
+        </div>
+      </div>
+      {alerts.length === 0 ? (
+        <p className="rounded-md bg-green-50 px-3 py-2 text-sm font-medium text-green-700">Nie wykryto prostych blokad przepływu sprawy.</p>
+      ) : (
+        <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
+          {alerts.slice(0, 6).map(alert => (
+            <div key={`${alert.label}-${alert.description}`} className={`rounded-md border px-3 py-2 text-sm ${flowAlertClasses[alert.tone]}`}>
+              <p className="font-semibold">{alert.label}</p>
+              <p className="mt-1 text-xs opacity-80">{alert.description}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export default function RepairOrderOverview({ work, products }: { work: IWorkData; products: IProduct[] }) {
@@ -213,6 +299,7 @@ export default function RepairOrderOverview({ work, products }: { work: IWorkDat
             badgeClassName: 'bg-amber-100 text-amber-800 ring-amber-600/20',
           };
   const releaseNextStep = getReleaseNextStep(releaseMissingItems);
+  const flowAlerts = buildFlowAlerts(work, parts, documents, communication);
   const blockedStepKeys = new Set<string>();
   if (!work.audatexEstimateNumber) blockedStepKeys.add('estimate_sent');
   if (!work.insurerDecisionOn) blockedStepKeys.add('approval_pending');
@@ -253,6 +340,8 @@ export default function RepairOrderOverview({ work, products }: { work: IWorkDat
           </div>
         </div>
       </div>
+
+      <FlowAlertsPanel alerts={flowAlerts} />
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
