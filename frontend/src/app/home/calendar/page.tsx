@@ -37,6 +37,11 @@ const kindLabels: Record<string, string> = {
   inspection_missing_after_two_days: 'Brak oględzin po 2 dniach od zgłoszenia',
   missing_claim_handler: 'Brak opiekuna szkody',
   missing_estimate: 'Brak kosztorysu',
+  no_client_contact_overdue: 'Brak kontaktu z klientem',
+  client_contact_overdue: 'Brak kontaktu z klientem',
+  missing_parts_order: 'Brak zamówionych części',
+  missing_documents: 'Brak dokumentów',
+  ready_for_pickup: 'Gotowe do wydania',
   insurer_decision_overdue: 'Brak decyzji TU > 3 dni',
   estimate_sent_overdue: 'Brak decyzji TU > 3 dni',
   estimate_rejected_or_correction: 'Kosztorys odrzucony lub do poprawy',
@@ -156,12 +161,16 @@ function alertTone(kind: string) {
     return 'red';
   }
 
-  if (['missing_estimate', 'missing_assignment', 'missing_power_of_attorney', 'replacement_without_return_date'].includes(kind)) {
+  if (['missing_estimate', 'missing_assignment', 'missing_power_of_attorney', 'missing_parts_order', 'missing_documents', 'no_client_contact_overdue', 'client_contact_overdue', 'replacement_without_return_date'].includes(kind)) {
     return 'amber';
   }
 
   if (['vat_payment', 'unsettled_case', 'client_vat_without_payment_date'].includes(kind)) {
     return 'yellow';
+  }
+
+  if (kind === 'ready_for_pickup') {
+    return 'blue';
   }
 
   return 'gray';
@@ -173,13 +182,14 @@ function alertToneClasses(kind: string) {
     red: 'bg-red-50 text-red-700 ring-red-600/20',
     amber: 'bg-amber-50 text-amber-700 ring-amber-600/20',
     yellow: 'bg-yellow-50 text-yellow-700 ring-yellow-600/20',
+    blue: 'bg-blue-50 text-blue-700 ring-blue-600/20',
     gray: 'bg-gray-50 text-gray-700 ring-gray-500/10',
   }[tone];
 }
 
 function alertPriority(kind: string) {
   const tone = alertTone(kind);
-  return tone === 'red' ? 0 : tone === 'amber' ? 1 : tone === 'yellow' ? 2 : 3;
+  return tone === 'red' ? 0 : tone === 'amber' ? 1 : tone === 'yellow' ? 2 : tone === 'blue' ? 3 : 4;
 }
 
 function groupAlerts(alerts: CalendarWorkItem[]) {
