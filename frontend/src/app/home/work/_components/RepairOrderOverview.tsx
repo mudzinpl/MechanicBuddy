@@ -96,14 +96,29 @@ const taskTypeLabels: Record<string, string> = {
   other: 'Inne',
 };
 
+const emptyQualityChecklist = [
+  'Jazda próbna',
+  'Diagnostyka',
+  'Oświetlenie',
+  'ADAS / kalibracja',
+  'Zdjęcia końcowe',
+  'Czystość pojazdu',
+];
+
 function formatCurrency(value?: number | null) {
   return typeof value === 'number'
     ? new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(value).replace(/\u00A0/g, ' ')
     : '';
 }
 
-function emptyState(text: string) {
-  return <p className="rounded-md border border-dashed border-gray-200 px-3 py-4 text-sm text-gray-500">{text}</p>;
+function emptyState(title: string, description: string, children?: React.ReactNode) {
+  return (
+    <div className="rounded-md border border-dashed border-gray-200 bg-gray-50 px-3 py-4 text-sm">
+      <p className="font-medium text-gray-700">{title}</p>
+      <p className="mt-1 text-gray-500">{description}</p>
+      {children && <div className="mt-3">{children}</div>}
+    </div>
+  );
 }
 
 function getNextStep(work: IWorkData) {
@@ -116,6 +131,30 @@ function getNextStep(work: IWorkData) {
   if (work.damageStatus === 'ready_for_pickup') return 'Można przygotować wydanie pojazdu.';
   if (work.damageStatus === 'released') return 'Pojazd wydany klientowi.';
   return 'Następny krok: uzupełnienie danych i prowadzenie sprawy.';
+}
+
+function getReleaseNextStep(missingItems: string[]) {
+  if (missingItems.includes('brak dokumentów') || missingItems.includes('brak cesji') || missingItems.includes('brak pełnomocnictwa')) {
+    return 'Uzupełnij dokumentację.';
+  }
+
+  if (missingItems.includes('brak kontroli jakości')) {
+    return 'Wykonaj kontrolę jakości.';
+  }
+
+  if (missingItems.includes('brak kosztorysu')) {
+    return 'Uzupełnij kosztorys.';
+  }
+
+  if (missingItems.includes('brak decyzji TU')) {
+    return 'Uzyskaj decyzję ubezpieczyciela.';
+  }
+
+  if (missingItems.includes('nierozliczona dopłata')) {
+    return 'Sprawdź rozliczenie dopłaty.';
+  }
+
+  return 'Przygotuj protokół wydania.';
 }
 
 export default function RepairOrderOverview({ work, products }: { work: IWorkData; products: IProduct[] }) {
@@ -139,6 +178,7 @@ export default function RepairOrderOverview({ work, products }: { work: IWorkDat
   const estimatedRbg = (work.estimateLaborMechanicalRbg ?? 0) + (work.estimateLaborPaintRbg ?? 0);
   const completedTasks = tasks.filter(task => task.status === 'completed').length;
   const remainingTasks = Math.max(tasks.length - completedTasks, 0);
+  const rbgProgress = estimatedRbg > 0 && completedTasks > 0 ? Math.min(100, Math.round((completedTasks / estimatedRbg) * 100)) : null;
   const releaseMissingItems = [
     !work.assignmentOfClaimSigned ? 'brak cesji' : '',
     !work.powerOfAttorneySigned ? 'brak pełnomocnictwa' : '',
@@ -153,21 +193,31 @@ export default function RepairOrderOverview({ work, products }: { work: IWorkDat
     ? {
         label: 'Nie można jeszcze określić gotowości wydania.',
         className: 'border-gray-200 bg-gray-50 text-gray-700',
+        badgeClassName: 'bg-gray-100 text-gray-700 ring-gray-500/10',
       }
     : releaseMissingItems.length === 0
       ? {
           label: 'Gotowe do wydania',
-          className: 'border-green-200 bg-green-50 text-green-800',
+          className: 'border-green-200 bg-green-50 text-green-900',
+          badgeClassName: 'bg-green-100 text-green-800 ring-green-600/20',
         }
       : hasHardReleaseBlocker
         ? {
             label: 'Nie można wydać pojazdu',
-            className: 'border-red-200 bg-red-50 text-red-800',
+            className: 'border-red-200 bg-red-50 text-red-900',
+            badgeClassName: 'bg-red-100 text-red-800 ring-red-600/20',
           }
         : {
             label: 'Wymaga uzupełnienia',
-            className: 'border-amber-200 bg-amber-50 text-amber-800',
+            className: 'border-amber-200 bg-amber-50 text-amber-900',
+            badgeClassName: 'bg-amber-100 text-amber-800 ring-amber-600/20',
           };
+  const releaseNextStep = getReleaseNextStep(releaseMissingItems);
+  const blockedStepKeys = new Set<string>();
+  if (!work.audatexEstimateNumber) blockedStepKeys.add('estimate_sent');
+  if (!work.insurerDecisionOn) blockedStepKeys.add('approval_pending');
+  if (checklist.length === 0 || completedChecklist < checklist.length) blockedStepKeys.add('quality_control');
+  if (documents.length === 0 || !work.assignmentOfClaimSigned || !work.powerOfAttorneySigned || releaseMissingItems.includes('nierozliczona dopłata')) blockedStepKeys.add('ready_for_pickup');
   const latestNotes = [
     ...tasks.filter(task => task.comment).map(task => ({ id: `task-${task.id}`, title: task.title, text: task.comment || '' })),
     ...communication.slice(0, 3).map(entry => ({ id: `communication-${entry.id}`, title: getCommunicationCategoryLabel(entry.category), text: entry.note })),
@@ -175,16 +225,33 @@ export default function RepairOrderOverview({ work, products }: { work: IWorkDat
 
   return (
     <section className="mb-6 space-y-5 rounded-lg border border-gray-200 bg-white p-4 shadow-xs">
-      <div className={`rounded-lg border px-4 py-3 ${releaseReadiness.className}`}>
-        <p className="text-xs font-semibold uppercase tracking-wide">Status gotowości wydania</p>
-        <p className="mt-1 text-lg font-semibold">{releaseReadiness.label}</p>
-        {releaseMissingItems.length > 0 ? (
-          <ul className="mt-2 space-y-1 text-sm">
-            {releaseMissingItems.map(item => <li key={item}>□ {item}</li>)}
-          </ul>
-        ) : (
-          <p className="mt-2 text-sm">Nie wykryto braków blokujących wydanie pojazdu.</p>
-        )}
+      <div className={`rounded-xl border px-5 py-4 shadow-xs ${releaseReadiness.className}`}>
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wide">Status gotowości wydania</p>
+            <h2 className="mt-1 text-2xl font-semibold">{releaseReadiness.label}</h2>
+          </div>
+          <span className={`inline-flex w-fit items-center rounded-full px-3 py-1 text-xs font-semibold ring-1 ring-inset ${releaseReadiness.badgeClassName}`}>
+            {releaseMissingItems.length === 0 ? 'Kompletne' : `${releaseMissingItems.length} braków`}
+          </span>
+        </div>
+
+        <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
+          <div className="lg:col-span-2">
+            <p className="text-sm font-semibold">Braki do usunięcia</p>
+            {releaseMissingItems.length > 0 ? (
+              <ul className="mt-2 grid grid-cols-1 gap-1 text-sm sm:grid-cols-2">
+                {releaseMissingItems.map(item => <li key={item}>□ {item}</li>)}
+              </ul>
+            ) : (
+              <p className="mt-2 text-sm">Nie wykryto braków blokujących wydanie pojazdu.</p>
+            )}
+          </div>
+          <div className="rounded-lg bg-white/60 px-3 py-2 text-sm">
+            <p className="font-semibold">Następny krok</p>
+            <p className="mt-1">{releaseNextStep}</p>
+          </div>
+        </div>
       </div>
 
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -207,8 +274,16 @@ export default function RepairOrderOverview({ work, products }: { work: IWorkDat
           {repairSteps.map((step, index) => {
             const completed = index < activeStep;
             const current = index === activeStep;
+            const problem = blockedStepKeys.has(step.key) && index >= activeStep;
+            const className = problem
+              ? 'border-red-200 bg-red-50 text-red-700'
+              : current
+                ? 'border-blue-200 bg-blue-50 text-blue-700'
+                : completed
+                  ? 'border-green-200 bg-green-50 text-green-700'
+                  : 'border-gray-200 bg-gray-50 text-gray-500';
             return (
-              <div key={step.key} className={`rounded-md border px-3 py-2 text-xs font-medium ${current ? 'border-indigo-200 bg-indigo-50 text-indigo-700' : completed ? 'border-green-200 bg-green-50 text-green-700' : 'border-gray-200 bg-gray-50 text-gray-500'}`}>
+              <div key={step.key} className={`rounded-md border px-3 py-2 text-xs font-medium ${className}`}>
                 {step.label}
               </div>
             );
@@ -222,7 +297,7 @@ export default function RepairOrderOverview({ work, products }: { work: IWorkDat
             <WrenchScrewdriverIcon className="size-5 text-gray-400" aria-hidden="true" />
             Operacje naprawy
           </div>
-          {products.length === 0 && tasks.length === 0 ? emptyState('Brak dodanych operacji naprawy.') : (
+          {products.length === 0 && tasks.length === 0 ? emptyState('Brak dodanych operacji naprawy.', 'Dodaj operacje z kosztorysu lub utwórz zadanie dla mechanika.') : (
             <div className="space-y-2">
               {products.slice(0, 5).map(product => (
                 <div key={`product-${product.id}`} className="rounded-md border border-gray-200 p-3 text-sm">
@@ -245,7 +320,7 @@ export default function RepairOrderOverview({ work, products }: { work: IWorkDat
             <CubeIcon className="size-5 text-gray-400" aria-hidden="true" />
             Części
           </div>
-          {parts.length === 0 ? emptyState('Brak przypisanych części.') : (
+          {parts.length === 0 ? emptyState('Brak przypisanych części.', 'Dodaj części wymagane do naprawy albo sprawdź, czy kosztorys zawiera pozycje częściowe.') : (
             <div className="space-y-2">
               {parts.slice(0, 6).map(part => (
                 <div key={part.id} className="rounded-md border border-gray-200 p-3 text-sm">
@@ -266,12 +341,25 @@ export default function RepairOrderOverview({ work, products }: { work: IWorkDat
         <div className="rounded-md border border-gray-200 p-3">
           <p className="text-sm font-semibold text-gray-900">RBG</p>
           {estimatedRbg > 0 ? (
-            <dl className="mt-2 space-y-1 text-sm text-gray-600">
-              <div className="flex justify-between"><dt>Z kosztorysu</dt><dd>{estimatedRbg}</dd></div>
-              <div className="flex justify-between"><dt>Wykonane</dt><dd>{completedTasks}</dd></div>
-              <div className="flex justify-between"><dt>Pozostałe</dt><dd>{remainingTasks}</dd></div>
-            </dl>
-          ) : emptyState('Brak danych RBG.')}
+            <div className="mt-2 space-y-3">
+              <dl className="space-y-1 text-sm text-gray-600">
+                <div className="flex justify-between"><dt>RBG z kosztorysu</dt><dd>{estimatedRbg}</dd></div>
+                <div className="flex justify-between"><dt>RBG wykonane</dt><dd>{completedTasks}</dd></div>
+                <div className="flex justify-between"><dt>RBG pozostałe</dt><dd>{remainingTasks}</dd></div>
+              </dl>
+              {rbgProgress !== null && (
+                <div>
+                  <div className="mb-1 flex justify-between text-xs text-gray-500">
+                    <span>Postęp RBG</span>
+                    <span>{rbgProgress}%</span>
+                  </div>
+                  <div className="h-2 rounded-full bg-gray-100">
+                    <div className="h-2 rounded-full bg-blue-500" style={{ width: `${rbgProgress}%` }} />
+                  </div>
+                </div>
+              )}
+            </div>
+          ) : emptyState('Brak danych RBG.', 'Uzupełnij RBG w kosztorysie, żeby kierownik widział zakres i pozostałą pracę.')}
         </div>
 
         <div className="rounded-md border border-gray-200 p-3 xl:col-span-2">
@@ -279,7 +367,13 @@ export default function RepairOrderOverview({ work, products }: { work: IWorkDat
             <CheckCircleIcon className="size-5 text-gray-400" aria-hidden="true" />
             Kontrola jakości
           </div>
-          {checklist.length === 0 ? emptyState('Checklista jakości nie została jeszcze uzupełniona.') : (
+          {checklist.length === 0 ? emptyState(
+            'Checklista jakości nie została jeszcze uzupełniona.',
+            'Przed wydaniem sprawdź minimum poniższe punkty. To tylko podpowiedź, bez zapisu do systemu.',
+            <ul className="grid grid-cols-1 gap-1 text-sm text-gray-600 sm:grid-cols-2">
+              {emptyQualityChecklist.map(item => <li key={item}>□ {item}</li>)}
+            </ul>
+          ) : (
             <div>
               <p className="mb-2 text-sm text-gray-600">Wykonano {completedChecklist} z {checklist.length} pozycji.</p>
               <div className="space-y-1">
@@ -300,7 +394,7 @@ export default function RepairOrderOverview({ work, products }: { work: IWorkDat
           <ExclamationTriangleIcon className="size-5 text-gray-400" aria-hidden="true" />
           Uwagi robocze
         </div>
-        {latestNotes.length === 0 ? emptyState('Brak uwag roboczych.') : (
+        {latestNotes.length === 0 ? emptyState('Brak uwag roboczych.', 'Dodaj notatkę komunikacji albo komentarz do zadania, jeśli naprawa wymaga dodatkowego wyjaśnienia.') : (
           <div className="space-y-2">
             {latestNotes.map(note => (
               <div key={note.id} className="rounded-md bg-gray-50 px-3 py-2 text-sm">
