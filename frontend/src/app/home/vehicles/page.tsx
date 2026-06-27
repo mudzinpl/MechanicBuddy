@@ -16,6 +16,16 @@ interface VehiclesPageResult {
 
 type VehicleRow = Record<string, unknown>;
 
+type OperationalStatus = "W naprawie" | "Oczekuje" | "Wydane" | "Archiwum" | "Nieaktywny";
+
+const operationalStatusStyles: Record<OperationalStatus, string> = {
+  "W naprawie": "bg-emerald-50 text-emerald-700 ring-emerald-200",
+  "Oczekuje": "bg-amber-50 text-amber-800 ring-amber-200",
+  "Wydane": "bg-blue-50 text-blue-700 ring-blue-200",
+  "Archiwum": "bg-gray-50 text-gray-600 ring-gray-200",
+  "Nieaktywny": "bg-slate-50 text-slate-600 ring-slate-200",
+};
+
 function getString(item: VehicleRow, keys: string[]) {
   for (const key of keys) {
     const value = item[key];
@@ -27,6 +37,55 @@ function getString(item: VehicleRow, keys: string[]) {
 function isClientVehicle(item: VehicleRow, clientId: string) {
   const ownerId = getString(item, ["ownerId", "clientId", "customerId"]);
   return ownerId === clientId;
+}
+
+function getActiveWorkId(item: VehicleRow) {
+  return getString(item, ["workId", "activeWorkId", "currentWorkId", "activeOrderId", "currentOrderId"]);
+}
+
+function getActiveWorkLabel(item: VehicleRow) {
+  const number = getString(item, ["workNr", "workNumber", "workNo", "activeWorkNumber", "currentWorkNumber", "orderNumber"]);
+  if (number) return number.startsWith("APPRA") ? number : `Zlecenie nr ${number}`;
+
+  const title = getString(item, ["workTitle", "activeWorkTitle", "currentWorkTitle"]);
+  if (title) return title;
+
+  return "";
+}
+
+function getOperationalStatus(item: VehicleRow): OperationalStatus {
+  const status = getString(item, ["vehicleStatus", "status", "workStatus", "currentWorkStatus", "activeWorkStatus", "processStatus", "repairStatus"]).toLowerCase();
+  const hasActiveWork = Boolean(getActiveWorkId(item) || getActiveWorkLabel(item));
+
+  if (status.includes("arch") || status.includes("anul")) return "Archiwum";
+  if (status.includes("wydan") || status.includes("zako") || status.includes("rozlic")) return "Wydane";
+  if (status.includes("oczek") || status.includes("czeka") || status.includes("plan") || status.includes("now")) return "Oczekuje";
+  if (status.includes("napraw") || status.includes("toku") || status.includes("lakier") || status.includes("kontrol") || status.includes("blachar") || status.includes("mechan")) return "W naprawie";
+
+  return hasActiveWork ? "W naprawie" : "Nieaktywny";
+}
+
+function VehicleStatusBadge({ vehicle }: { vehicle: VehicleRow }) {
+  const status = getOperationalStatus(vehicle);
+  return (
+    <span className={clsx("inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset", operationalStatusStyles[status])}>
+      {status}
+    </span>
+  );
+}
+
+function ActiveWorkLink({ vehicle }: { vehicle: VehicleRow }) {
+  const workId = getActiveWorkId(vehicle);
+  const label = getActiveWorkLabel(vehicle);
+
+  if (!workId && !label) return <span className="text-gray-400">—</span>;
+  if (!workId) return <span className="text-gray-700">{label}</span>;
+
+  return (
+    <Link href={`/home/work/${workId}`} className="font-medium text-indigo-700 hover:text-indigo-500">
+      {label || "Zlecenie"}
+    </Link>
+  );
 }
 
 function VehicleProducer({ producer }: { producer: string }) {
@@ -50,6 +109,8 @@ function ClientVehiclesTable({ vehicles }: { vehicles: VehicleRow[] }) {
               <th className="px-3 py-3 text-left text-xs font-semibold tracking-wide text-gray-600 uppercase">Model</th>
               <th className="px-3 py-3 text-left text-xs font-semibold tracking-wide text-gray-600 uppercase">Numer rejestracyjny</th>
               <th className="px-3 py-3 text-left text-xs font-semibold tracking-wide text-gray-600 uppercase">Właściciel</th>
+              <th className="px-3 py-3 text-left text-xs font-semibold tracking-wide text-gray-600 uppercase">Status</th>
+              <th className="px-3 py-3 text-left text-xs font-semibold tracking-wide text-gray-600 uppercase">Aktywne zlecenie</th>
               <th className="px-3 py-3 text-left text-xs font-semibold tracking-wide text-gray-600 uppercase">VIN</th>
             </tr>
           </thead>
@@ -77,6 +138,12 @@ function ClientVehiclesTable({ vehicles }: { vehicles: VehicleRow[] }) {
                 </td>
                 <td className="px-3 py-3 align-top text-sm text-gray-600">
                   {ownerName && ownerId ? <Link href={`/home/clients/${ownerId}`} className="text-indigo-700 hover:text-indigo-500">{ownerName}</Link> : ownerName || "Brak właściciela"}
+                </td>
+                <td className="px-3 py-3 align-top text-sm">
+                  <VehicleStatusBadge vehicle={vehicle} />
+                </td>
+                <td className="max-w-40 px-3 py-3 align-top text-sm">
+                  <ActiveWorkLink vehicle={vehicle} />
                 </td>
                 <td className="px-3 py-3 align-top text-sm text-gray-600">
                   {id ? <Link href={`/home/vehicles/${id}`} className="hover:text-indigo-700">{vin || "-"}</Link> : vin || "-"}
@@ -237,6 +304,26 @@ export default async function Page(
                 <h5 >{ownerName}</h5>
               </Link>
             );
+          }
+        },
+        {
+          dataField: 'vehicleStatus',
+          headerText: 'Status',
+          dataClasses: () => {
+            return "px-3 py-4 text-sm whitespace-nowrap";
+          },
+          dataFormatter: (vehicle) => {
+            return <VehicleStatusBadge vehicle={vehicle} />;
+          }
+        },
+        {
+          dataField: 'activeWork',
+          headerText: 'Aktywne zlecenie',
+          dataClasses: () => {
+            return "max-w-40 px-3 py-4 text-sm whitespace-nowrap";
+          },
+          dataFormatter: (vehicle) => {
+            return <ActiveWorkLink vehicle={vehicle} />;
           }
         },
         {
