@@ -4,7 +4,7 @@ import { query } from '@/_lib/client/query-api';
 import { CheckCircleIcon, ClockIcon, CubeIcon, ExclamationTriangleIcon, WrenchScrewdriverIcon } from '@heroicons/react/20/solid';
 import React from 'react';
 import { getCommunicationCategoryLabel, IWorkCommunicationEntry } from '../communicationModel';
-import { getDamageStatusLabel, IProduct, IWorkData } from '../model';
+import { getDamageStatusLabel, IProduct, IWorkData, IWorkDocument } from '../model';
 
 interface WorkPartOrder {
   id: string;
@@ -123,12 +123,14 @@ export default function RepairOrderOverview({ work, products }: { work: IWorkDat
   const [tasks, setTasks] = React.useState<WorkTask[]>([]);
   const [checklist, setChecklist] = React.useState<ChecklistItem[]>([]);
   const [communication, setCommunication] = React.useState<IWorkCommunicationEntry[]>([]);
+  const [documents, setDocuments] = React.useState<IWorkDocument[]>([]);
 
   React.useEffect(() => {
     query({ url: `work/${work.id}/part-orders`, method: 'GET', onSuccess: (result: WorkPartOrder[]) => setParts(result || []), onFailure: () => setParts([]) });
     query({ url: `work/${work.id}/tasks`, method: 'GET', onSuccess: (result: WorkTask[]) => setTasks(result || []), onFailure: () => setTasks([]) });
     query({ url: `work/${work.id}/quality-checklist`, method: 'GET', onSuccess: (result: ChecklistItem[]) => setChecklist(result || []), onFailure: () => setChecklist([]) });
     query({ url: `work/${work.id}/communication`, method: 'GET', onSuccess: (result: IWorkCommunicationEntry[]) => setCommunication(result || []), onFailure: () => setCommunication([]) });
+    query({ url: `work/${work.id}/documents`, method: 'GET', onSuccess: (result: IWorkDocument[]) => setDocuments(result || []), onFailure: () => setDocuments([]) });
   }, [work.id]);
 
   const activeStep = statusToStepIndex[work.damageStatus || 'new'] ?? 0;
@@ -137,6 +139,35 @@ export default function RepairOrderOverview({ work, products }: { work: IWorkDat
   const estimatedRbg = (work.estimateLaborMechanicalRbg ?? 0) + (work.estimateLaborPaintRbg ?? 0);
   const completedTasks = tasks.filter(task => task.status === 'completed').length;
   const remainingTasks = Math.max(tasks.length - completedTasks, 0);
+  const releaseMissingItems = [
+    !work.assignmentOfClaimSigned ? 'brak cesji' : '',
+    !work.powerOfAttorneySigned ? 'brak pełnomocnictwa' : '',
+    !work.audatexEstimateNumber ? 'brak kosztorysu' : '',
+    !work.insurerDecisionOn ? 'brak decyzji TU' : '',
+    documents.length === 0 ? 'brak dokumentów' : '',
+    checklist.length === 0 || completedChecklist < checklist.length ? 'brak kontroli jakości' : '',
+    work.clientPaysVat && !work.paymentReceivedOn && work.settlementStatus !== 'settled' ? 'nierozliczona dopłata' : '',
+  ].filter(Boolean);
+  const hasHardReleaseBlocker = !work.audatexEstimateNumber || !work.insurerDecisionOn || checklist.length === 0 || completedChecklist < checklist.length;
+  const releaseReadiness = !work.damageStatus
+    ? {
+        label: 'Nie można jeszcze określić gotowości wydania.',
+        className: 'border-gray-200 bg-gray-50 text-gray-700',
+      }
+    : releaseMissingItems.length === 0
+      ? {
+          label: 'Gotowe do wydania',
+          className: 'border-green-200 bg-green-50 text-green-800',
+        }
+      : hasHardReleaseBlocker
+        ? {
+            label: 'Nie można wydać pojazdu',
+            className: 'border-red-200 bg-red-50 text-red-800',
+          }
+        : {
+            label: 'Wymaga uzupełnienia',
+            className: 'border-amber-200 bg-amber-50 text-amber-800',
+          };
   const latestNotes = [
     ...tasks.filter(task => task.comment).map(task => ({ id: `task-${task.id}`, title: task.title, text: task.comment || '' })),
     ...communication.slice(0, 3).map(entry => ({ id: `communication-${entry.id}`, title: getCommunicationCategoryLabel(entry.category), text: entry.note })),
@@ -144,6 +175,18 @@ export default function RepairOrderOverview({ work, products }: { work: IWorkDat
 
   return (
     <section className="mb-6 space-y-5 rounded-lg border border-gray-200 bg-white p-4 shadow-xs">
+      <div className={`rounded-lg border px-4 py-3 ${releaseReadiness.className}`}>
+        <p className="text-xs font-semibold uppercase tracking-wide">Status gotowości wydania</p>
+        <p className="mt-1 text-lg font-semibold">{releaseReadiness.label}</p>
+        {releaseMissingItems.length > 0 ? (
+          <ul className="mt-2 space-y-1 text-sm">
+            {releaseMissingItems.map(item => <li key={item}>□ {item}</li>)}
+          </ul>
+        ) : (
+          <p className="mt-2 text-sm">Nie wykryto braków blokujących wydanie pojazdu.</p>
+        )}
+      </div>
+
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div>
           <p className="text-sm font-semibold text-gray-900">Status naprawy</p>
