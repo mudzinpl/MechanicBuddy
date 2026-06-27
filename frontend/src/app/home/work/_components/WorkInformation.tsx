@@ -42,19 +42,24 @@ function DetailRows({ rows }: { rows: DetailRow[] }) {
 function DetailSection({
     title,
     icon: Icon,
+    summary,
     defaultOpen = false,
     children,
 }: {
     title: string,
     icon: React.ComponentType<React.SVGProps<SVGSVGElement>>,
+    summary?: React.ReactNode,
     defaultOpen?: boolean,
     children: React.ReactNode
 }) {
     return (
         <details open={defaultOpen} className="group border-t border-gray-900/5 px-6 py-4">
-            <summary className="flex cursor-pointer list-none items-center gap-x-3 text-sm font-semibold text-gray-900">
-                <Icon aria-hidden="true" className="h-5 w-5 text-gray-400" />
-                <span>{title}</span>
+            <summary className="flex cursor-pointer list-none items-start gap-x-3 text-sm font-semibold text-gray-900">
+                <Icon aria-hidden="true" className="mt-0.5 h-5 w-5 flex-none text-gray-400" />
+                <span className="min-w-0 flex-1">
+                    <span className="block">{title}</span>
+                    {summary && <span className="mt-1 block truncate text-xs font-normal text-gray-500 group-open:hidden">{summary}</span>}
+                </span>
                 <span className="ml-auto text-xs font-medium text-gray-400 group-open:hidden">▶</span>
                 <span className="ml-auto hidden text-xs font-medium text-gray-400 group-open:inline">▼</span>
             </summary>
@@ -175,6 +180,27 @@ export function WorkInformation({
         ['Klient', clientSummary || 'Brak danych klienta'],
         ['Pojazd', vehicleSummary || 'Brak danych pojazdu'],
     ].filter(([, value]) => value) as DetailRow[];
+    const compactSummary = [
+        getDamageStatusLabel(work.damageStatus),
+        work.claimNumber ? `szkoda ${work.claimNumber}` : 'brak numeru szkody',
+        work.insurer || 'brak ubezpieczyciela',
+    ].filter(Boolean).join(' · ');
+    const compactEstimate = hasEstimateDetails
+        ? [
+            work.audatexEstimateNumber,
+            getEstimateSystemLabel(work.estimateSystem),
+            getEstimateStatusLabel(work.estimateStatus),
+            formatCurrency(work.estimateGrossAmount),
+        ].filter(Boolean).join(' · ')
+        : 'Brak kosztorysu';
+    const compactSettlement = [
+        getSettlementStatusLabel(work.settlementStatus),
+        work.clientPaysVat ? `dopłata VAT ${work.clientVatPercent ?? 100}%` : '',
+        formatCurrency(work.underpaymentAmount) ? `niedopłata ${formatCurrency(work.underpaymentAmount)}` : '',
+    ].filter(Boolean).join(' · ');
+    const compactHistory = (work.statusHistory?.length ?? 0) > 0
+        ? `${work.statusHistory?.length} wpisów historii statusów`
+        : 'Brak historii statusów';
 
     const deleteInvoiceRef = React.useRef<BaseDialogHandle>(null);
     const createInvoiceRef = React.useRef<BaseDialogHandle>(null);
@@ -318,7 +344,7 @@ export function WorkInformation({
                     </div>
                 </div>}
 
-                <DetailSection title="Podsumowanie" icon={ClipboardDocumentListIcon}>
+                <DetailSection title="Podsumowanie" icon={ClipboardDocumentListIcon} summary={compactSummary}>
                     <DetailRows rows={summaryRows} />
                     {hasClaimDetails && <div className="mt-4 border-t border-gray-100 pt-4">
                         <p className="mb-2 font-semibold text-gray-900">Ubezpieczyciel i szkoda</p>
@@ -368,7 +394,7 @@ export function WorkInformation({
                     </div>
                 </DetailSection>
 
-                <DetailSection title="Kosztorys" icon={ClipboardDocumentListIcon}>
+                <DetailSection title="Kosztorys" icon={ClipboardDocumentListIcon} summary={compactEstimate}>
                     {hasEstimateDetails ? <DetailRows rows={estimateDetails} /> : <p>Brak kosztorysu.</p>}
                     {work.estimateNotes && <p className="mt-3 whitespace-pre-line rounded-md bg-gray-50 px-3 py-2">
                         <span className="font-medium text-gray-700">Uwagi:</span>{' '}
@@ -376,7 +402,7 @@ export function WorkInformation({
                     </p>}
                 </DetailSection>
 
-                <DetailSection title="Rozliczenia" icon={BanknotesIcon}>
+                <DetailSection title="Rozliczenia" icon={BanknotesIcon} summary={compactSettlement}>
                     <DetailRows rows={settlementDetails} />
                     {work.settlementNotes && <p className="mt-3 whitespace-pre-line rounded-md bg-gray-50 px-3 py-2">
                         <span className="font-medium text-gray-700">Uwagi do rozliczenia:</span>{' '}
@@ -393,7 +419,7 @@ export function WorkInformation({
                     </div>}
                 </DetailSection>
 
-                <DetailSection title="Historia" icon={ClockIcon} defaultOpen={false}>
+                <DetailSection title="Historia" icon={ClockIcon} summary={compactHistory} defaultOpen={false}>
                     {(work.statusHistory?.length ?? 0) > 0 ? (
                         <div className="space-y-3">
                             {work.statusHistory?.map((item) => (

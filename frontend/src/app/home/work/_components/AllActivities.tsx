@@ -23,11 +23,14 @@ import WorkTasks from './WorkTasks'
 import QualityChecklist from './QualityChecklist'
 import VehicleRelease from './VehicleRelease'
 
-function CollapsibleAsideSection({ title, children }: { title: string, children: React.ReactNode }) {
+function CollapsibleAsideSection({ title, summary, children }: { title: string, summary?: React.ReactNode, children: React.ReactNode }) {
   return (
     <details className="group border-t border-gray-900/5 bg-white">
-      <summary className="flex cursor-pointer list-none items-center px-5 py-4 text-sm font-semibold text-gray-900">
-        <span>{title}</span>
+      <summary className="flex cursor-pointer list-none items-start gap-x-3 px-5 py-4 text-sm font-semibold text-gray-900">
+        <span className="min-w-0 flex-1">
+          <span className="block">{title}</span>
+          {summary && <span className="mt-1 block truncate text-xs font-normal text-gray-500 group-open:hidden">{summary}</span>}
+        </span>
         <span className="ml-auto text-xs font-medium text-gray-400 group-open:hidden">▶</span>
         <span className="ml-auto hidden text-xs font-medium text-gray-400 group-open:inline">▼</span>
       </summary>
@@ -56,6 +59,14 @@ export default function Activities({
   const confirmRemoveActivityRef = React.useRef<ConfirmDialogHandle>(null);
   const containsRepairJobWithProductsOrServices = activities.items.findIndex(x=>!x.isEmpty && x.name == 'repairjob')>-1;
   const items = activities.items??[];
+  const repairSummary = [
+    containsRepairJobWithProductsOrServices ? 'naprawa z pozycjami' : 'brak pozycji naprawy',
+    work.replacementVehicle ? `pojazd zastępczy: ${work.replacementVehicle.replacementVehicleName}` : '',
+  ].filter(Boolean).join(' · ');
+  const documentsSummary = [
+    documents.length === 1 ? '1 dokument' : `${documents.length} dokumentów`,
+    communicationEntries.length === 1 ? '1 kontakt' : `${communicationEntries.length} wpisów komunikacji`,
+  ].join(' · ');
   //todo fix bordering 
   return (
     <aside className="2xl:fixed  pl-0 lg:pl-62 2xl:pl-0    bg-white  border-l-1  border-l-gray-200  overflow-y-auto overflow-x-hidden  inset-y-0 right-0    2xl:w-108    ">
@@ -70,7 +81,7 @@ export default function Activities({
           </div>
         </li>
         <li>
-          <CollapsibleAsideSection title="Naprawa">
+          <CollapsibleAsideSection title="Naprawa" summary={repairSummary}>
             <WorkTasks workId={work.id}></WorkTasks>
             <QualityChecklist workId={work.id}></QualityChecklist>
             <VehicleRelease workId={work.id}></VehicleRelease>
@@ -79,7 +90,7 @@ export default function Activities({
           </CollapsibleAsideSection>
         </li>
         <li>
-          <CollapsibleAsideSection title="Dokumenty">
+          <CollapsibleAsideSection title="Dokumenty" summary={documentsSummary}>
             <WorkDocuments workId={work.id} documents={documents}></WorkDocuments>
             <WorkCommunication workId={work.id} entries={communicationEntries} documents={documents}></WorkCommunication>
           </CollapsibleAsideSection>
@@ -122,7 +133,7 @@ export default function Activities({
                   </p> 
                   {issuance&& <PricingDownloadLink name="Oferta"  hideLabel={true} id={issuance.id} number={issuance.number} ></PricingDownloadLink>}
                   {issuance&& <IssuanceBadges issueance={issuance}   ></IssuanceBadges>}
-                </div>
+                </div> 
                  <ActivityCreatedBy activity={item}></ActivityCreatedBy>  
               </div>  
               {options.length>0 &&
