@@ -7,17 +7,139 @@ import SimpleSearchBar from "../_components/SimpleSearchBar";
 import Link from "next/link";
 import { CardHeader } from "@/_components/Card";
 import { PlusCircleIcon } from "@heroicons/react/24/outline";
+import { httpGet } from "@/_lib/server/query-api";
 
+interface VehiclesPageResult {
+  hasMore: boolean;
+  items: VehicleRow[];
+}
+
+type VehicleRow = Record<string, unknown>;
+
+function getString(item: VehicleRow, keys: string[]) {
+  for (const key of keys) {
+    const value = item[key];
+    if (value !== undefined && value !== null && value !== "") return String(value);
+  }
+  return "";
+}
+
+function isClientVehicle(item: VehicleRow, clientId: string) {
+  const ownerId = getString(item, ["ownerId", "clientId", "customerId"]);
+  return ownerId === clientId;
+}
+
+function VehicleProducer({ producer }: { producer: string }) {
+  const producerName = producer.trim().replace(" ", "-").toLowerCase();
+  return (
+    <div className="flex items-center">
+      <i className={clsx("pr-2 text-2xl", "car-" + producerName)}> </i>
+      <span className="text-sm">{producer || "-"}</span>
+    </div>
+  );
+}
+
+function ClientVehiclesTable({ vehicles }: { vehicles: VehicleRow[] }) {
+  return (
+    <div className="overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200">
+          <thead className="bg-gray-50">
+            <tr>
+              <th className="py-3 pr-3 pl-4 text-left text-xs font-semibold tracking-wide text-gray-600 uppercase sm:pl-6">Marka</th>
+              <th className="px-3 py-3 text-left text-xs font-semibold tracking-wide text-gray-600 uppercase">Model</th>
+              <th className="px-3 py-3 text-left text-xs font-semibold tracking-wide text-gray-600 uppercase">Numer rejestracyjny</th>
+              <th className="px-3 py-3 text-left text-xs font-semibold tracking-wide text-gray-600 uppercase">Właściciel</th>
+              <th className="px-3 py-3 text-left text-xs font-semibold tracking-wide text-gray-600 uppercase">VIN</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100 bg-white">
+            {vehicles.map(vehicle => {
+              const id = getString(vehicle, ["id"]);
+              const producer = getString(vehicle, ["producer"]);
+              const model = getString(vehicle, ["model"]);
+              const regNr = getString(vehicle, ["regNr", "registrationNumber"]);
+              const ownerName = getString(vehicle, ["ownerName", "clientName"]);
+              const ownerId = getString(vehicle, ["ownerId", "clientId"]);
+              const vin = getString(vehicle, ["vin"]);
+              const isReplacementVehicle = Boolean(vehicle.isReplacementVehicle);
+
+              return <tr key={id || `${regNr}-${vin}`} className="hover:bg-gray-50">
+                <td className="py-3 pr-3 pl-4 align-top font-medium text-gray-900 sm:pl-6">
+                  <VehicleProducer producer={producer} />
+                </td>
+                <td className="px-3 py-3 align-top text-sm text-gray-600">{model || "-"}</td>
+                <td className="px-3 py-3 align-top text-sm">
+                  {id ? <Link href={`/home/vehicles/${id}`} className="inline-flex items-center gap-2 font-semibold text-gray-900 hover:text-indigo-700">
+                    {regNr || "Brak numeru"}
+                    {isReplacementVehicle && <span className="rounded-full bg-sky-50 px-2 py-0.5 text-xs font-semibold text-sky-700">Zastępczy</span>}
+                  </Link> : <span className="font-semibold text-gray-900">{regNr || "Brak numeru"}</span>}
+                </td>
+                <td className="px-3 py-3 align-top text-sm text-gray-600">
+                  {ownerName && ownerId ? <Link href={`/home/clients/${ownerId}`} className="text-indigo-700 hover:text-indigo-500">{ownerName}</Link> : ownerName || "Brak właściciela"}
+                </td>
+                <td className="px-3 py-3 align-top text-sm text-gray-600">
+                  {id ? <Link href={`/home/vehicles/${id}`} className="hover:text-indigo-700">{vin || "-"}</Link> : vin || "-"}
+                </td>
+              </tr>
+            })}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+
+async function ClientVehiclesView({ searchParams, clientId }: { searchParams: Promise<Record<string, string>>, clientId: string }) {
+  const options = await searchParams;
+  const apiOptions: Record<string, string> = Object.fromEntries(
+    Object.entries(options).filter(([key]) => key !== "replacement")
+  );
+  apiOptions.offset = "0";
+  apiOptions.limit = "200";
+
+  const response = await httpGet(`vehicles/page?${new URLSearchParams(apiOptions).toString()}`);
+  const data = (await response.json()) as VehiclesPageResult;
+  const vehicles = (data.items || []).filter(item => isClientVehicle(item, clientId));
+  const clientName = vehicles.map(item => getString(item, ["ownerName", "clientName"])).find(Boolean);
+
+  return <Main header={
+    <CardHeader
+      title={clientName ? `Pojazdy klienta: ${clientName}` : "Pojazdy klienta"}
+      description="Lista pojazdów powiązanych z wybranym klientem."
+    >
+      <div className="mt-2 shrink-0">
+        <Link
+          href="/home/vehicles"
+          className="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 ring-1 shadow-xs ring-gray-300 ring-inset hover:bg-gray-50"
+        >
+          Pokaż wszystkie pojazdy
+        </Link>
+      </div>
+    </CardHeader>
+  } narrow={false}>
+    {vehicles.length > 0 ? <ClientVehiclesTable vehicles={vehicles} /> :
+      <div className="rounded-md border border-gray-200 bg-white px-4 py-8 text-center shadow-sm">
+        <h3 className="text-sm font-semibold text-gray-900">Brak pojazdów przypisanych do tego klienta.</h3>
+        <p className="mt-2 text-sm text-gray-500">Wróć do wszystkich pojazdów albo sprawdź kartę klienta.</p>
+      </div>}
+  </Main>
+}
 
 export default async function Page(
   { searchParams }: { searchParams: Promise<Record<string, string>> }) {
 
   const options = await searchParams;
   const isReplacementView = options.replacement === 'true';
+  const clientId = options.clientId;
   const title = isReplacementView ? 'Flota pojazdów zastępczych' : 'Pojazdy';
   const description = isReplacementView
     ? 'Tutaj będą widoczne pojazdy należące do floty zastępczej warsztatu.'
     : 'Baza pojazdów powiązanych z klientami i zleceniami.';
+
+  if (clientId && !isReplacementView) {
+    return <ClientVehiclesView searchParams={searchParams} clientId={clientId} />;
+  }
 
   if (isReplacementView) {
     return <Main header={
