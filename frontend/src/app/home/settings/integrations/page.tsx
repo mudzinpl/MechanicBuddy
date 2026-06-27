@@ -21,13 +21,13 @@ export default async function Page() {
 
             <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
                 {integrations.map((integration) => (
-                    <div key={integration.integrationType} className="rounded-md border border-gray-200 bg-white p-5 shadow-xs">
+                    <div key={integration.integrationType} className="flex h-full flex-col rounded-md border border-gray-200 bg-white p-5 shadow-xs">
                         <div className="flex flex-wrap items-start justify-between gap-3">
-                            <div>
+                            <div className="min-w-0 flex-1">
                                 <h3 className="text-sm/6 font-semibold text-gray-900">{integration.displayName}</h3>
                                 <p className="mt-1 text-sm/6 text-gray-500">{integration.description}</p>
                             </div>
-                            <span className={clsx('inline-flex items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset', getIntegrationStatusClass(integration.status))}>
+                            <span className={clsx('inline-flex shrink-0 items-center rounded-md px-2 py-1 text-xs font-medium ring-1 ring-inset', getIntegrationStatusClass(integration.status))}>
                                 {getIntegrationStatusLabel(integration.status)}
                             </span>
                         </div>
@@ -51,7 +51,7 @@ export default async function Page() {
                             </div>
                         </dl>
 
-                        <div className="mt-5 flex flex-wrap items-center justify-end gap-3">
+                        <div className="mt-auto flex flex-wrap items-center justify-end gap-3 pt-5">
                             <form action={testIntegrationConnection}>
                                 <input type="hidden" name="integrationType" value={integration.integrationType} />
                                 <button type="submit" className="rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50">
