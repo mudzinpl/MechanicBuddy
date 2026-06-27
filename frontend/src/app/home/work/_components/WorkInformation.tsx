@@ -2,7 +2,7 @@
 
 'use client'
 import { damageStatuses, getDamageStatusLabel, getEstimateStatusLabel, getEstimateSystemLabel, getSettlementStatusLabel, IWorkData, statusNames } from '../model';
-import { BanknotesIcon, ClipboardDocumentListIcon, ClockIcon, DocumentTextIcon, ExclamationTriangleIcon, ShieldCheckIcon, TruckIcon, UserCircleIcon, WrenchScrewdriverIcon } from '@heroicons/react/20/solid';
+import { BanknotesIcon, ClipboardDocumentListIcon, ClockIcon, DocumentTextIcon, ExclamationTriangleIcon, ShieldCheckIcon, UserCircleIcon } from '@heroicons/react/20/solid';
 import moment from 'moment';
 import React from 'react';
 import { startAnActivity } from '../actions/startAnActivity';
