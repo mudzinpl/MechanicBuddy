@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using Dapper;
 using MechanicBuddy.Core.Application.Extensions;
 using MechanicBuddy.Core.Application.RateLimiting;
@@ -94,15 +93,26 @@ namespace MechanicBuddy.Http.Api.Controllers
         private bool IsAllowedEnvironment()
         {
             var host = Request.Host.Host ?? string.Empty;
+            var frontendHost = Request.Headers.TryGetValue("X-App-Frontend-Host", out var frontendHostHeader)
+                ? frontendHostHeader.ToString()
+                : string.Empty;
             var tenantId = Request.Headers.TryGetValue("X-Tenant-ID", out var tenantHeader)
                 ? tenantHeader.ToString()
                 : string.Empty;
 
             return environment.IsDevelopment()
-                || host.Contains("localhost", StringComparison.OrdinalIgnoreCase)
-                || host.Contains("127.0.0.1", StringComparison.OrdinalIgnoreCase)
+                || IsLocalOrDemoHost(host)
+                || IsLocalOrDemoHost(frontendHost)
                 || tenantId.StartsWith("demo", StringComparison.OrdinalIgnoreCase)
                 || tenantId.Contains("demo", StringComparison.OrdinalIgnoreCase);
+        }
+
+        private static bool IsLocalOrDemoHost(string value)
+        {
+            return !string.IsNullOrWhiteSpace(value)
+                && (value.Contains("localhost", StringComparison.OrdinalIgnoreCase)
+                    || value.Contains("127.0.0.1", StringComparison.OrdinalIgnoreCase)
+                    || value.Contains("demo", StringComparison.OrdinalIgnoreCase));
         }
 
         private bool DemoExists()
@@ -295,7 +305,7 @@ namespace MechanicBuddy.Http.Api.Controllers
         {
             var statuses = new[] { "new", "new", "inspection_pending", "inspection_pending", "estimate_sent", "estimate_sent", "approval_pending", "approval_pending", "parts_pending", "parts_pending", "repair", "repair", "paint_shop", "paint_shop", "quality_control", "quality_control", "ready_for_pickup", "ready_for_pickup", "released", "released" };
             var insurers = new[] { "PZU", "Warta", "ERGO Hestia", "UNIQA", "InterRisk", "Compensa", "Allianz", "Generali" };
-            var damageTypes = new[] { "OC", "AC", "Gotówka", "Flota", "Assistance" };
+            var damageTypes = new[] { "OC", "AC", "Gotówka", "OC", "AC", "Gotówka", "OC", "AC", "Gotówka", "OC", "AC", "Gotówka", "OC", "AC", "Gotówka", "OC", "AC", "Gotówka", "OC", "AC" };
             var startNumber = session.Connection.ExecuteScalar<int?>("SELECT COALESCE(MAX(number), 0) + 1 FROM domain.work") ?? 1;
             var ids = new List<Guid>();
 
@@ -305,14 +315,20 @@ namespace MechanicBuddy.Http.Api.Controllers
                 var status = statuses[i];
                 var startedOn = DateTime.UtcNow.Date.AddDays(-(24 - i));
                 var estimatePrepared = i >= 4;
-                var estimateSent = i >= 6 ? startedOn.AddDays(2) : (DateTime?)null;
-                var decisionOn = i >= 10 && i % 4 != 0 ? startedOn.AddDays(5) : (DateTime?)null;
+                var estimateSent = i >= 4 ? startedOn.AddDays(3) : (DateTime?)null;
+                var estimateStatus = i < 4 ? null : i < 8 ? "sent" : i == 14 ? "needs_correction" : "accepted";
+                var decisionOn = estimateStatus == "accepted" ? startedOn.AddDays(6) : (DateTime?)null;
                 var settled = i == 18 || i == 19;
                 var partiallySettled = i == 14 || i == 17;
-                var clientVatPercent = i % 6 == 0 ? 50 : i % 9 == 0 ? 100 : 0;
+                var clientVatPercent = i == 6 ? 50 : i == 9 ? 100 : i == 12 ? 50 : 0;
                 var gross = 4200m + i * 390m;
                 var net = Math.Round(gross / 1.23m, 2);
                 var vat = gross - net;
+                var assignmentSigned = i > 1 && i != 5 && i != 10;
+                var powerSigned = i > 1 && i != 5 && i != 8;
+                var hasClaimNumber = i > 1 && i != 15;
+                var hasInsurer = i > 1 && i != 16;
+                var handlerMissing = i == 0 || i == 1 || i == 7;
 
                 session.Connection.Execute(@"
                     INSERT INTO domain.work(
@@ -347,38 +363,38 @@ namespace MechanicBuddy.Http.Api.Controllers
                         StarterId = employees.Admin,
                         ClientId = clients[i % clients.Count],
                         VehicleId = vehicles[i],
-                        Notes = $"[{Marker}] Demonstracyjna szkoda APPRA: {DemoStatusLabel(status)}.",
+                        Notes = $"[{Marker}] {DemoCaseDescription(i, status)}",
                         Odo = 42000 + i * 4100,
                         ChangedOn = startedOn.AddDays(Math.Min(i, 10)),
-                        ClaimNumber = i % 7 != 0 ? $"APPRA/{DateTime.UtcNow:yyyy}/{1000 + i}" : null,
-                        Insurer = i % 8 != 1 ? insurers[i % insurers.Length] : null,
-                        DamageType = damageTypes[i % damageTypes.Length],
+                        ClaimNumber = hasClaimNumber ? $"APPRA/{DateTime.UtcNow:yyyy}/{1000 + i}" : null,
+                        Insurer = hasInsurer ? insurers[i % insurers.Length] : null,
+                        DamageType = damageTypes[i],
                         DamageStatus = status,
-                        AssignmentSigned = i % 5 != 0,
+                        AssignmentSigned = assignmentSigned,
                         ClientPaysVat = clientVatPercent > 0,
                         EstimateNumber = estimatePrepared ? $"AUD-{DateTime.UtcNow:yyyy}-{2000 + i}" : null,
-                        InsurerNotes = i % 3 == 0 ? "Ubezpieczyciel wymaga dodatkowej dokumentacji zdjęciowej." : "Standardowa ścieżka likwidacji szkody.",
-                        HandlerName = i % 6 == 0 ? null : $"Opiekun szkody {i + 1}",
-                        HandlerEmail = i % 6 == 0 ? null : $"opiekun{i + 1}@ubezpieczyciel-demo.local",
-                        HandlerPhone = i % 6 == 0 ? null : $"+48 22 100 {i + 1:D3}",
+                        InsurerNotes = DemoInsurerNotes(i, status),
+                        HandlerName = handlerMissing ? null : $"Opiekun szkody {i + 1}",
+                        HandlerEmail = handlerMissing ? null : $"opiekun{i + 1}@ubezpieczyciel-demo.local",
+                        HandlerPhone = handlerMissing ? null : $"+48 22 100 {i + 1:D3}",
                         ClaimReportedOn = startedOn,
                         EstimateSentOn = estimateSent,
                         InsurerDecisionOn = decisionOn,
                         SupplementPaidOn = settled ? DateTime.UtcNow.AddDays(-2) : (DateTime?)null,
                         PlannedIntakeOn = startedOn.AddDays(1),
-                        PlannedInspectionOn = startedOn.AddDays(2),
+                        PlannedInspectionOn = i >= 2 ? startedOn.AddDays(2) : (DateTime?)null,
                         PlannedReleaseOn = status == "ready_for_pickup" ? DateTime.UtcNow.Date.AddDays(i % 2 == 0 ? -1 : 1) : status == "released" ? DateTime.UtcNow.Date.AddDays(-2) : (DateTime?)null,
-                        AssignmentSignedOn = i % 5 != 0 ? startedOn.AddDays(1) : (DateTime?)null,
-                        PowerSigned = i % 4 != 0,
-                        PowerSignedOn = i % 4 != 0 ? startedOn.AddDays(1) : (DateTime?)null,
+                        AssignmentSignedOn = assignmentSigned ? startedOn.AddDays(1) : (DateTime?)null,
+                        PowerSigned = powerSigned,
+                        PowerSignedOn = powerSigned ? startedOn.AddDays(1) : (DateTime?)null,
                         ClientVatPercent = clientVatPercent,
                         ClientVatAmount = clientVatPercent == 0 ? 0 : Math.Round(vat * clientVatPercent / 100m, 2),
-                        UnderpaymentAmount = i % 6 == 0 ? 620m + i * 15 : 0,
+                        UnderpaymentAmount = i == 6 || i == 12 || i == 17 ? 620m + i * 15 : 0,
                         SettlementStatus = settled ? "settled" : partiallySettled ? "partially_settled" : "unsettled",
-                        PaymentDemandOn = i % 6 == 0 ? DateTime.UtcNow.AddDays(-9) : (DateTime?)null,
+                        PaymentDemandOn = i == 6 || i == 12 || i == 17 ? DateTime.UtcNow.AddDays(-9) : (DateTime?)null,
                         PaymentReceivedOn = settled ? DateTime.UtcNow.AddDays(-1) : (DateTime?)null,
-                        SettlementNotes = settled ? "Sprawa rozliczona demonstracyjnie." : partiallySettled ? "Częściowa płatność, oczekiwanie na dopłatę." : "Rozliczenie w toku.",
-                        EstimateSystem = estimatePrepared ? (i % 2 == 0 ? "audanet" : "audatex") : null,
+                        SettlementNotes = DemoSettlementNotes(i, settled, partiallySettled, clientVatPercent),
+                        EstimateSystem = estimatePrepared ? (i % 3 == 0 ? "manual" : "audanet") : null,
                         EstimateVersion = estimatePrepared ? $"v{1 + i % 3}" : null,
                         EstimatePreparedOn = estimatePrepared ? startedOn.AddDays(2) : (DateTime?)null,
                         EstimateNetAmount = estimatePrepared ? net : (decimal?)null,
@@ -386,9 +402,9 @@ namespace MechanicBuddy.Http.Api.Controllers
                         EstimateGrossAmount = estimatePrepared ? gross : (decimal?)null,
                         MechanicalRbg = estimatePrepared ? 130m + i * 2 : (decimal?)null,
                         PaintRbg = estimatePrepared ? 150m + i * 2 : (decimal?)null,
-                        EstimateStatus = i < 4 ? null : i < 6 ? "draft" : i < 10 ? "sent" : i % 7 == 0 ? "needs_correction" : "accepted",
-                        EstimateAcceptedOn = decisionOn,
-                        EstimateNotes = estimatePrepared ? "Kosztorys demonstracyjny APPRA." : null,
+                        EstimateStatus = estimateStatus,
+                        EstimateAcceptedOn = estimateStatus == "accepted" ? decisionOn : (DateTime?)null,
+                        EstimateNotes = estimatePrepared ? DemoEstimateNotes(i, estimateStatus) : null,
                         InvoiceNetAmount = i >= 16 ? net : (decimal?)null,
                         InvoiceVatAmount = i >= 16 ? vat : (decimal?)null,
                         InvoiceGrossAmount = i >= 16 ? gross : (decimal?)null,
@@ -408,18 +424,39 @@ namespace MechanicBuddy.Http.Api.Controllers
 
         private void CreateDocuments(List<Guid> workIds, Guid adminId)
         {
-            var categories = new[] { "vehicle_photos", "audanet_estimates", "audatex_estimates", "insurer_decisions", "claim_assignments", "authorizations", "invoices", "notes", "transfer_confirmations", "other" };
+            var documentSets = new[]
+            {
+                Array.Empty<string>(),
+                new[] { "vehicle_photos" },
+                new[] { "vehicle_photos", "client_documents" },
+                new[] { "vehicle_photos", "authorizations" },
+                new[] { "vehicle_photos", "audanet_estimates" },
+                new[] { "vehicle_photos", "audanet_estimates", "authorizations" },
+                new[] { "vehicle_photos", "audanet_estimates", "claim_assignments", "authorizations" },
+                new[] { "vehicle_photos", "audanet_estimates", "emails" },
+                new[] { "vehicle_photos", "audanet_estimates", "insurer_decisions", "claim_assignments", "authorizations" },
+                new[] { "vehicle_photos", "audanet_estimates", "insurer_decisions" },
+                new[] { "vehicle_photos", "audanet_estimates", "parts_orders", "claim_assignments" },
+                new[] { "vehicle_photos", "audanet_estimates", "parts_orders", "authorizations" },
+                new[] { "vehicle_photos", "audanet_estimates", "paint_photos", "claim_assignments", "authorizations" },
+                new[] { "vehicle_photos", "audanet_estimates", "paint_photos" },
+                new[] { "vehicle_photos", "audanet_estimates", "quality_check", "emails" },
+                new[] { "vehicle_photos", "audanet_estimates", "quality_check", "insurer_decisions" },
+                new[] { "vehicle_photos", "audanet_estimates", "release_protocol", "invoices" },
+                new[] { "vehicle_photos", "audanet_estimates", "release_protocol", "payment_demands" },
+                new[] { "vehicle_photos", "audanet_estimates", "release_protocol", "invoices", "transfer_confirmations" },
+                new[] { "vehicle_photos", "audanet_estimates", "release_protocol", "invoices", "notes" }
+            };
+
             for (var i = 0; i < workIds.Count; i++)
             {
-                var docsToCreate = i < 4 ? 1 : i < 12 ? 2 : 3;
-                for (var j = 0; j < docsToCreate; j++)
+                foreach (var category in documentSets[i])
                 {
-                    var category = categories[(i + j) % categories.Length];
                     var content = System.Text.Encoding.UTF8.GetBytes($"APPRA demo placeholder: {category} dla zlecenia {i + 1}");
                     session.Connection.Execute(@"
                         INSERT INTO domain.workdocument(id, workid, category, filename, contenttype, filesize, content, uploadedon, uploadedbyemployeeid, uploadedbyname)
                         VALUES (@Id, @WorkId, @Category, @FileName, 'application/pdf', @FileSize, @Content, @UploadedOn, @EmployeeId, 'APPRA Demo')",
-                        new { Id = Guid.NewGuid(), WorkId = workIds[i], Category = category, FileName = $"appra-demo-{i + 1:D2}-{category}.pdf", FileSize = content.Length, Content = content, UploadedOn = DateTime.UtcNow.AddDays(-(20 - i)).AddHours(j), EmployeeId = adminId });
+                        new { Id = Guid.NewGuid(), WorkId = workIds[i], Category = category, FileName = $"appra-demo-{i + 1:D2}-{category}.pdf", FileSize = content.Length, Content = content, UploadedOn = DateTime.UtcNow.AddDays(-(20 - i)), EmployeeId = adminId });
                 }
             }
         }
@@ -438,7 +475,7 @@ namespace MechanicBuddy.Http.Api.Controllers
                 session.Connection.Execute(@"
                     INSERT INTO domain.work_replacement_vehicle(id, workid, replacementvehicleid, issuedon, plannedreturnon, returnedon, mileageout, mileagein, fuelout, fuelin, conditionout, conditionin, notes, status, createdon, changedon)
                     VALUES (@Id, @WorkId, @VehicleId, @IssuedOn, @PlannedReturnOn, @ReturnedOn, @MileageOut, @MileageIn, @FuelOut, @FuelIn, @ConditionOut, @ConditionIn, @Notes, @Status, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",
-                    new { Id = Guid.NewGuid(), WorkId = workIds[workIndexes[i]], VehicleId = replacementVehicleIds[i % replacementVehicleIds.Count], IssuedOn = issuedOn, PlannedReturnOn = plannedReturn, ReturnedOn = returnedOn, MileageOut = 30000 + i * 1500, MileageIn = returnedOn.HasValue ? 30250 + i * 1500 : (int?)null, FuelOut = i % 2 == 0 ? "3/4" : "1/2", FuelIn = returnedOn.HasValue ? "1/2" : null, ConditionOut = "Stan dobry, dokumentacja zdjęciowa wykonana.", ConditionIn = returnedOn.HasValue ? "Zwrot bez nowych uszkodzeń." : null, Notes = i == 1 ? "Pojazd wydany bez daty zwrotu - alert demonstracyjny." : "Najem pojazdu zastępczego APPRA demo.", Status = status });
+                    new { Id = Guid.NewGuid(), WorkId = workIds[workIndexes[i]], VehicleId = replacementVehicleIds[i % replacementVehicleIds.Count], IssuedOn = issuedOn, PlannedReturnOn = plannedReturn, ReturnedOn = returnedOn, MileageOut = 30000 + i * 1500, MileageIn = returnedOn.HasValue ? 30250 + i * 1500 : (int?)null, FuelOut = i % 2 == 0 ? "3/4" : "1/2", FuelIn = returnedOn.HasValue ? "1/2" : null, ConditionOut = "Stan dobry, dokumentacja zdjęciowa wykonana.", ConditionIn = returnedOn.HasValue ? "Zwrot bez nowych uszkodzeń." : null, Notes = i == 1 ? "Pojazd wydany bez daty zwrotu - alert demonstracyjny." : i == 3 ? "Planowany zwrot przekroczony - alert demonstracyjny." : "Najem pojazdu zastępczego APPRA demo.", Status = status });
             }
         }
 
@@ -478,7 +515,7 @@ namespace MechanicBuddy.Http.Api.Controllers
                     session.Connection.Execute(@"
                         INSERT INTO domain.work_task(id, workid, title, description, tasktype, assignedemployeeid, status, priority, dueon, completedon, comment, createdbyemployeeid, createdon, changedon)
                         VALUES (@Id, @WorkId, @Title, @Description, @TaskType, @AssignedEmployeeId, @Status, @Priority, @DueOn, @CompletedOn, @Comment, @CreatedByEmployeeId, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)",
-                        new { Id = Guid.NewGuid(), WorkId = workIds[i], task.Title, Description = "Zadanie demonstracyjne APPRA.", TaskType = task.Type, AssignedEmployeeId = i % 9 == 0 ? (Guid?)null : task.EmployeeId, Status = status, Priority = priorities[(i + j) % priorities.Length], DueOn = i % 5 == 0 ? DateTime.UtcNow.AddDays(-2) : DateTime.UtcNow.AddDays(2 + j), CompletedOn = status == "completed" ? DateTime.UtcNow.AddDays(-1) : (DateTime?)null, Comment = i % 5 == 0 ? "Termin zadania przekroczony - alert demonstracyjny." : "Bez uwag.", CreatedByEmployeeId = employees.Admin });
+                        new { Id = Guid.NewGuid(), WorkId = workIds[i], task.Title, Description = $"Zadanie demonstracyjne APPRA dla sprawy: {DemoCaseDescription(i, "")}", TaskType = task.Type, AssignedEmployeeId = i % 9 == 0 ? (Guid?)null : task.EmployeeId, Status = status, Priority = priorities[(i + j) % priorities.Length], DueOn = i % 5 == 0 ? DateTime.UtcNow.AddDays(-2) : DateTime.UtcNow.AddDays(2 + j), CompletedOn = status == "completed" ? DateTime.UtcNow.AddDays(-1) : (DateTime?)null, Comment = i % 5 == 0 ? "Termin zadania przekroczony - alert demonstracyjny." : "Bez uwag.", CreatedByEmployeeId = employees.Admin });
                 }
             }
         }
@@ -518,7 +555,7 @@ namespace MechanicBuddy.Http.Api.Controllers
                     session.Connection.Execute(@"
                         INSERT INTO domain.work_status_history(id, workid, oldstatus, newstatus, comment, changedbyemployeeid, changedon)
                         VALUES (@Id, @WorkId, @OldStatus, @NewStatus, @Comment, @ChangedByEmployeeId, @ChangedOn)",
-                        new { Id = Guid.NewGuid(), WorkId = workIds[i], OldStatus = flow[step - 1], NewStatus = flow[step], Comment = $"Demo APPRA: zmiana statusu na {DemoStatusLabel(flow[step])}.", ChangedByEmployeeId = employees.Manager, ChangedOn = startedOn.AddDays(step).AddHours(9 + step) });
+                        new { Id = Guid.NewGuid(), WorkId = workIds[i], OldStatus = flow[step - 1], NewStatus = flow[step], Comment = $"Demo APPRA: {DemoCaseDescription(i, flow[step])}", ChangedByEmployeeId = employees.Manager, ChangedOn = startedOn.AddDays(step).AddHours(9 + step) });
                 }
             }
         }
@@ -537,7 +574,7 @@ namespace MechanicBuddy.Http.Api.Controllers
                     session.Connection.Execute(@"
                         INSERT INTO domain.work_communication_entry(id, workid, category, subject, note, status, documentid, authorbyemployeeid, authorname, occurredon, createdon, changedon, integrationchannel, externalmessageid, externalthreadid)
                         VALUES (@Id, @WorkId, @Category, @Subject, @Note, @Status, NULL, @AuthorId, @AuthorName, @OccurredOn, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, @Channel, NULL, NULL)",
-                        new { Id = Guid.NewGuid(), WorkId = workIds[i], Category = category, Subject = category.Contains("insurer") ? "Kontakt z ubezpieczycielem" : "Kontakt w sprawie szkody", Note = status == "waiting_for_response" ? "Oczekujemy na odpowiedź - alert demonstracyjny." : "Wpis komunikacji demonstracyjnej APPRA.", Status = status, AuthorId = employees.Office, AuthorName = "APPRA Demo", OccurredOn = DateTime.UtcNow.AddDays(-(10 - j)).AddHours(i), Channel = category == "email" ? "email_placeholder" : "manual" });
+                        new { Id = Guid.NewGuid(), WorkId = workIds[i], Category = category, Subject = category.Contains("insurer") ? "Kontakt z ubezpieczycielem" : "Kontakt w sprawie szkody", Note = status == "waiting_for_response" ? "Oczekujemy na odpowiedź - alert demonstracyjny." : DemoCaseDescription(i, ""), Status = status, AuthorId = employees.Office, AuthorName = "APPRA Demo", OccurredOn = DateTime.UtcNow.AddDays(-(10 - j)).AddHours(i), Channel = category == "email" ? "email_placeholder" : "manual" });
                 }
             }
         }
@@ -559,6 +596,85 @@ namespace MechanicBuddy.Http.Api.Controllers
         private bool TableExists(string tableName)
         {
             return session.Connection.ExecuteScalar<bool>("SELECT to_regclass(@TableName) IS NOT NULL", new { TableName = tableName });
+        }
+
+        private static string DemoCaseDescription(int index, string status)
+        {
+            return index switch
+            {
+                0 => "Nowa szkoda bez dokumentów, cesji, pełnomocnictwa, kosztorysu i decyzji ubezpieczyciela.",
+                1 => "Nowe zgłoszenie z podstawowym opisem uszkodzeń, ale bez kompletu dokumentów formalnych.",
+                2 => "Sprawa po oględzinach z numerem szkody, opiekunem i ubezpieczycielem, jeszcze bez kosztorysu.",
+                3 => "Oględziny wykonane, oczekuje na przygotowanie kosztorysu i weryfikację dokumentów.",
+                4 => "Kosztorys Audanet wysłany do ubezpieczyciela, sprawa czeka na decyzję.",
+                5 => "Kosztorys wysłany, ale brakuje cesji albo pełnomocnictwa klienta.",
+                6 => "Kosztorys wysłany, klient dopłaca 50% VAT, rozliczenie pozostaje nierozliczone.",
+                7 => "Sprawa sporna: brak decyzji ubezpieczyciela i oczekiwanie na odpowiedź opiekuna szkody.",
+                8 => "Kosztorys zaakceptowany, dokumenty formalne kompletne, gotowe do zamówienia części.",
+                9 => "Kosztorys zaakceptowany, klient dopłaca 100% VAT, części są w przygotowaniu do zamówienia.",
+                10 => "Części zamówione, ale brakuje cesji - sprawa wymaga reakcji biura.",
+                11 => "Części w dostawie, termin naprawy zależy od dostawcy.",
+                12 => "Naprawa w toku z dopłatą VAT i częściowo wykonanymi zadaniami warsztatowymi.",
+                13 => "Naprawa w toku z pojazdem zastępczym i planowanym zwrotem.",
+                14 => "Lakiernia, kosztorys wymaga korekty po dodatkowej weryfikacji ubezpieczyciela.",
+                15 => "Kontrola jakości, brak numeru szkody tworzy alert demonstracyjny.",
+                16 => "Gotowe do wydania, ale brakuje ubezpieczyciela i trzeba sprawdzić komplet dokumentów.",
+                17 => "Gotowe do wydania, zaległa płatność i aktywny pojazd zastępczy po terminie zwrotu.",
+                18 => "Pojazd wydany klientowi, rozliczenie zakończone i dokumenty wydania kompletne.",
+                19 => "Pojazd wydany, faktura gotowa do wystawienia lub kontroli końcowej rozliczenia.",
+                _ => $"Demonstracyjna sprawa APPRA: {DemoStatusLabel(status)}."
+            };
+        }
+
+        private static string DemoInsurerNotes(int index, string status)
+        {
+            if (index == 7)
+            {
+                return "Sprawa sporna: ubezpieczyciel nie przesłał decyzji po wysłaniu kosztorysu. Wymagany ponowny kontakt.";
+            }
+
+            if (index == 14)
+            {
+                return "Ubezpieczyciel wymaga korekty kosztorysu po dodatkowych oględzinach.";
+            }
+
+            if (status == "new")
+            {
+                return "Brak decyzji i dokumentów formalnych - sprawa do uzupełnienia.";
+            }
+
+            return "Standardowa ścieżka likwidacji szkody w danych demonstracyjnych APPRA.";
+        }
+
+        private static string DemoEstimateNotes(int index, string estimateStatus)
+        {
+            return estimateStatus switch
+            {
+                "sent" => "Kosztorys wysłany do ubezpieczyciela, oczekuje na akceptację.",
+                "accepted" => "Kosztorys zaakceptowany, można kontynuować proces naprawy.",
+                "needs_correction" => "Kosztorys wymaga poprawy po weryfikacji ubezpieczyciela.",
+                _ => "Kosztorys demonstracyjny APPRA."
+            };
+        }
+
+        private static string DemoSettlementNotes(int index, bool settled, bool partiallySettled, int clientVatPercent)
+        {
+            if (settled)
+            {
+                return "Sprawa rozliczona demonstracyjnie, płatność zaksięgowana.";
+            }
+
+            if (partiallySettled)
+            {
+                return "Częściowe rozliczenie, oczekiwanie na dopłatę albo decyzję końcową.";
+            }
+
+            if (clientVatPercent > 0)
+            {
+                return $"Klient dopłaca {clientVatPercent}% VAT, rozliczenie wymaga kontroli biura.";
+            }
+
+            return "Rozliczenie w toku - dane demonstracyjne APPRA.";
         }
 
         private static string DemoStatusLabel(string status)
