@@ -17,7 +17,6 @@ import PricingDownloadLink from './activity/PricingDownloadLink'
 import WorkDocuments from './WorkDocuments'
 import ReplacementVehicle from './ReplacementVehicle'
 import WorkCommunication from './WorkCommunication'
-import InvoiceSettlement from './InvoiceSettlement'
 import PartOrders from './PartOrders'
 import WorkTasks from './WorkTasks'
 import QualityChecklist from './QualityChecklist'
@@ -28,8 +27,8 @@ function CollapsibleAsideSection({ title, children }: { title: string, children:
     <details className="group border-t border-gray-900/5 bg-white">
       <summary className="flex cursor-pointer list-none items-center px-5 py-4 text-sm font-semibold text-gray-900">
         <span>{title}</span>
-        <span className="ml-auto text-xs font-medium text-gray-400 group-open:hidden">Pokaż</span>
-        <span className="ml-auto hidden text-xs font-medium text-gray-400 group-open:inline">Ukryj</span>
+        <span className="ml-auto text-xs font-medium text-gray-400 group-open:hidden">▶</span>
+        <span className="ml-auto hidden text-xs font-medium text-gray-400 group-open:inline">▼</span>
       </summary>
       <div>
         {children}
@@ -66,43 +65,18 @@ export default function Activities({
           </div>
         </li>
         <li>
-          <CollapsibleAsideSection title="Zadania">
+          <CollapsibleAsideSection title="Naprawa">
             <WorkTasks workId={work.id}></WorkTasks>
-          </CollapsibleAsideSection>
-        </li>
-        <li>
-          <CollapsibleAsideSection title="Checklista i kontrola jakości">
             <QualityChecklist workId={work.id}></QualityChecklist>
-          </CollapsibleAsideSection>
-        </li>
-        <li>
-          <CollapsibleAsideSection title="Wydanie pojazdu">
             <VehicleRelease workId={work.id}></VehicleRelease>
-          </CollapsibleAsideSection>
-        </li>
-        <li>
-          <CollapsibleAsideSection title="Rozliczenia">
-            <InvoiceSettlement workId={work.id}></InvoiceSettlement>
-          </CollapsibleAsideSection>
-        </li>
-        <li>
-          <CollapsibleAsideSection title="Części / zamówienia">
             <PartOrders workId={work.id}></PartOrders>
-          </CollapsibleAsideSection>
-        </li>
-        <li>
-          <CollapsibleAsideSection title="Pojazd zastępczy">
             <ReplacementVehicle workId={work.id} rental={work.replacementVehicle}></ReplacementVehicle>
-          </CollapsibleAsideSection>
-        </li>
-        <li>
-          <CollapsibleAsideSection title="Komunikacja">
-            <WorkCommunication workId={work.id} entries={communicationEntries} documents={documents}></WorkCommunication>
           </CollapsibleAsideSection>
         </li>
         <li>
           <CollapsibleAsideSection title="Dokumenty">
             <WorkDocuments workId={work.id} documents={documents}></WorkDocuments>
+            <WorkCommunication workId={work.id} entries={communicationEntries} documents={documents}></WorkCommunication>
           </CollapsibleAsideSection>
         </li>
       </ul>
