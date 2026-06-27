@@ -68,9 +68,11 @@ function DetailSection({
 export function WorkInformation({
     work,
     hasRepairJobWithProductsOrServices,
+    settlementContent,
 }: {
     work: IWorkData,
-    hasRepairJobWithProductsOrServices: boolean
+    hasRepairJobWithProductsOrServices: boolean,
+    settlementContent?: React.ReactNode
 }) {
 
 
@@ -386,6 +388,9 @@ export function WorkInformation({
                             <IssuanceBadges issueance={work.issuance}></IssuanceBadges>
                         </>}
                     </div>
+                    {settlementContent && <div className="mt-4 border-t border-gray-100 pt-4">
+                        {settlementContent}
+                    </div>}
                 </DetailSection>
 
                 <DetailSection title="Historia" icon={ClockIcon} defaultOpen={false}>
