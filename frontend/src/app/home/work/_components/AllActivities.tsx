@@ -23,6 +23,21 @@ import WorkTasks from './WorkTasks'
 import QualityChecklist from './QualityChecklist'
 import VehicleRelease from './VehicleRelease'
 
+function CollapsibleAsideSection({ title, children }: { title: string, children: React.ReactNode }) {
+  return (
+    <details className="group border-t border-gray-900/5 bg-white">
+      <summary className="flex cursor-pointer list-none items-center px-5 py-4 text-sm font-semibold text-gray-900">
+        <span>{title}</span>
+        <span className="ml-auto text-xs font-medium text-gray-400 group-open:hidden">Pokaż</span>
+        <span className="ml-auto hidden text-xs font-medium text-gray-400 group-open:inline">Ukryj</span>
+      </summary>
+      <div>
+        {children}
+      </div>
+    </details>
+  )
+}
+
  
 export default function Activities({
   work,
@@ -51,28 +66,44 @@ export default function Activities({
           </div>
         </li>
         <li>
-          <WorkTasks workId={work.id}></WorkTasks>
+          <CollapsibleAsideSection title="Zadania">
+            <WorkTasks workId={work.id}></WorkTasks>
+          </CollapsibleAsideSection>
         </li>
         <li>
-          <QualityChecklist workId={work.id}></QualityChecklist>
+          <CollapsibleAsideSection title="Checklista i kontrola jakości">
+            <QualityChecklist workId={work.id}></QualityChecklist>
+          </CollapsibleAsideSection>
         </li>
         <li>
-          <VehicleRelease workId={work.id}></VehicleRelease>
+          <CollapsibleAsideSection title="Wydanie pojazdu">
+            <VehicleRelease workId={work.id}></VehicleRelease>
+          </CollapsibleAsideSection>
         </li>
         <li>
-          <InvoiceSettlement workId={work.id}></InvoiceSettlement>
+          <CollapsibleAsideSection title="Rozliczenia">
+            <InvoiceSettlement workId={work.id}></InvoiceSettlement>
+          </CollapsibleAsideSection>
         </li>
         <li>
-          <PartOrders workId={work.id}></PartOrders>
+          <CollapsibleAsideSection title="Części / zamówienia">
+            <PartOrders workId={work.id}></PartOrders>
+          </CollapsibleAsideSection>
         </li>
         <li>
-          <ReplacementVehicle workId={work.id} rental={work.replacementVehicle}></ReplacementVehicle>
+          <CollapsibleAsideSection title="Pojazd zastępczy">
+            <ReplacementVehicle workId={work.id} rental={work.replacementVehicle}></ReplacementVehicle>
+          </CollapsibleAsideSection>
         </li>
         <li>
-          <WorkCommunication workId={work.id} entries={communicationEntries} documents={documents}></WorkCommunication>
+          <CollapsibleAsideSection title="Komunikacja">
+            <WorkCommunication workId={work.id} entries={communicationEntries} documents={documents}></WorkCommunication>
+          </CollapsibleAsideSection>
         </li>
         <li>
-          <WorkDocuments workId={work.id} documents={documents}></WorkDocuments>
+          <CollapsibleAsideSection title="Dokumenty">
+            <WorkDocuments workId={work.id} documents={documents}></WorkDocuments>
+          </CollapsibleAsideSection>
         </li>
       </ul>
       

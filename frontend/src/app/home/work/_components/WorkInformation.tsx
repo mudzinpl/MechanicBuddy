@@ -42,7 +42,7 @@ function DetailRows({ rows }: { rows: DetailRow[] }) {
 function DetailSection({
     title,
     icon: Icon,
-    defaultOpen = true,
+    defaultOpen = false,
     children,
 }: {
     title: string,
@@ -391,7 +391,7 @@ export function WorkInformation({
                     </div>}
                 </DetailSection>
 
-                <DetailSection title="Dokumenty / braki" icon={DocumentTextIcon} defaultOpen={missingItems.length > 0}>
+                <DetailSection title="Dokumenty / braki" icon={DocumentTextIcon}>
                     {missingItems.length > 0 ? (
                         <ul className="list-disc space-y-1 pl-5">
                             {missingItems.map(item => <li key={item}>{item}</li>)}
@@ -401,7 +401,7 @@ export function WorkInformation({
                     )}
                 </DetailSection>
 
-                <DetailSection title="Kosztorys" icon={ClipboardDocumentListIcon} defaultOpen={hasEstimateDetails || missingItems.includes('Brak kosztorysu')}>
+                <DetailSection title="Kosztorys" icon={ClipboardDocumentListIcon}>
                     {hasEstimateDetails ? <DetailRows rows={estimateDetails} /> : <p>Brak kosztorysu.</p>}
                     {work.estimateNotes && <p className="mt-3 whitespace-pre-line rounded-md bg-gray-50 px-3 py-2">
                         <span className="font-medium text-gray-700">Uwagi:</span>{' '}
