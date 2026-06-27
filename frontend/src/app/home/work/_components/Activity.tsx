@@ -11,6 +11,7 @@ import { DataItemRowHandle } from "./editabletable/DataIItemRow"
 import { IActivities, IOfferIssuance, IProduct, IWorkData } from "../model"
 import OfferAcceptedDialog from "./activity/OfferAcceptedDialog" 
 import SendPricingDialog from "./activity/SendPricingDialog"
+import RepairOrderOverview from "./RepairOrderOverview"
 
 export default function Activity({
     edit,
@@ -132,6 +133,7 @@ export default function Activity({
             <ApplyDiscountsDialog dialogRef={applyDiscountsRef} tableRef={tableRef} ></ApplyDiscountsDialog>
             {activityIsOffer&& <IssueOfferDialog dialogRef={issueOfferRef} work={work}   activities={activities} ></IssueOfferDialog>}
             {activityIsOffer&&issuance&& <SendPricingDialog work={work} offerId={issuance.id}  dialogRef={sendOfferRef}></SendPricingDialog>}
+            {!activityIsOffer && <RepairOrderOverview work={work} products={data}></RepairOrderOverview>}
             <div className="xl:flex xl:items-end">
                 <div className="xl:flex-auto xl:px-4  ">
                     <ActivityNotes notes={activities.current.notes} edit={edit} ></ActivityNotes>
