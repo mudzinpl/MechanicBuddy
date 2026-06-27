@@ -5,7 +5,7 @@ import Main from "../_components/Main";
 import { SearchCardHeader } from "../_components/SearchCardHeader";
 import SearchInput from "../_components/SearchInput";
 
-type ClientRow = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
+type ClientRow = Record<string, unknown>;
 
 type ClientView = "all" | "active" | "company" | "private" | "fleet";
 
@@ -141,12 +141,11 @@ export default async function Page(
   const limit = parseInt(options.limit ?? "30");
   const view = (["all", "active", "company", "private", "fleet"].includes(options.view) ? options.view : "all") as ClientView;
 
-  const apiOptions = {
-    ...options,
-    offset: offset.toString(),
-    limit: limit.toString(),
-  };
-  delete apiOptions.view;
+  const apiOptions: Record<string, string> = Object.fromEntries(
+    Object.entries(options).filter(([key]) => key !== "view")
+  );
+  apiOptions.offset = offset.toString();
+  apiOptions.limit = limit.toString();
 
   const response = await httpGet(`clients/page?${new URLSearchParams(apiOptions).toString()}`);
   const data = (await response.json()) as ClientsPageResult;
