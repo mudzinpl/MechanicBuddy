@@ -7,7 +7,9 @@ import SearchInput from "../_components/SearchInput";
 
 type ClientRow = Record<string, unknown>;
 
-type ClientView = "all" | "active" | "company" | "private" | "fleet";
+type ClientView = "all" | "active" | "history" | "company";
+
+type ClientType = "Firma" | "Flota" | "Indywidualny";
 
 interface ClientsPageResult {
   hasMore: boolean;
@@ -17,18 +19,20 @@ interface ClientsPageResult {
 const relationStyles: Record<string, string> = {
   "Aktywna naprawa": "bg-blue-50 text-blue-700 ring-blue-200",
   "Historia": "bg-gray-50 text-gray-700 ring-gray-200",
-  "Flota": "bg-indigo-50 text-indigo-700 ring-indigo-200",
-  "Firma": "bg-emerald-50 text-emerald-700 ring-emerald-200",
-  "Osoba prywatna": "bg-slate-50 text-slate-700 ring-slate-200",
   "Zaległość / nierozliczone": "bg-amber-50 text-amber-800 ring-amber-200",
+};
+
+const clientTypeStyles: Record<ClientType, string> = {
+  "Firma": "bg-emerald-50 text-emerald-700 ring-emerald-200",
+  "Flota": "bg-indigo-50 text-indigo-700 ring-indigo-200",
+  "Indywidualny": "bg-slate-50 text-slate-700 ring-slate-200",
 };
 
 const viewLabels: Record<ClientView, string> = {
   all: "Wszyscy",
   active: "Aktywni",
+  history: "Historia",
   company: "Firmy",
-  private: "Osoby prywatne",
-  fleet: "Flota",
 };
 
 function firstValue(item: ClientRow, keys: string[]) {
@@ -77,26 +81,31 @@ function hasDebt(item: ClientRow) {
   return Boolean((amount !== undefined && amount > 0) || status.includes("zaleg") || status.includes("nierozlic"));
 }
 
+function getClientType(item: ClientRow): ClientType {
+  const historyCount = getHistoryCount(item) ?? 0;
+  const type = getString(item, ["type", "clientType", "customerType", "kind", "relation"]).toLowerCase();
+
+  if (type.includes("fleet") || type.includes("flota") || historyCount >= 3) return "Flota";
+  if (isCompanyClient(item)) return "Firma";
+  return "Indywidualny";
+}
+
 function getClientRelation(item: ClientRow) {
   const activeWorks = getActiveWorkCount(item) ?? 0;
   const historyCount = getHistoryCount(item) ?? activeWorks;
-  const type = getString(item, ["type", "clientType", "customerType", "kind", "relation"]).toLowerCase();
 
   if (hasDebt(item)) return "Zaległość / nierozliczone";
   if (activeWorks > 0) return "Aktywna naprawa";
-  if (type.includes("fleet") || type.includes("flota") || historyCount >= 3) return "Flota";
-  if (isCompanyClient(item)) return "Firma";
   if (historyCount > 0) return "Historia";
-  return "Osoba prywatna";
+  return "Historia";
 }
 
 function matchesView(item: ClientRow, view: ClientView) {
   const relation = getClientRelation(item);
   if (view === "all") return true;
   if (view === "active") return relation === "Aktywna naprawa";
-  if (view === "fleet") return relation === "Flota";
-  if (view === "company") return relation === "Firma" || relation === "Flota" || isCompanyClient(item);
-  if (view === "private") return !isCompanyClient(item) && relation !== "Flota";
+  if (view === "history") return relation === "Historia";
+  if (view === "company") return isCompanyClient(item) || getClientType(item) === "Flota";
   return true;
 }
 
@@ -139,7 +148,7 @@ export default async function Page(
   const options = await searchParams;
   const offset = parseInt(options.offset ?? "0");
   const limit = parseInt(options.limit ?? "30");
-  const view = (["all", "active", "company", "private", "fleet"].includes(options.view) ? options.view : "all") as ClientView;
+  const view = (["all", "active", "history", "company"].includes(options.view) ? options.view : "all") as ClientView;
 
   const apiOptions: Record<string, string> = Object.fromEntries(
     Object.entries(options).filter(([key]) => key !== "view")
@@ -189,8 +198,8 @@ export default async function Page(
     <div className="mt-4 overflow-hidden rounded-lg border border-gray-200 bg-white shadow-sm">
       {clients.length === 0 ?
         <div className="px-6 py-10 text-center">
-          <h3 className="text-sm font-semibold text-gray-900">Nie znaleziono klientów dla wybranego widoku.</h3>
-          <p className="mt-1 text-sm text-gray-500">Zmień filtr albo wyszukaj klienta po nazwie, telefonie lub adresie.</p>
+          <h3 className="text-sm font-semibold text-gray-900">Brak klientów dla wybranego filtra.</h3>
+          <p className="mt-1 text-sm text-gray-500">Zmień filtr albo wyszukaj klienta.</p>
         </div> :
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200">
@@ -198,6 +207,7 @@ export default async function Page(
               <tr>
                 <th className="py-3 pr-3 pl-4 text-left text-xs font-semibold tracking-wide text-gray-600 uppercase sm:pl-6">Klient</th>
                 <th className="px-3 py-3 text-left text-xs font-semibold tracking-wide text-gray-600 uppercase">Relacja</th>
+                <th className="px-3 py-3 text-left text-xs font-semibold tracking-wide text-gray-600 uppercase">Typ</th>
                 <th className="px-3 py-3 text-left text-xs font-semibold tracking-wide text-gray-600 uppercase">Kontakt</th>
                 <th className="px-3 py-3 text-left text-xs font-semibold tracking-wide text-gray-600 uppercase">Miejscowość</th>
                 <th className="px-3 py-3 text-left text-xs font-semibold tracking-wide text-gray-600 uppercase">Aktywne sprawy</th>
@@ -214,22 +224,26 @@ export default async function Page(
                 const email = getString(item, ["email", "emailAddress"]);
                 const address = getString(item, ["address", "fullAddress"]);
                 const relation = getClientRelation(item);
+                const clientType = getClientType(item);
                 const activeWorks = getActiveWorkCount(item);
                 const historyCount = getHistoryCount(item);
                 const relationClass = relationStyles[relation] || relationStyles["Historia"];
+                const clientTypeClass = clientTypeStyles[clientType];
 
                 return <tr key={id} className="hover:bg-gray-50">
                   <td className="py-3 pr-3 pl-4 align-top sm:pl-6">
                     <Link href={`/home/clients/${id}`} className="font-semibold text-gray-900 hover:text-indigo-700">
                       {name}
                     </Link>
-                    <div className="mt-1 text-xs text-gray-500">
-                      {isCompanyClient(item) ? "Klient firmowy" : "Osoba prywatna"}
-                    </div>
                   </td>
                   <td className="px-3 py-3 align-top">
                     <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ${relationClass}`}>
                       {relation}
+                    </span>
+                  </td>
+                  <td className="px-3 py-3 align-top">
+                    <span className={`inline-flex items-center rounded-full px-2.5 py-1 text-xs font-medium ring-1 ring-inset ${clientTypeClass}`}>
+                      {clientType}
                     </span>
                   </td>
                   <td className="px-3 py-3 align-top text-sm text-gray-600">
