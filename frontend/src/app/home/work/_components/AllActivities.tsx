@@ -17,6 +17,7 @@ import PricingDownloadLink from './activity/PricingDownloadLink'
 import WorkDocuments from './WorkDocuments'
 import ReplacementVehicle from './ReplacementVehicle'
 import WorkCommunication from './WorkCommunication'
+import InvoiceSettlement from './InvoiceSettlement'
 import PartOrders from './PartOrders'
 import WorkTasks from './WorkTasks'
 import QualityChecklist from './QualityChecklist'
@@ -61,7 +62,11 @@ export default function Activities({
       <ul role="list" className="  mb-0 pb-0   inset-y-0   2xl:w-108">
         <li className='  '>
           <div className="p-5 pb-10">
-            <WorkInformation hasRepairJobWithProductsOrServices={containsRepairJobWithProductsOrServices} work={ work} ></WorkInformation>
+            <WorkInformation
+              hasRepairJobWithProductsOrServices={containsRepairJobWithProductsOrServices}
+              work={ work}
+              settlementContent={<InvoiceSettlement workId={work.id}></InvoiceSettlement>}
+            ></WorkInformation>
           </div>
         </li>
         <li>
