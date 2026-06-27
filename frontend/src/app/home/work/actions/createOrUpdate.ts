@@ -14,9 +14,53 @@ export async function createOrUpdate(
        const value = formData.get(name)?.toString();
        return value ? Number(value) : null;
     };
+    const optionalText = (name: string) => {
+       const value = formData.get(name)?.toString().trim();
+       return value ? value : null;
+    };
+    const splitFullName = (fullName: string | null) => {
+       const parts = (fullName ?? '').trim().split(/\s+/).filter(Boolean);
+       if (parts.length === 0) return { firstName: '', lastName: '' };
+       if (parts.length === 1) return { firstName: parts[0], lastName: '' };
+       return { firstName: parts.slice(0, -1).join(' '), lastName: parts[parts.length - 1] };
+    };
+
+    const createNewClient = !id && formData.get('createNewClient') == 'on';
+    const createNewVehicle = !id && formData.get('createNewVehicle') == 'on';
+    let clientId: FormDataEntryValue | string | null = formData.get('clientId[value]');
+
+    if (createNewClient) {
+       const clientType = formData.get('newClientType')?.toString() || 'private';
+       const email = optionalText('newClientEmail');
+       const fullName = optionalText('newClientName');
+       const { firstName, lastName } = splitFullName(fullName);
+       const clientBody = {
+          name: fullName,
+          regNr: optionalText('newClientRegNr'),
+          firstName,
+          lastName,
+          emailAddresses: email ? [email] : [],
+          currentEmail: email,
+          phone: optionalText('newClientPhone'),
+          address: {
+             street: optionalText('newClientAddress'),
+             country: null,
+             region: null,
+             city: null,
+             postalCode: null,
+          },
+          description: null,
+          isAsshole: false,
+          personalCode: null,
+          introducedAt: new Date(),
+       };
+       const clientResponse = await httpPost({ url: clientType === 'company' ? 'legalclients' : 'privateclients', body: clientBody });
+       clientId = await clientResponse.json();
+    }
+
     // When 'onlyClientVehicles' switch is ON, user is searching all vehicles (VehiclesCombobox)
     // When OFF, user selects from client's vehicles dropdown (Select)
-    let vehicleId = formData.get('onlyClientVehicles') == 'on'
+    let vehicleId: FormDataEntryValue | string | null = formData.get('onlyClientVehicles') == 'on'
         ? formData.get('vehicleId[value]')  // VehiclesCombobox uses hidden input
         : formData.get('vehicleId');         // Select uses direct value
 
@@ -25,7 +69,21 @@ export async function createOrUpdate(
         vehicleId = formData.get('vehicleId[value]');
     }
 
-    const clientId = formData.get('clientId[value]');
+    if (createNewVehicle) {
+       const vehicleBody = {
+          model: optionalText('newVehicleModel'),
+          producer: optionalText('newVehicleProducer'),
+          vin: optionalText('newVehicleVin'),
+          regNr: optionalText('newVehicleRegNr'),
+          odo: optionalNumber('newVehicleOdo') ?? optionalNumber('odo') ?? 0,
+          description: null,
+          ownerId: clientId == '' ? null : clientId,
+          isReplacementVehicle: false
+       };
+       const vehicleResponse = await httpPost({ url: 'vehicles', body: vehicleBody });
+       vehicleId = await vehicleResponse.json();
+    }
+
  //Guid? ClientId, string Description, Guid? VehicleId, Guid[] AssignedTo, int? Odo, bool StartWithOffer
     const body = {
        clientId: clientId == '' ? null : clientId,
