@@ -41,7 +41,7 @@ export default function FormInput({
         hasError = true;
     } 
     return (
-        <> 
+        <div>
             {label&&<FormLabel name={name} label={label}></FormLabel>}
             <div className="mt-2   grid grid-cols-1">
                 <input
@@ -72,7 +72,7 @@ export default function FormInput({
                 {inputError}
             </p>}
 
-        </>
+        </div>
     )
 }
 
