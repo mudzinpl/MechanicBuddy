@@ -25,7 +25,7 @@ export default function FormTextArea({
  
     
     return (
-        <>
+        <div>
             {label&&<label htmlFor={name} className="block text-sm/6 font-medium text-gray-900">
                 {label}
             </label>}
@@ -41,6 +41,6 @@ export default function FormTextArea({
                     defaultValue={defaultValue}
                 />
             </div> 
-        </>
+        </div>
     )
 }
