@@ -18,9 +18,9 @@ import clsx from 'clsx';
 import WorkInputMechanics from './WorkInputMechanics';
 
 const workFormGridClass = 'grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2';
-const formSectionGridClass = 'mt-6 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2 [&_label]:flex [&_label]:min-h-12 [&_label]:items-end';
+const formSectionGridClass = 'mt-6 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2';
 const fieldColumnClass = 'min-w-0';
-const switchFieldClass = 'flex min-h-[68px] items-end';
+const switchControlClass = 'mt-2 flex min-h-9 items-center';
 
 export default function WorkInput({
     work,
@@ -313,6 +313,13 @@ export default function WorkInput({
                                     placeholder='Numer kosztorysu'>
                                 </FormInput>
 
+                                <FormInput
+                                    name='estimateVersion'
+                                    label='Wersja'
+                                    defaultValue={work?.estimateVersion ?? ''}
+                                    placeholder='np. 1, 2, korekta'>
+                                </FormInput>
+
                                 <div className={fieldColumnClass}>
                                     <FormLabel name='estimateSystem' label='System kosztorysu'></FormLabel>
                                     <div className="mt-2 grid grid-cols-1">
@@ -324,13 +331,6 @@ export default function WorkInput({
                                         </Select>
                                     </div>
                                 </div>
-
-                                <FormInput
-                                    name='estimateVersion'
-                                    label='Wersja'
-                                    defaultValue={work?.estimateVersion ?? ''}
-                                    placeholder='np. 1, 2, korekta'>
-                                </FormInput>
 
                                 <FormInput
                                     name='estimatePreparedOn'
@@ -429,15 +429,18 @@ export default function WorkInput({
                             </p>
 
                             <div className={formSectionGridClass}>
-                                <Field className={switchFieldClass}>
-                                    <FormSwitch
-                                        name='assignmentOfClaimSigned'
-                                        defaultChecked={work?.assignmentOfClaimSigned ?? false}>
-                                    </FormSwitch>
-                                    <Label as="span" className="ml-3 text-sm text-gray-700">
-                                        Cesja podpisana
-                                    </Label>
-                                </Field>
+                                <div className={fieldColumnClass}>
+                                    <FormLabel name='assignmentOfClaimSigned' label='Cesja'></FormLabel>
+                                    <Field className={switchControlClass}>
+                                        <FormSwitch
+                                            name='assignmentOfClaimSigned'
+                                            defaultChecked={work?.assignmentOfClaimSigned ?? false}>
+                                        </FormSwitch>
+                                        <Label as="span" className="ml-3 text-sm text-gray-700">
+                                            Podpisana
+                                        </Label>
+                                    </Field>
+                                </div>
                                 <FormInput
                                     name='assignmentOfClaimSignedOn'
                                     type='date'
@@ -445,15 +448,18 @@ export default function WorkInput({
                                     defaultValue={toDateInputValue(work?.assignmentOfClaimSignedOn)}>
                                 </FormInput>
 
-                                <Field className={switchFieldClass}>
-                                    <FormSwitch
-                                        name='powerOfAttorneySigned'
-                                        defaultChecked={work?.powerOfAttorneySigned ?? false}>
-                                    </FormSwitch>
-                                    <Label as="span" className="ml-3 text-sm text-gray-700">
-                                        Pełnomocnictwo podpisane
-                                    </Label>
-                                </Field>
+                                <div className={fieldColumnClass}>
+                                    <FormLabel name='powerOfAttorneySigned' label='Pełnomocnictwo'></FormLabel>
+                                    <Field className={switchControlClass}>
+                                        <FormSwitch
+                                            name='powerOfAttorneySigned'
+                                            defaultChecked={work?.powerOfAttorneySigned ?? false}>
+                                        </FormSwitch>
+                                        <Label as="span" className="ml-3 text-sm text-gray-700">
+                                            Podpisane
+                                        </Label>
+                                    </Field>
+                                </div>
                                 <FormInput
                                     name='powerOfAttorneySignedOn'
                                     type='date'
@@ -461,15 +467,18 @@ export default function WorkInput({
                                     defaultValue={toDateInputValue(work?.powerOfAttorneySignedOn)}>
                                 </FormInput>
 
-                                <Field className={switchFieldClass}>
-                                    <FormSwitch
-                                        name='clientPaysVat'
-                                        defaultChecked={work?.clientPaysVat ?? false}>
-                                    </FormSwitch>
-                                    <Label as="span" className="ml-3 text-sm text-gray-700">
-                                        Klient dopłaca VAT
-                                    </Label>
-                                </Field>
+                                <div className={fieldColumnClass}>
+                                    <FormLabel name='clientPaysVat' label='Dopłata VAT'></FormLabel>
+                                    <Field className={switchControlClass}>
+                                        <FormSwitch
+                                            name='clientPaysVat'
+                                            defaultChecked={work?.clientPaysVat ?? false}>
+                                        </FormSwitch>
+                                        <Label as="span" className="ml-3 text-sm text-gray-700">
+                                            Klient dopłaca VAT
+                                        </Label>
+                                    </Field>
+                                </div>
                                 <div className={fieldColumnClass}>
                                     <FormLabel name='clientVatPercent' label='Procent VAT po stronie klienta'></FormLabel>
                                     <div className="mt-2 grid grid-cols-1">
