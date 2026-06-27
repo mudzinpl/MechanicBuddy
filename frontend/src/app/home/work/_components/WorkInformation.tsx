@@ -2,7 +2,7 @@
 
 'use client'
 import { damageStatuses, getDamageStatusLabel, getEstimateStatusLabel, getEstimateSystemLabel, getSettlementStatusLabel, IWorkData, statusNames } from '../model';
-import { BanknotesIcon, ClipboardDocumentListIcon, ClockIcon, DocumentTextIcon, ExclamationTriangleIcon, ShieldCheckIcon, UserCircleIcon } from '@heroicons/react/20/solid';
+import { BanknotesIcon, ClipboardDocumentListIcon, ClockIcon, ExclamationTriangleIcon } from '@heroicons/react/20/solid';
 import moment from 'moment';
 import React from 'react';
 import { startAnActivity } from '../actions/startAnActivity';
@@ -55,8 +55,8 @@ function DetailSection({
             <summary className="flex cursor-pointer list-none items-center gap-x-3 text-sm font-semibold text-gray-900">
                 <Icon aria-hidden="true" className="h-5 w-5 text-gray-400" />
                 <span>{title}</span>
-                <span className="ml-auto text-xs font-medium text-gray-400 group-open:hidden">Pokaż</span>
-                <span className="ml-auto text-xs font-medium text-gray-400 hidden group-open:inline">Ukryj</span>
+                <span className="ml-auto text-xs font-medium text-gray-400 group-open:hidden">▶</span>
+                <span className="ml-auto hidden text-xs font-medium text-gray-400 group-open:inline">▼</span>
             </summary>
             <div className="mt-3 text-sm/6 text-gray-500">
                 {children}
@@ -84,12 +84,6 @@ export function WorkInformation({
     const formatCurrency = (value?: number | null) => typeof value === 'number'
         ? new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(value).replace(/\u00A0/g, ' ')
         : '';
-    const replacementVehicleStatusLabels: Record<string, string> = {
-        planned: 'Planowany',
-        issued: 'Wydany',
-        returned: 'Zwrócony',
-        cancelled: 'Anulowany',
-    };
     const hasClaimDetails = Boolean(
         work.claimNumber ||
         work.insurer ||
@@ -163,12 +157,6 @@ export function WorkInformation({
         ['Data wezwania do dopłaty', formatDate(work.paymentDemandOn)],
         ['Data zapłaty', formatDate(work.paymentReceivedOn)],
     ].filter(([, value]) => value) as DetailRow[];
-    const replacementVehicle = work.replacementVehicle;
-    const replacementVehicleDetails = replacementVehicle ? [
-        ['Status', replacementVehicleStatusLabels[replacementVehicle.status] ?? replacementVehicle.status],
-        ['Data wydania', formatDateTime(replacementVehicle.issuedOn)],
-        ['Planowana data zwrotu', formatDateTime(replacementVehicle.plannedReturnOn)],
-    ].filter(([, value]) => value) as DetailRow[] : [];
     const missingItems = [
         !work.assignmentOfClaimSigned ? 'Brak cesji' : '',
         !work.powerOfAttorneySigned ? 'Brak pełnomocnictwa' : '',
@@ -182,11 +170,9 @@ export function WorkInformation({
         ['Status zlecenia', <WorkStatusBadge key="status" status={work.status}></WorkStatusBadge>],
         ['Status procesu', getDamageStatusLabel(work.damageStatus)],
         ['Mechanicy', work.mechanics?.length > 0 ? work.mechanics.map((item) => item.name).join(', ') : 'Nie przypisano'],
-    ].filter(([, value]) => value) as DetailRow[];
-    const clientVehicleRows = [
         ['Klient', clientSummary || 'Brak danych klienta'],
         ['Pojazd', vehicleSummary || 'Brak danych pojazdu'],
-    ] as DetailRow[];
+    ].filter(([, value]) => value) as DetailRow[];
 
     const deleteInvoiceRef = React.useRef<BaseDialogHandle>(null);
     const createInvoiceRef = React.useRef<BaseDialogHandle>(null);
@@ -330,9 +316,32 @@ export function WorkInformation({
                     </div>
                 </div>}
 
-                <DetailSection title="Podsumowanie zlecenia" icon={ClipboardDocumentListIcon}>
+                <DetailSection title="Podsumowanie" icon={ClipboardDocumentListIcon}>
                     <DetailRows rows={summaryRows} />
+                    {hasClaimDetails && <div className="mt-4 border-t border-gray-100 pt-4">
+                        <p className="mb-2 font-semibold text-gray-900">Ubezpieczyciel i szkoda</p>
+                        <DetailRows rows={claimDetails} />
+                    </div>}
+                    {work.insurerNotes && <p className="mt-3 whitespace-pre-line rounded-md bg-gray-50 px-3 py-2">
+                        <span className="font-medium text-gray-700">Uwagi do ubezpieczyciela:</span>{' '}
+                        {work.insurerNotes}
+                    </p>}
                     {work.notes && <p className="mt-3 whitespace-pre-line rounded-md bg-gray-50 px-3 py-2 text-gray-500">{work.notes}</p>}
+                    {!work.issuance && <div className="mt-4 max-w-xs">
+                        <label htmlFor="damage-status-change" className="block text-sm font-medium text-gray-700">
+                            Zmień status procesu
+                        </label>
+                        <select
+                            id="damage-status-change"
+                            value={work.damageStatus || 'new'}
+                            onChange={(event) => openDamageStatusDialog(event.target.value)}
+                            className="mt-1 block w-full rounded-md border-0 bg-white py-2 pr-8 pl-3 text-sm text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset focus:ring-2 focus:ring-indigo-600"
+                        >
+                            {damageStatuses.map(status => (
+                                <option key={status.value} value={status.value}>{status.label}</option>
+                            ))}
+                        </select>
+                    </div>}
                     <div className="mt-4 flex w-full items-center justify-between gap-3">
                         {!work.issuance && work.status !== 'closed' && <Field className="flex items-center"> 
                             <FormSwitch 
@@ -357,50 +366,6 @@ export function WorkInformation({
                     </div>
                 </DetailSection>
 
-                <DetailSection title="Klient i pojazd" icon={UserCircleIcon}>
-                    <DetailRows rows={clientVehicleRows} />
-                    {replacementVehicle && <div className="mt-4 rounded-md border border-sky-100 bg-sky-50 px-3 py-3">
-                        <p className="font-semibold text-sky-900">Pojazd zastępczy</p>
-                        {replacementVehicle.replacementVehicleName && <p className="font-medium text-sky-800">{replacementVehicle.replacementVehicleName}</p>}
-                        <div className="mt-2 text-sky-800">
-                            <DetailRows rows={replacementVehicleDetails} />
-                        </div>
-                    </div>}
-                </DetailSection>
-
-                <DetailSection title="Ubezpieczyciel i szkoda" icon={ShieldCheckIcon}>
-                    {hasClaimDetails ? <DetailRows rows={claimDetails} /> : <p>Brak danych szkody.</p>}
-                    {work.insurerNotes && <p className="mt-3 whitespace-pre-line rounded-md bg-gray-50 px-3 py-2">
-                        <span className="font-medium text-gray-700">Uwagi do ubezpieczyciela:</span>{' '}
-                        {work.insurerNotes}
-                    </p>}
-                    {!work.issuance && <div className="mt-4 max-w-xs">
-                        <label htmlFor="damage-status-change" className="block text-sm font-medium text-gray-700">
-                            Zmień status procesu
-                        </label>
-                        <select
-                            id="damage-status-change"
-                            value={work.damageStatus || 'new'}
-                            onChange={(event) => openDamageStatusDialog(event.target.value)}
-                            className="mt-1 block w-full rounded-md border-0 bg-white py-2 pr-8 pl-3 text-sm text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset focus:ring-2 focus:ring-indigo-600"
-                        >
-                            {damageStatuses.map(status => (
-                                <option key={status.value} value={status.value}>{status.label}</option>
-                            ))}
-                        </select>
-                    </div>}
-                </DetailSection>
-
-                <DetailSection title="Dokumenty / braki" icon={DocumentTextIcon}>
-                    {missingItems.length > 0 ? (
-                        <ul className="list-disc space-y-1 pl-5">
-                            {missingItems.map(item => <li key={item}>{item}</li>)}
-                        </ul>
-                    ) : (
-                        <p>Nie wykryto podstawowych braków w danych zlecenia.</p>
-                    )}
-                </DetailSection>
-
                 <DetailSection title="Kosztorys" icon={ClipboardDocumentListIcon}>
                     {hasEstimateDetails ? <DetailRows rows={estimateDetails} /> : <p>Brak kosztorysu.</p>}
                     {work.estimateNotes && <p className="mt-3 whitespace-pre-line rounded-md bg-gray-50 px-3 py-2">
@@ -423,7 +388,7 @@ export function WorkInformation({
                     </div>
                 </DetailSection>
 
-                <DetailSection title="Historia statusów" icon={ClockIcon} defaultOpen={false}>
+                <DetailSection title="Historia" icon={ClockIcon} defaultOpen={false}>
                     {(work.statusHistory?.length ?? 0) > 0 ? (
                         <div className="space-y-3">
                             {work.statusHistory?.map((item) => (
