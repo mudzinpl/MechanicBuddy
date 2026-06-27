@@ -8,7 +8,6 @@ import {
 } from '@heroicons/react/20/solid';
 import Link from 'next/link';
 import moment from 'moment';
-import type { ReactNode } from 'react';
 import DamageStatusBadge from '../work/_components/activity/badges/DamageStatusBadge';
 
 interface CalendarWorkItem {
@@ -38,19 +37,19 @@ const kindLabels: Record<string, string> = {
   inspection_missing_after_two_days: 'Brak oględzin po 2 dniach od zgłoszenia',
   missing_claim_handler: 'Brak opiekuna szkody',
   missing_estimate: 'Brak kosztorysu',
-  insurer_decision_overdue: 'Brak decyzji ubezpieczyciela po 3 dniach od wysłania kosztorysu',
-  estimate_sent_overdue: 'Kosztorys wysłany ponad 3 dni temu bez decyzji',
+  insurer_decision_overdue: 'Brak decyzji TU > 3 dni',
+  estimate_sent_overdue: 'Brak decyzji TU > 3 dni',
   estimate_rejected_or_correction: 'Kosztorys odrzucony lub do poprawy',
   estimate_accepted_ready: 'Zaakceptowane do rozpoczęcia naprawy',
-  approval_overdue: 'Oczekiwanie na akceptację ponad 3 dni',
+  approval_overdue: 'Brak decyzji TU > 3 dni',
   repair_overdue: 'Pojazd w naprawie ponad 7 dni',
-  replacement_without_return_date: 'Pojazd zastępczy wydany bez terminu zwrotu',
+  replacement_without_return_date: 'Zwrot pojazdu zastępczego',
   planned_release_overdue: 'Przekroczony planowany termin wydania',
-  missing_assignment: 'Brak podpisanej cesji',
-  missing_power_of_attorney: 'Brak podpisanego pełnomocnictwa',
-  vat_payment: 'Dopłata VAT klienta',
-  unsettled_case: 'Sprawa nierozliczona',
-  client_vat_without_payment_date: 'Dopłata VAT bez daty zapłaty',
+  missing_assignment: 'Brak cesji',
+  missing_power_of_attorney: 'Brak pełnomocnictwa',
+  vat_payment: 'Dopłata VAT',
+  unsettled_case: 'Nierozliczone',
+  client_vat_without_payment_date: 'Dopłata VAT',
 };
 
 const filterLabels = [
@@ -70,10 +69,6 @@ const planningKindGroups = {
   settlements: ['vat_payment', 'unsettled_case', 'client_vat_without_payment_date'],
   insurerDecisions: ['insurer_decision_overdue', 'estimate_sent_overdue', 'approval_overdue'],
 };
-
-function formatDate(value?: string | null) {
-  return value ? moment(value).locale('pl').format('DD.MM.YYYY HH:mm') : 'Bez daty';
-}
 
 function formatDay(value?: string | null) {
   return value ? moment(value).locale('pl').format('DD.MM.YYYY') : 'Bez daty';
@@ -156,47 +151,90 @@ function UpcomingItem({ item }: { item: CalendarWorkItem }) {
   );
 }
 
-function CompactSection({
-  title,
-  description,
-  items,
-  empty,
-  icon,
-}: {
-  title: string;
-  description: string;
-  items: CalendarWorkItem[];
-  empty: string;
-  icon: ReactNode;
-}) {
+function alertTone(kind: string) {
+  if (['insurer_decision_overdue', 'estimate_sent_overdue', 'approval_overdue', 'planned_release_overdue', 'repair_overdue'].includes(kind)) {
+    return 'red';
+  }
+
+  if (['missing_estimate', 'missing_assignment', 'missing_power_of_attorney', 'replacement_without_return_date'].includes(kind)) {
+    return 'amber';
+  }
+
+  if (['vat_payment', 'unsettled_case', 'client_vat_without_payment_date'].includes(kind)) {
+    return 'yellow';
+  }
+
+  return 'gray';
+}
+
+function alertToneClasses(kind: string) {
+  const tone = alertTone(kind);
+  return {
+    red: 'bg-red-50 text-red-700 ring-red-600/20',
+    amber: 'bg-amber-50 text-amber-700 ring-amber-600/20',
+    yellow: 'bg-yellow-50 text-yellow-700 ring-yellow-600/20',
+    gray: 'bg-gray-50 text-gray-700 ring-gray-500/10',
+  }[tone];
+}
+
+function alertPriority(kind: string) {
+  const tone = alertTone(kind);
+  return tone === 'red' ? 0 : tone === 'amber' ? 1 : tone === 'yellow' ? 2 : 3;
+}
+
+function groupAlerts(alerts: CalendarWorkItem[]) {
+  const groups = new Map<string, CalendarWorkItem[]>();
+  alerts.forEach(alert => {
+    const groupKey = kindLabels[alert.kind] ?? alert.kind;
+    groups.set(groupKey, [...(groups.get(groupKey) || []), alert]);
+  });
+
+  return Array.from(groups.entries())
+    .map(([label, items]) => ({ label, items, kind: items[0]?.kind || label }))
+    .sort((a, b) => alertPriority(a.kind) - alertPriority(b.kind) || b.items.length - a.items.length || a.label.localeCompare(b.label, 'pl'));
+}
+
+function AlertSummarySection({ alerts }: { alerts: CalendarWorkItem[] }) {
+  const groups = groupAlerts(alerts);
+
   return (
     <section className="rounded-lg bg-white shadow-sm ring-1 ring-gray-900/5">
       <div className="flex items-center gap-3 border-b border-gray-100 px-5 py-4">
-        {icon}
+        <TruckIcon className="size-6 text-amber-500" aria-hidden="true" />
         <div>
-          <h2 className="font-semibold text-gray-900">{title}</h2>
-          <p className="text-sm text-gray-500">{description}</p>
+          <h2 className="font-semibold text-gray-900">Alerty kierownika</h2>
+          <p className="text-sm text-gray-500">Podsumowanie problemów wymagających reakcji.</p>
         </div>
       </div>
-      <div className="p-3">
-        {items.length === 0 ? (
-          <div className="py-8 text-center">
+      <div className="p-4">
+        {groups.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-gray-200 px-4 py-8 text-center">
             <CheckCircleIcon className="mx-auto size-9 text-green-500" aria-hidden="true" />
-            <p className="mt-3 text-sm font-medium text-gray-600">{empty}</p>
+            <p className="mt-3 text-sm font-medium text-gray-600">Brak alertów kierownika.</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-100">
-            {items.map(item => (
-              <Link key={`${item.kind}-${item.id}-${item.scheduledOn}`} href={`/home/work/${item.id}`} className="block px-3 py-3 hover:bg-gray-50">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold text-gray-900">Zlecenie nr {item.workNr}</p>
-                    <p className="mt-1 truncate text-xs text-gray-500">{[item.clientName, item.regNr].filter(Boolean).join(' · ') || 'Brak danych klienta i pojazdu'}</p>
-                    <p className="mt-2 text-sm text-gray-700">{kindLabels[item.kind] ?? item.kind}</p>
-                  </div>
-                  <p className="shrink-0 text-xs font-medium text-gray-500">{formatDate(item.scheduledOn)}</p>
+          <div className="grid grid-cols-1 gap-3 xl:grid-cols-2">
+            {groups.map(group => (
+              <details key={group.label} className="rounded-lg border border-gray-100 bg-white px-4 py-3 shadow-xs open:bg-gray-50">
+                <summary className="flex cursor-pointer list-none items-center justify-between gap-4">
+                  <span className="min-w-0 truncate text-sm font-semibold text-gray-900">{group.label}</span>
+                  <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ring-1 ring-inset ${alertToneClasses(group.kind)}`}>{group.items.length}</span>
+                </summary>
+                <div className="mt-3 max-h-48 space-y-2 overflow-y-auto pr-1">
+                  {group.items.slice(0, 8).map(item => (
+                    <Link key={`${item.kind}-${item.id}-${item.scheduledOn}`} href={`/home/work/${item.id}`} className="block rounded-md border border-gray-200 bg-white px-3 py-2 text-sm hover:bg-indigo-50/40">
+                      <div className="flex items-start justify-between gap-3">
+                        <div className="min-w-0">
+                          <p className="font-medium text-gray-900">Zlecenie nr {item.workNr}</p>
+                          <p className="mt-1 truncate text-xs text-gray-500">{[item.clientName, item.regNr].filter(Boolean).join(' · ') || 'Brak danych klienta i pojazdu'}</p>
+                        </div>
+                        <p className="shrink-0 text-xs text-gray-500">{formatDay(item.scheduledOn)}</p>
+                      </div>
+                    </Link>
+                  ))}
+                  {group.items.length > 8 && <p className="text-xs font-medium text-gray-500">Pokazano 8 z {group.items.length} spraw.</p>}
                 </div>
-              </Link>
+              </details>
             ))}
           </div>
         )}
@@ -211,6 +249,7 @@ export default async function Page() {
   const today = data.today || [];
   const upcoming = data.upcoming || [];
   const overdue = data.overdue || [];
+  const alerts = data.alerts || [];
   const overduePreview = overdue.slice(0, 8);
   const overdueRest = overdue.slice(8);
   const upcomingPreview = upcoming.slice(0, 5);
@@ -320,13 +359,7 @@ export default async function Page() {
         </div>
 
         <div className="mt-6">
-          <CompactSection
-            title="Alerty kierownika"
-            description="Sprawy, które wymagają reakcji niezależnie od kalendarza."
-            items={data.alerts || []}
-            empty="Brak alertów kierownika"
-            icon={<TruckIcon className="size-6 text-amber-500" aria-hidden="true" />}
-          />
+          <AlertSummarySection alerts={alerts} />
         </div>
       </div>
     </main>
