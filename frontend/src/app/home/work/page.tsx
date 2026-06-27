@@ -41,6 +41,7 @@ const workAreaCopy: Record<string, { title: string; description: string }> = {
 const criticalBadges = new Set(['Brak cesji', 'Brak pełnomocnictwa', 'Brak kosztorysu', 'Brak dokumentów']);
 const actionBadges = new Set(['Dopłata VAT', 'Nierozliczone', 'Oczekuje na decyzję', 'Oczekuje na części', 'Kosztorys wysłany']);
 const positiveBadges = new Set(['Kosztorys zaakceptowany', 'Gotowe do wydania', 'Rozliczone']);
+const requiredDocumentCount = 10;
 
 function getWorkBadgeClass(badge: string) {
   if (criticalBadges.has(badge)) {
@@ -58,12 +59,25 @@ function getWorkBadgeClass(badge: string) {
   return 'bg-gray-50 text-gray-700 ring-gray-500/10';
 }
 
+function getDocumentCompletenessBadge(documentCount: number, hasFormalMissing: boolean) {
+  if (documentCount === 0) {
+    return { label: 'Brak dokumentów', className: 'bg-red-50 text-red-700 ring-red-600/20' };
+  }
+
+  if (documentCount >= requiredDocumentCount && !hasFormalMissing) {
+    return { label: 'Komplet', className: 'bg-green-50 text-green-700 ring-green-600/20' };
+  }
+
+  return { label: 'Braki', className: 'bg-amber-50 text-amber-800 ring-amber-600/20' };
+}
+
 export default async function Page(
   { searchParams }: { searchParams: Promise<Record<string, string>> }) {
 
   const options = (await searchParams);
 
   const isInvoiceView = options.issued == 'on';
+  const isDocumentsView = options['module'] === 'documents';
   const workArea = workAreaCopy[options['module'] ?? ''];
   const searchTitle = workArea?.title ?? 'Znajdź zlecenia';
   const searchDescription = workArea?.description;
@@ -227,12 +241,43 @@ export default async function Page(
     {
       dataField: 'documentCount',
       headerText: 'Dokumenty',
-      dataFormatter: ({ documentCount }: { documentCount: number }) => (
-        <span className="inline-flex items-center gap-1.5" title={`Liczba dokumentów: ${documentCount}`}>
-          <PaperClipIcon className="size-4 text-gray-400" aria-hidden="true" />
-          <span>{documentCount}</span>
-        </span>
-      )
+      dataFormatter: ({
+        documentCount,
+        assignmentOfClaimSigned,
+        powerOfAttorneySigned,
+      }: {
+        documentCount?: number,
+        assignmentOfClaimSigned?: boolean,
+        powerOfAttorneySigned?: boolean,
+      }) => {
+        const count = documentCount ?? 0;
+        const formalBadges = [
+          assignmentOfClaimSigned === false ? 'Brak cesji' : '',
+          powerOfAttorneySigned === false ? 'Brak pełnomocnictwa' : '',
+        ].filter(Boolean);
+        const completeness = Math.min(100, Math.round((count / requiredDocumentCount) * 100));
+        const statusBadge = getDocumentCompletenessBadge(count, formalBadges.length > 0);
+
+        return (
+          <div className="min-w-36 text-sm">
+            <div className="flex items-center gap-2">
+              <PaperClipIcon className="size-4 text-gray-400" aria-hidden="true" />
+              <span className="font-semibold text-gray-900">{count} / {requiredDocumentCount}</span>
+              <span className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ring-inset ${statusBadge.className}`}>
+                {statusBadge.label}
+              </span>
+            </div>
+            <p className="mt-1 text-xs text-gray-500">Kompletność {completeness}%</p>
+            {formalBadges.length > 0 && <div className="mt-1 flex flex-wrap gap-1">
+              {formalBadges.map(badge => (
+                <span key={badge} className={`inline-flex rounded-full px-2 py-0.5 text-xs font-semibold ring-1 ring-inset ${getWorkBadgeClass(badge)}`}>
+                  {badge}
+                </span>
+              ))}
+            </div>}
+          </div>
+        );
+      }
     },
     {
       dataField: 'startedOn',
@@ -284,6 +329,9 @@ export default async function Page(
     }
   ]
 
+  const visibleColumns = isDocumentsView
+    ? columns.filter(column => column.dataField !== 'mechanicNames')
+    : columns;
 
   return <main className=" lg:pl-62   ">
     <form method="GET" >
@@ -304,7 +352,7 @@ export default async function Page(
               rowClass={(item) => {
                 return (item['status'] === 'closed' ? 'line-through' : '')
               }}
-              columns={columns}> 
+              columns={visibleColumns}> 
               <div className="flex flex-col gap-4">
                 <div className="grid grid-cols-1 gap-3 lg:grid-cols-2 2xl:grid-cols-12">
                   <div className="min-w-0 2xl:col-span-4">
