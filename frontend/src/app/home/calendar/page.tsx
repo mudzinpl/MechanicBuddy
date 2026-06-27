@@ -96,9 +96,9 @@ function SummaryCard({ title, value, tone }: { title: string; value: number | st
   }[tone];
 
   return (
-    <div className="rounded-lg bg-white px-4 py-3 shadow-sm ring-1 ring-gray-900/5">
-      <p className="text-sm text-gray-500">{title}</p>
-      <p className={`mt-2 inline-flex min-w-12 justify-center rounded-full px-3 py-1 text-lg font-semibold ring-1 ring-inset ${toneClass}`}>{value}</p>
+    <div className="rounded-lg bg-white px-3 py-2 shadow-sm ring-1 ring-gray-900/5">
+      <p className="text-xs font-medium text-gray-500">{title}</p>
+      <p className={`mt-1 inline-flex min-w-10 justify-center rounded-full px-2.5 py-0.5 text-base font-semibold ring-1 ring-inset ${toneClass}`}>{value}</p>
     </div>
   );
 }
@@ -137,6 +137,21 @@ function OverdueItem({ item }: { item: CalendarWorkItem }) {
           <p className="mt-2 text-xs font-medium text-gray-500">{formatDay(item.scheduledOn)}</p>
         </div>
       </div>
+    </Link>
+  );
+}
+
+function UpcomingItem({ item }: { item: CalendarWorkItem }) {
+  const description = [item.clientName, item.regNr].filter(Boolean).join(' · ');
+
+  return (
+    <Link href={`/home/work/${item.id}`} className="grid gap-3 rounded-lg border border-gray-100 bg-white px-3 py-3 shadow-xs hover:border-sky-200 hover:bg-sky-50/30 sm:grid-cols-[96px_1fr_auto]">
+      <div className="text-xs font-semibold text-gray-500">{formatDay(item.scheduledOn)}</div>
+      <div className="min-w-0">
+        <p className="text-sm font-semibold text-gray-900">Zlecenie nr {item.workNr}</p>
+        <p className="mt-1 truncate text-xs text-gray-500">{description || 'Brak danych klienta i pojazdu'}</p>
+      </div>
+      <span className="h-fit rounded-full bg-gray-100 px-2.5 py-1 text-xs font-semibold text-gray-700">{kindLabels[item.kind] ?? item.kind}</span>
     </Link>
   );
 }
@@ -194,12 +209,16 @@ export default async function Page() {
   const response = await httpGet('work/calendar');
   const data = await response.json() as CalendarData;
   const today = data.today || [];
+  const upcoming = data.upcoming || [];
   const overdue = data.overdue || [];
+  const overduePreview = overdue.slice(0, 8);
+  const overdueRest = overdue.slice(8);
+  const upcomingPreview = upcoming.slice(0, 5);
 
   return (
     <main className="lg:pl-62">
-      <div className="px-4 py-6 sm:px-6 lg:px-8">
-        <div className="mb-6 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+      <div className="px-4 py-5 sm:px-6 lg:px-8">
+        <div className="mb-5 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-gray-900">Terminy</h1>
             <p className="mt-1 text-sm text-gray-500">Centrum planowania dnia kierownika warsztatu.</p>
@@ -207,7 +226,7 @@ export default async function Page() {
           <p className="text-sm font-medium text-gray-500">{moment().locale('pl').format('DD.MM.YYYY')}</p>
         </div>
 
-        <div className="mb-6 grid grid-cols-2 gap-3 lg:grid-cols-5">
+        <div className="mb-4 grid grid-cols-2 gap-2 lg:grid-cols-5">
           <SummaryCard title="Dzisiaj" value={today.length} tone="blue" />
           <SummaryCard title="Przyjęcia" value={countKinds(today, planningKindGroups.intake)} tone="green" />
           <SummaryCard title="Oględziny" value={countKinds(today, planningKindGroups.inspection)} tone="blue" />
@@ -215,11 +234,11 @@ export default async function Page() {
           <SummaryCard title="Zaległe" value={overdue.length} tone={overdue.length > 0 ? 'red' : 'green'} />
         </div>
 
-        <div className="mb-6 rounded-lg bg-white px-4 py-3 shadow-sm ring-1 ring-gray-900/5">
-          <p className="mb-3 text-sm font-semibold text-gray-900">Typ wydarzenia</p>
+        <div className="mb-4 rounded-lg bg-white px-4 py-3 shadow-sm ring-1 ring-gray-900/5">
+          <p className="mb-2 text-sm font-semibold text-gray-900">Typ wydarzenia</p>
           <div className="flex flex-wrap gap-2">
             {filterLabels.map(label => (
-              <span key={label} className="rounded-full bg-gray-50 px-3 py-1.5 text-sm font-medium text-gray-700 ring-1 ring-gray-200 ring-inset">
+              <span key={label} className="rounded-full bg-gray-50 px-3 py-1 text-sm font-medium text-gray-700 ring-1 ring-gray-200 ring-inset">
                 {label}
               </span>
             ))}
@@ -227,55 +246,80 @@ export default async function Page() {
         </div>
 
         <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
-          <section className="rounded-lg bg-white shadow-sm ring-1 ring-gray-900/5">
-            <div className="flex items-center gap-3 border-b border-gray-100 px-5 py-4">
-              <CalendarDaysIcon className="size-6 text-indigo-600" aria-hidden="true" />
-              <div>
-                <h2 className="font-semibold text-gray-900">Harmonogram dnia</h2>
-                <p className="text-sm text-gray-500">Przyjęcia, oględziny, wydania, zwroty i rozliczenia zaplanowane na dziś.</p>
-              </div>
-            </div>
-            <div className="space-y-3 p-4">
-              {today.length === 0 ? (
-                <div className="rounded-lg border border-dashed border-gray-200 px-4 py-10 text-center">
-                  <CheckCircleIcon className="mx-auto size-9 text-green-500" aria-hidden="true" />
-                  <p className="mt-3 text-sm font-medium text-gray-600">Brak zaplanowanych terminów na dziś.</p>
+          <div className="space-y-6">
+            <section className="rounded-lg bg-white shadow-sm ring-1 ring-gray-900/5">
+              <div className="flex items-center gap-3 border-b border-gray-100 px-5 py-4">
+                <CalendarDaysIcon className="size-6 text-indigo-600" aria-hidden="true" />
+                <div>
+                  <h2 className="font-semibold text-gray-900">Harmonogram dnia</h2>
+                  <p className="text-sm text-gray-500">Przyjęcia, oględziny, wydania, zwroty i rozliczenia zaplanowane na dziś.</p>
                 </div>
-              ) : (
-                today.map(item => <ScheduleItem key={`${item.kind}-${item.id}-${item.scheduledOn}`} item={item} />)
-              )}
-            </div>
-          </section>
+              </div>
+              <div className="space-y-3 p-4">
+                {today.length === 0 ? (
+                  <div className="rounded-lg border border-dashed border-gray-200 px-4 py-10 text-center">
+                    <CheckCircleIcon className="mx-auto size-9 text-green-500" aria-hidden="true" />
+                    <p className="mt-3 text-sm font-medium text-gray-600">Brak zaplanowanych terminów na dziś.</p>
+                  </div>
+                ) : (
+                  today.map(item => <ScheduleItem key={`${item.kind}-${item.id}-${item.scheduledOn}`} item={item} />)
+                )}
+              </div>
+            </section>
+
+            <section className="rounded-lg bg-white shadow-sm ring-1 ring-gray-900/5">
+              <div className="flex items-center gap-3 border-b border-gray-100 px-5 py-4">
+                <ClockIcon className="size-6 text-sky-600" aria-hidden="true" />
+                <div>
+                  <h2 className="font-semibold text-gray-900">Nadchodzące terminy</h2>
+                  <p className="text-sm text-gray-500">Najbliższe sprawy z tego tygodnia.</p>
+                </div>
+              </div>
+              <div className="space-y-3 p-4">
+                {upcomingPreview.length === 0 ? (
+                  <div className="rounded-lg border border-dashed border-gray-200 px-4 py-8 text-center">
+                    <CheckCircleIcon className="mx-auto size-8 text-green-500" aria-hidden="true" />
+                    <p className="mt-3 text-sm font-medium text-gray-600">Brak nadchodzących terminów.</p>
+                  </div>
+                ) : (
+                  upcomingPreview.map(item => <UpcomingItem key={`${item.kind}-${item.id}-${item.scheduledOn}`} item={item} />)
+                )}
+              </div>
+            </section>
+          </div>
 
           <section className="rounded-lg bg-white shadow-sm ring-1 ring-gray-900/5">
             <div className="flex items-center gap-3 border-b border-gray-100 px-5 py-4">
               <ExclamationTriangleIcon className="size-6 text-red-500" aria-hidden="true" />
               <div>
                 <h2 className="font-semibold text-gray-900">Zaległe terminy</h2>
-                <p className="text-sm text-gray-500">Sprawy po terminie, które wymagają reakcji.</p>
+                <p className="text-sm text-gray-500">Najważniejsze sprawy po terminie.</p>
               </div>
             </div>
-            <div className="space-y-3 p-4">
+            <div className="max-h-[680px] overflow-y-auto p-4">
               {overdue.length === 0 ? (
                 <div className="rounded-lg border border-dashed border-gray-200 px-4 py-8 text-center">
                   <CheckCircleIcon className="mx-auto size-9 text-green-500" aria-hidden="true" />
                   <p className="mt-3 text-sm font-medium text-gray-600">Brak zaległych terminów.</p>
                 </div>
               ) : (
-                overdue.map(item => <OverdueItem key={`${item.kind}-${item.id}-${item.scheduledOn}`} item={item} />)
+                <div className="space-y-3">
+                  {overduePreview.map(item => <OverdueItem key={`${item.kind}-${item.id}-${item.scheduledOn}`} item={item} />)}
+                  {overdueRest.length > 0 && (
+                    <details className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2">
+                      <summary className="cursor-pointer text-sm font-semibold text-indigo-700">Pokaż wszystkie zaległe ({overdue.length})</summary>
+                      <div className="mt-3 max-h-[420px] space-y-3 overflow-y-auto pr-1">
+                        {overdueRest.map(item => <OverdueItem key={`${item.kind}-${item.id}-${item.scheduledOn}`} item={item} />)}
+                      </div>
+                    </details>
+                  )}
+                </div>
               )}
             </div>
           </section>
         </div>
 
-        <div className="mt-6 grid grid-cols-1 gap-6 xl:grid-cols-2">
-          <CompactSection
-            title="Najbliższe 7 dni"
-            description="Terminy zaplanowane od jutra do kolejnych 7 dni."
-            items={data.upcoming || []}
-            empty="Brak terminów w najbliższych 7 dniach"
-            icon={<ClockIcon className="size-6 text-sky-600" aria-hidden="true" />}
-          />
+        <div className="mt-6">
           <CompactSection
             title="Alerty kierownika"
             description="Sprawy, które wymagają reakcji niezależnie od kalendarza."
