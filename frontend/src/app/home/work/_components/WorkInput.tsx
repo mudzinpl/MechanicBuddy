@@ -17,6 +17,10 @@ import Select from '@/_components/Select';
 import clsx from 'clsx';
 import WorkInputMechanics from './WorkInputMechanics';
 
+const workFormGridClass = 'grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2';
+const formSectionGridClass = 'mt-6 grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2 [&_label]:flex [&_label]:min-h-12 [&_label]:items-end';
+const fieldColumnClass = 'min-w-0';
+const switchFieldClass = 'flex min-h-[68px] items-end';
 
 export default function WorkInput({
     work,
@@ -76,8 +80,8 @@ export default function WorkInput({
             <div className="space-y-12 ">
                 <div className="border-b  border-gray-900/10 pb-12">
 
-                    <div className="grid grid grid-flow-row grid-cols-1  gap-4">
-                        {!work && <div>
+                    <div className={workFormGridClass}>
+                        {!work && <div className="sm:col-span-2">
                             <FormLabel name='startWith' label='Rozpocznij od'></FormLabel>
                             <Field className="flex mt-2 items-center">
                                 <FormSwitch
@@ -93,7 +97,7 @@ export default function WorkInput({
                             </Field>
                         </div>}
 
-                        <div className=" ">
+                        <div className={fieldColumnClass}>
                             <FormLabel name='clientId' label='Klient'>
                                 <span className="ml-4 float-right text-gray-500">
                                     Nieujawniony{' '}
@@ -121,7 +125,7 @@ export default function WorkInput({
                                 </ClientsCombobox>}
 
                         </div>
-                        <div className='  ' >
+                        <div className={fieldColumnClass}>
                             <FormLabel name='vehicleId' label='Pojazd'>
                                 {!clientUndisclosed && <span className="ml-2 float-right text-gray-500">
                                     Szukaj we wszystkich pojazdach{' '}
@@ -135,10 +139,10 @@ export default function WorkInput({
                                 </span>}
 
                             </FormLabel>
-                            <div className='flex'>
+                            <div className='flex flex-col gap-3 sm:flex-row'>
 
-                                <div className="-mr-px grid grow grid-cols-1 focus-within:relative">
-                                    <div className= {clsx(onlyClientVehicles&&"mt-2", " sm:col-span-2   grid grid-cols-1")}> 
+                                <div className="grid grow grid-cols-1 focus-within:relative">
+                                    <div className={clsx(onlyClientVehicles && "mt-2", "grid grid-cols-1")}>
                                         {onlyClientVehicles ?
                                             <Select
                                                 name='vehicleId'
@@ -159,27 +163,29 @@ export default function WorkInput({
                                             </VehiclesCombobox>}
                                     </div>
                                 </div>
-                                <div className='ml-2  '>
+                                <div className='sm:w-40'>
                                     <FormInput type='number' placeholder='Wartość przebiegu' name='odo' defaultValue={work?.odo ?? 0}></FormInput>
                                 </div>
                             </div>
 
                         </div>
-                       <WorkInputMechanics mechanics={mechanics} work={work}></WorkInputMechanics>
-                        <div className="mt-4 border-t border-gray-900/10 pt-8">
+                        <div className="sm:col-span-2">
+                            <WorkInputMechanics mechanics={mechanics} work={work}></WorkInputMechanics>
+                        </div>
+                        <div className="mt-4 border-t border-gray-900/10 pt-8 sm:col-span-2">
                             <h3 className="text-base font-semibold text-gray-900">Ubezpieczyciel i szkoda</h3>
                             <p className="mt-1 text-sm text-gray-500">
                                 Dane szkody komunikacyjnej i rozliczenia z ubezpieczycielem.
                             </p>
 
-                            <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div className={formSectionGridClass}>
                                 <FormInput
                                     name='claimNumber'
                                     label='Numer szkody'
                                     defaultValue={work?.claimNumber ?? ''}
                                     placeholder='np. PL/123456/2026'>
                                 </FormInput>
-                                <div>
+                                <div className={fieldColumnClass}>
                                     <FormLabel name='insurer' label='Ubezpieczyciel'></FormLabel>
                                     <div className="mt-2 grid grid-cols-1">
                                         <Select name='insurer' defaultValue={currentInsurer}>
@@ -192,7 +198,7 @@ export default function WorkInput({
                                     </div>
                                 </div>
 
-                                <div>
+                                <div className={fieldColumnClass}>
                                     <FormLabel name='damageType' label='Rodzaj szkody'></FormLabel>
                                     <div className="mt-2 grid grid-cols-1">
                                         <Select name='damageType' defaultValue={currentDamageType}>
@@ -205,7 +211,7 @@ export default function WorkInput({
                                     </div>
                                 </div>
 
-                                <div>
+                                <div className={fieldColumnClass}>
                                     <FormLabel name='damageStatus' label='Status procesu'></FormLabel>
                                     <div className="mt-2 grid grid-cols-1">
                                         <Select name='damageStatus' defaultValue={currentDamageStatus}>
@@ -293,13 +299,13 @@ export default function WorkInput({
                                 </div>
                             </div>
                         </div>
-                        <div className="mt-4 border-t border-gray-900/10 pt-8">
+                        <div className="mt-4 border-t border-gray-900/10 pt-8 sm:col-span-2">
                             <h3 className="text-base font-semibold text-gray-900">Kosztorys naprawy</h3>
                             <p className="mt-1 text-sm text-gray-500">
                                 Podstawowe dane kosztorysu, kwoty i status akceptacji.
                             </p>
 
-                            <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
+                            <div className={formSectionGridClass}>
                                 <FormInput
                                     name='audatexEstimateNumber'
                                     label='Numer kosztorysu'
@@ -307,7 +313,7 @@ export default function WorkInput({
                                     placeholder='Numer kosztorysu'>
                                 </FormInput>
 
-                                <div>
+                                <div className={fieldColumnClass}>
                                     <FormLabel name='estimateSystem' label='System kosztorysu'></FormLabel>
                                     <div className="mt-2 grid grid-cols-1">
                                         <Select name='estimateSystem' defaultValue={work?.estimateSystem || ''}>
@@ -369,7 +375,7 @@ export default function WorkInput({
                                     defaultValue={work?.estimateLaborPaintRbg ?? ''}>
                                 </FormInput>
 
-                                <div>
+                                <div className={fieldColumnClass}>
                                     <FormLabel name='estimateStatus' label='Status kosztorysu'></FormLabel>
                                     <div className="mt-2 grid grid-cols-1">
                                         <Select name='estimateStatus' defaultValue={work?.estimateStatus || ''}>
@@ -416,59 +422,55 @@ export default function WorkInput({
                                 </div>
                             </div>
                         </div>
-                        <div className="mt-4 border-t border-gray-900/10 pt-8">
+                        <div className="mt-4 border-t border-gray-900/10 pt-8 sm:col-span-2">
                             <h3 className="text-base font-semibold text-gray-900">Cesja i rozliczenia</h3>
                             <p className="mt-1 text-sm text-gray-500">
                                 Dokumenty formalne, dopłaty klienta i status rozliczenia.
                             </p>
 
-                            <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-2">
-                                <div className="space-y-4 pt-1">
-                                    <Field className="flex items-center">
-                                        <FormSwitch
-                                            name='assignmentOfClaimSigned'
-                                            defaultChecked={work?.assignmentOfClaimSigned ?? false}>
-                                        </FormSwitch>
-                                        <Label as="span" className="ml-3 text-sm text-gray-700">
-                                            Cesja podpisana
-                                        </Label>
-                                    </Field>
-                                    <Field className="flex items-center">
-                                        <FormSwitch
-                                            name='powerOfAttorneySigned'
-                                            defaultChecked={work?.powerOfAttorneySigned ?? false}>
-                                        </FormSwitch>
-                                        <Label as="span" className="ml-3 text-sm text-gray-700">
-                                            Pełnomocnictwo podpisane
-                                        </Label>
-                                    </Field>
-                                    <Field className="flex items-center">
-                                        <FormSwitch
-                                            name='clientPaysVat'
-                                            defaultChecked={work?.clientPaysVat ?? false}>
-                                        </FormSwitch>
-                                        <Label as="span" className="ml-3 text-sm text-gray-700">
-                                            Klient dopłaca VAT
-                                        </Label>
-                                    </Field>
-                                </div>
+                            <div className={formSectionGridClass}>
+                                <Field className={switchFieldClass}>
+                                    <FormSwitch
+                                        name='assignmentOfClaimSigned'
+                                        defaultChecked={work?.assignmentOfClaimSigned ?? false}>
+                                    </FormSwitch>
+                                    <Label as="span" className="ml-3 text-sm text-gray-700">
+                                        Cesja podpisana
+                                    </Label>
+                                </Field>
+                                <FormInput
+                                    name='assignmentOfClaimSignedOn'
+                                    type='date'
+                                    label='Data podpisania cesji'
+                                    defaultValue={toDateInputValue(work?.assignmentOfClaimSignedOn)}>
+                                </FormInput>
 
-                                <div className="grid grid-cols-1 gap-4">
-                                    <FormInput
-                                        name='assignmentOfClaimSignedOn'
-                                        type='date'
-                                        label='Data podpisania cesji'
-                                        defaultValue={toDateInputValue(work?.assignmentOfClaimSignedOn)}>
-                                    </FormInput>
-                                    <FormInput
-                                        name='powerOfAttorneySignedOn'
-                                        type='date'
-                                        label='Data podpisania pełnomocnictwa'
-                                        defaultValue={toDateInputValue(work?.powerOfAttorneySignedOn)}>
-                                    </FormInput>
-                                </div>
+                                <Field className={switchFieldClass}>
+                                    <FormSwitch
+                                        name='powerOfAttorneySigned'
+                                        defaultChecked={work?.powerOfAttorneySigned ?? false}>
+                                    </FormSwitch>
+                                    <Label as="span" className="ml-3 text-sm text-gray-700">
+                                        Pełnomocnictwo podpisane
+                                    </Label>
+                                </Field>
+                                <FormInput
+                                    name='powerOfAttorneySignedOn'
+                                    type='date'
+                                    label='Data podpisania pełnomocnictwa'
+                                    defaultValue={toDateInputValue(work?.powerOfAttorneySignedOn)}>
+                                </FormInput>
 
-                                <div>
+                                <Field className={switchFieldClass}>
+                                    <FormSwitch
+                                        name='clientPaysVat'
+                                        defaultChecked={work?.clientPaysVat ?? false}>
+                                    </FormSwitch>
+                                    <Label as="span" className="ml-3 text-sm text-gray-700">
+                                        Klient dopłaca VAT
+                                    </Label>
+                                </Field>
+                                <div className={fieldColumnClass}>
                                     <FormLabel name='clientVatPercent' label='Procent VAT po stronie klienta'></FormLabel>
                                     <div className="mt-2 grid grid-cols-1">
                                         <Select name='clientVatPercent' defaultValue={(work?.clientVatPercent ?? (work?.clientPaysVat ? 100 : 0)).toString()}>
@@ -479,7 +481,7 @@ export default function WorkInput({
                                     </div>
                                 </div>
 
-                                <div>
+                                <div className={fieldColumnClass}>
                                     <FormLabel name='settlementStatus' label='Status rozliczenia'></FormLabel>
                                     <div className="mt-2 grid grid-cols-1">
                                         <Select name='settlementStatus' defaultValue={work?.settlementStatus || 'unsettled'}>
@@ -489,7 +491,6 @@ export default function WorkInput({
                                         </Select>
                                     </div>
                                 </div>
-
                                 <FormInput
                                     name='clientVatAmount'
                                     type='number'
@@ -497,6 +498,7 @@ export default function WorkInput({
                                     label='Kwota dopłaty VAT'
                                     defaultValue={work?.clientVatAmount ?? ''}>
                                 </FormInput>
+
                                 <FormInput
                                     name='underpaymentAmount'
                                     type='number'
@@ -527,7 +529,7 @@ export default function WorkInput({
                                 </div>
                             </div>
                         </div>
-                        <div className=" ">
+                        <div className="sm:col-span-2">
                             <FormTextArea name='about' rows={8} label='Uwagi' defaultValue={work?.notes}>
                             </FormTextArea>
                         </div>
