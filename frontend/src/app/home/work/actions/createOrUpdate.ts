@@ -24,6 +24,21 @@ export async function createOrUpdate(
        if (parts.length === 1) return { firstName: parts[0], lastName: '' };
        return { firstName: parts.slice(0, -1).join(' '), lastName: parts[parts.length - 1] };
     };
+    const formatIntakeDetails = () => {
+       const lines = [
+          ['Źródło sprawy', optionalText('caseSource')],
+          ['Źródło zgłoszenia', optionalText('reportSource')],
+          ['Zakres uszkodzeń', optionalText('damageScope')],
+          ['Status odpowiedzialności', optionalText('liabilityStatus')],
+          ['Oględziny', optionalText('inspectionMode')],
+       ]
+          .filter(([, value]) => value)
+          .map(([label, value]) => `${label}: ${value}`);
+       const description = optionalText('about');
+
+       if (lines.length === 0) return description;
+       return [description, 'Dane przyjęcia szkody APPRA:', ...lines].filter(Boolean).join('\n');
+    };
 
     const createNewClient = !id && formData.get('createNewClient') == 'on';
     const createNewVehicle = !id && formData.get('createNewVehicle') == 'on';
@@ -87,10 +102,10 @@ export async function createOrUpdate(
  //Guid? ClientId, string Description, Guid? VehicleId, Guid[] AssignedTo, int? Odo, bool StartWithOffer
     const body = {
        clientId: clientId == '' ? null : clientId,
-       description: formData.get('about'),
+       description: formatIntakeDetails(),
        vehicleId: vehicleId == '' ? null : vehicleId ?? null,
        assignedTo: formData.getAll('mechanics'),
-       odo: +(formData.get('odo')?.toString() ?? '0'),
+       odo: +(formData.get('odo')?.toString() ?? formData.get('newVehicleOdo')?.toString() ?? '0'),
        startWithOffer: formData.get('isOffer') == 'on',
        claimNumber: formData.get('claimNumber')?.toString() || null,
        insurer: formData.get('insurer')?.toString() || null,
@@ -109,10 +124,10 @@ export async function createOrUpdate(
        paymentReceivedOn: formData.get('paymentReceivedOn')?.toString() || null,
        settlementNotes: formData.get('settlementNotes')?.toString() || null,
        audatexEstimateNumber: formData.get('audatexEstimateNumber')?.toString() || null,
-       insurerNotes: formData.get('insurerNotes')?.toString() || null,
+       insurerNotes: formData.get('insurerNotes')?.toString() || formData.get('damageScope')?.toString() || null,
        claimHandlerName: formData.get('claimHandlerName')?.toString() || null,
        claimHandlerEmail: formData.get('claimHandlerEmail')?.toString() || null,
-       claimHandlerPhone: formData.get('claimHandlerPhone')?.toString() || null,
+       claimHandlerPhone: formData.get('claimHandlerPhone')?.toString() || formData.get('contactPhone')?.toString() || null,
        claimReportedOn: formData.get('claimReportedOn')?.toString() || null,
        estimateSentOn: formData.get('estimateSentOn')?.toString() || null,
        insurerDecisionOn: formData.get('insurerDecisionOn')?.toString() || null,
