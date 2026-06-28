@@ -14,6 +14,7 @@ import { IssuanceBadges } from '../_components/activity/badges/IssuanceBadges';
 import { ActivityCreatedBy } from '../_components/activity/ActivityCreatedBy';
 import clsx from 'clsx'; 
 import ActivitySelect from '../_components/ActivitySelect'; 
+import CaseFlowTimeline from '../_components/CaseFlowTimeline';
 
 
  
@@ -74,6 +75,10 @@ export default async function Page({
                 <div>
                     <div className="  px-4  xl:py-10 xl:px-8 xl:py-6 ">
                         <div className='flex flex-col border-t border-gray-200 xl:border-t-0  '>
+
+                            <div className="mb-4 overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-gray-900/5">
+                                <CaseFlowTimeline work={work}></CaseFlowTimeline>
+                            </div>
 
                             {activity && <Card header={
                                 <CardHeader> 
