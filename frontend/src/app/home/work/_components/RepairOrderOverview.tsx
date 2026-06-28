@@ -222,7 +222,7 @@ function getReleaseBlockers(work: IWorkData, documents: IWorkDocument[], complet
   ].filter(Boolean);
 }
 
-function QualityCheckbox({ id, label, checked, onChange }: { id: string; label: string; checked: boolean; onChange: (checked: boolean) => void }) {
+function QualityCheckbox({ label, checked, onChange }: { label: string; checked: boolean; onChange: (checked: boolean) => void }) {
   return (
     <label className="flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700">
       <input
@@ -440,7 +440,6 @@ export default function RepairOrderOverview({ work, products }: { work: IWorkDat
           } as ChecklistItem))).map(item => (
             <QualityCheckbox
               key={item.id}
-              id={item.id}
               label={item.itemName}
               checked={qualityState[item.id] ?? item.isCompleted}
               onChange={(checked) => setQualityState(previous => ({ ...previous, [item.id]: checked }))}
