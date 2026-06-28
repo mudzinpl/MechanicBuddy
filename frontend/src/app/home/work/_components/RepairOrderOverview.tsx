@@ -2,10 +2,9 @@
 
 import { query } from '@/_lib/client/query-api';
 import { CheckCircleIcon, ClockIcon, CubeIcon, ExclamationTriangleIcon, WrenchScrewdriverIcon } from '@heroicons/react/20/solid';
-import moment from 'moment';
 import React from 'react';
 import { getCommunicationCategoryLabel, IWorkCommunicationEntry } from '../communicationModel';
-import { getDamageStatusLabel, IProduct, IWorkData, IWorkDocument } from '../model';
+import { IProduct, IWorkData, IWorkDocument } from '../model';
 
 interface WorkPartOrder {
   id: string;
@@ -34,14 +33,6 @@ interface ChecklistItem {
   completedOn?: string | null;
   notes?: string | null;
   sortOrder: number;
-}
-
-interface FlowEvent {
-  id: string;
-  date?: string | null;
-  title: string;
-  description: string;
-  person?: string | null;
 }
 
 const repairSteps = [
@@ -120,10 +111,6 @@ function formatCurrency(value?: number | null) {
     : '';
 }
 
-function formatDate(value?: string | null) {
-  return value ? moment(value).locale('pl').format('DD.MM') : '';
-}
-
 function emptyState(title: string, description: string, children?: React.ReactNode) {
   return (
     <div className="rounded-md border border-dashed border-gray-200 bg-gray-50 px-3 py-4 text-sm">
@@ -132,85 +119,6 @@ function emptyState(title: string, description: string, children?: React.ReactNo
       {children && <div className="mt-3">{children}</div>}
     </div>
   );
-}
-
-function buildFlowHistory(work: IWorkData, communication: IWorkCommunicationEntry[]) {
-  const events: FlowEvent[] = [];
-
-  if (work.claimReportedOn || work.startedOn) {
-    events.push({
-      id: 'claim-started',
-      date: work.claimReportedOn || work.startedOn?.toString(),
-      title: 'Sprawa zarejestrowana',
-      description: work.claimNumber ? `Numer szkody: ${work.claimNumber}` : 'Utworzono sprawę w systemie.',
-      person: work.claimHandlerName,
-    });
-  }
-
-  if (work.plannedInspectionOn) {
-    events.push({
-      id: 'inspection',
-      date: work.plannedInspectionOn,
-      title: 'Oględziny',
-      description: 'Zaplanowano lub wykonano oględziny pojazdu.',
-      person: work.claimHandlerName,
-    });
-  }
-
-  if (work.estimateSentOn) {
-    events.push({
-      id: 'estimate-sent',
-      date: work.estimateSentOn,
-      title: 'Kosztorys wysłany',
-      description: 'Kosztorys przekazano do ubezpieczyciela.',
-      person: work.claimHandlerName,
-    });
-  }
-
-  if (work.estimateSentOn && !work.insurerDecisionOn && !work.estimateAcceptedOn) {
-    events.push({
-      id: 'insurer-waiting',
-      date: work.estimateSentOn,
-      title: 'Brak odpowiedzi TU',
-      description: 'Sprawa oczekuje na decyzję ubezpieczyciela.',
-      person: work.claimHandlerName,
-    });
-  }
-
-  if (work.insurerDecisionOn || work.estimateAcceptedOn) {
-    events.push({
-      id: 'insurer-decision',
-      date: work.insurerDecisionOn || work.estimateAcceptedOn,
-      title: 'Decyzja TU',
-      description: 'Odnotowano decyzję albo akceptację kosztorysu.',
-      person: work.claimHandlerName,
-    });
-  }
-
-  (work.statusHistory ?? []).slice(0, 6).forEach(item => {
-    events.push({
-      id: `history-${item.id}`,
-      date: item.changedOn,
-      title: 'Zmiana statusu',
-      description: `${getDamageStatusLabel(item.oldStatus)} → ${getDamageStatusLabel(item.newStatus)}${item.comment ? ` · ${item.comment}` : ''}`,
-      person: item.changedByName,
-    });
-  });
-
-  communication.slice(0, 3).forEach(entry => {
-    events.push({
-      id: `communication-${entry.id}`,
-      date: entry.occurredOn || entry.createdOn,
-      title: getCommunicationCategoryLabel(entry.category),
-      description: entry.note,
-      person: entry.authorName,
-    });
-  });
-
-  return events
-    .filter(event => event.date || event.title)
-    .sort((a, b) => new Date(b.date || '').getTime() - new Date(a.date || '').getTime())
-    .slice(0, 8);
 }
 
 function getReleaseBlockers(work: IWorkData, documents: IWorkDocument[], completedChecklist: number, checklistLength: number) {
@@ -273,7 +181,6 @@ export default function RepairOrderOverview({ work, products }: { work: IWorkDat
   const remainingTasks = Math.max(tasks.length - completedTasks, 0);
   const rbgProgress = estimatedRbg > 0 && completedTasks > 0 ? Math.min(100, Math.round((completedTasks / estimatedRbg) * 100)) : null;
   const releaseBlockers = getReleaseBlockers(work, documents, completedChecklist, checklistLength);
-  const flowHistory = buildFlowHistory(work, communication);
   const blockedStepKeys = new Set<string>();
   if (!work.audatexEstimateNumber) blockedStepKeys.add('estimate_sent');
   if (!work.insurerDecisionOn) blockedStepKeys.add('approval_pending');
@@ -300,32 +207,6 @@ export default function RepairOrderOverview({ work, products }: { work: IWorkDat
           </div>
         </div>
       )}
-
-      <div className="rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-xs">
-        <div className="mb-3 flex items-center gap-2">
-          <ClockIcon className="size-5 text-gray-400" aria-hidden="true" />
-          <div>
-            <p className="text-sm font-semibold text-gray-900">Historia przepływu sprawy</p>
-            <p className="text-xs text-gray-500">Najważniejsze zdarzenia zapisane w sprawie.</p>
-          </div>
-        </div>
-        {flowHistory.length === 0 ? (
-          <p className="rounded-md bg-gray-50 px-3 py-2 text-sm text-gray-600">Brak historii przepływu sprawy.</p>
-        ) : (
-          <div className="space-y-3">
-            {flowHistory.map(event => (
-              <div key={event.id} className="grid grid-cols-[4rem_1fr] gap-3 border-l-2 border-gray-200 pl-3 text-sm">
-                <p className="font-medium text-gray-500">{formatDate(event.date)}</p>
-                <div>
-                  <p className="font-semibold text-gray-900">{event.title}</p>
-                  <p className="text-gray-600">{event.description}</p>
-                  {event.person && <p className="mt-0.5 text-xs text-gray-500">Osoba: {event.person}</p>}
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
 
       <details className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
         <summary className="flex cursor-pointer list-none items-center gap-2 text-sm font-semibold text-gray-900">
