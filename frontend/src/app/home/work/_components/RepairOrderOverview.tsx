@@ -2,6 +2,7 @@
 
 import { query } from '@/_lib/client/query-api';
 import { CheckCircleIcon, ClockIcon, CubeIcon, ExclamationTriangleIcon, WrenchScrewdriverIcon } from '@heroicons/react/20/solid';
+import moment from 'moment';
 import React from 'react';
 import { getCommunicationCategoryLabel, IWorkCommunicationEntry } from '../communicationModel';
 import { getDamageStatusLabel, IProduct, IWorkData, IWorkDocument } from '../model';
@@ -35,10 +36,12 @@ interface ChecklistItem {
   sortOrder: number;
 }
 
-interface FlowAlert {
-  label: string;
+interface FlowEvent {
+  id: string;
+  date?: string | null;
+  title: string;
   description: string;
-  tone: 'red' | 'amber' | 'blue' | 'gray';
+  person?: string | null;
 }
 
 const repairSteps = [
@@ -104,24 +107,21 @@ const taskTypeLabels: Record<string, string> = {
 
 const emptyQualityChecklist = [
   'Jazda próbna',
-  'Diagnostyka',
   'Oświetlenie',
-  'ADAS / kalibracja',
   'Zdjęcia końcowe',
+  'Diagnostyka',
+  'ADAS / kalibracja',
   'Czystość pojazdu',
 ];
-
-const flowAlertClasses = {
-  red: 'border-red-200 bg-red-50 text-red-900',
-  amber: 'border-amber-200 bg-amber-50 text-amber-900',
-  blue: 'border-blue-200 bg-blue-50 text-blue-900',
-  gray: 'border-gray-200 bg-gray-50 text-gray-800',
-} as const;
 
 function formatCurrency(value?: number | null) {
   return typeof value === 'number'
     ? new Intl.NumberFormat('pl-PL', { style: 'currency', currency: 'PLN' }).format(value).replace(/\u00A0/g, ' ')
     : '';
+}
+
+function formatDate(value?: string | null) {
+  return value ? moment(value).locale('pl').format('DD.MM') : '';
 }
 
 function emptyState(title: string, description: string, children?: React.ReactNode) {
@@ -134,112 +134,105 @@ function emptyState(title: string, description: string, children?: React.ReactNo
   );
 }
 
-function getNextStep(work: IWorkData) {
-  if (!work.audatexEstimateNumber) return 'Brakuje kosztorysu - nie można rozpocząć naprawy.';
-  if (!work.insurerDecisionOn && work.damageStatus === 'approval_pending') return 'Następny krok: decyzja ubezpieczyciela.';
-  if (work.damageStatus === 'parts_pending') return 'Następny krok: kompletacja części.';
-  if (work.damageStatus === 'repair') return 'Następny krok: lakiernia albo montaż.';
-  if (work.damageStatus === 'paint_shop') return 'Następny krok: montaż i kontrola jakości.';
-  if (work.damageStatus === 'quality_control') return 'Następny krok: przygotowanie wydania.';
-  if (work.damageStatus === 'ready_for_pickup') return 'Można przygotować wydanie pojazdu.';
-  if (work.damageStatus === 'released') return 'Pojazd wydany klientowi.';
-  return 'Następny krok: uzupełnienie danych i prowadzenie sprawy.';
+function buildFlowHistory(work: IWorkData, communication: IWorkCommunicationEntry[]) {
+  const events: FlowEvent[] = [];
+
+  if (work.claimReportedOn || work.startedOn) {
+    events.push({
+      id: 'claim-started',
+      date: work.claimReportedOn || work.startedOn?.toString(),
+      title: 'Sprawa zarejestrowana',
+      description: work.claimNumber ? `Numer szkody: ${work.claimNumber}` : 'Utworzono sprawę w systemie.',
+      person: work.claimHandlerName,
+    });
+  }
+
+  if (work.plannedInspectionOn) {
+    events.push({
+      id: 'inspection',
+      date: work.plannedInspectionOn,
+      title: 'Oględziny',
+      description: 'Zaplanowano lub wykonano oględziny pojazdu.',
+      person: work.claimHandlerName,
+    });
+  }
+
+  if (work.estimateSentOn) {
+    events.push({
+      id: 'estimate-sent',
+      date: work.estimateSentOn,
+      title: 'Kosztorys wysłany',
+      description: 'Kosztorys przekazano do ubezpieczyciela.',
+      person: work.claimHandlerName,
+    });
+  }
+
+  if (work.estimateSentOn && !work.insurerDecisionOn && !work.estimateAcceptedOn) {
+    events.push({
+      id: 'insurer-waiting',
+      date: work.estimateSentOn,
+      title: 'Brak odpowiedzi TU',
+      description: 'Sprawa oczekuje na decyzję ubezpieczyciela.',
+      person: work.claimHandlerName,
+    });
+  }
+
+  if (work.insurerDecisionOn || work.estimateAcceptedOn) {
+    events.push({
+      id: 'insurer-decision',
+      date: work.insurerDecisionOn || work.estimateAcceptedOn,
+      title: 'Decyzja TU',
+      description: 'Odnotowano decyzję albo akceptację kosztorysu.',
+      person: work.claimHandlerName,
+    });
+  }
+
+  (work.statusHistory ?? []).slice(0, 6).forEach(item => {
+    events.push({
+      id: `history-${item.id}`,
+      date: item.changedOn,
+      title: 'Zmiana statusu',
+      description: `${getDamageStatusLabel(item.oldStatus)} → ${getDamageStatusLabel(item.newStatus)}${item.comment ? ` · ${item.comment}` : ''}`,
+      person: item.changedByName,
+    });
+  });
+
+  communication.slice(0, 3).forEach(entry => {
+    events.push({
+      id: `communication-${entry.id}`,
+      date: entry.occurredOn || entry.createdOn,
+      title: getCommunicationCategoryLabel(entry.category),
+      description: entry.note,
+      person: entry.authorName,
+    });
+  });
+
+  return events
+    .filter(event => event.date || event.title)
+    .sort((a, b) => new Date(b.date || '').getTime() - new Date(a.date || '').getTime())
+    .slice(0, 8);
 }
 
-function getReleaseNextStep(missingItems: string[]) {
-  if (missingItems.includes('brak dokumentów') || missingItems.includes('brak cesji') || missingItems.includes('brak pełnomocnictwa')) {
-    return 'Uzupełnij dokumentację.';
-  }
-
-  if (missingItems.includes('brak kontroli jakości')) {
-    return 'Wykonaj kontrolę jakości.';
-  }
-
-  if (missingItems.includes('brak kosztorysu')) {
-    return 'Uzupełnij kosztorys.';
-  }
-
-  if (missingItems.includes('brak decyzji TU')) {
-    return 'Uzyskaj decyzję ubezpieczyciela.';
-  }
-
-  if (missingItems.includes('nierozliczona dopłata')) {
-    return 'Sprawdź rozliczenie dopłaty.';
-  }
-
-  return 'Przygotuj protokół wydania.';
+function getReleaseBlockers(work: IWorkData, documents: IWorkDocument[], completedChecklist: number, checklistLength: number) {
+  return [
+    !work.insurerDecisionOn ? 'decyzji TU' : '',
+    documents.length === 0 || !work.assignmentOfClaimSigned || !work.powerOfAttorneySigned ? 'dokumentów' : '',
+    work.clientPaysVat && !work.paymentReceivedOn && work.settlementStatus !== 'settled' ? 'dopłaty' : '',
+    checklistLength === 0 || completedChecklist < checklistLength ? 'kontroli jakości' : '',
+  ].filter(Boolean);
 }
 
-function daysSince(value?: string | null) {
-  if (!value) return null;
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return null;
-  return Math.floor((Date.now() - date.getTime()) / (1000 * 60 * 60 * 24));
-}
-
-function buildFlowAlerts(work: IWorkData, parts: WorkPartOrder[], documents: IWorkDocument[], communication: IWorkCommunicationEntry[]) {
-  const alerts: FlowAlert[] = [];
-  const sentEstimateDays = daysSince(work.estimateSentOn);
-  const latestContactDays = communication.length > 0
-    ? Math.min(...communication.map(entry => daysSince(entry.occurredOn || entry.createdOn)).filter((value): value is number => value !== null))
-    : null;
-  const needsParts = ['accepted', 'parts_pending', 'repair', 'paint_shop', 'quality_control'].includes(work.damageStatus || '') || work.estimateStatus === 'accepted' || Boolean(work.estimateAcceptedOn);
-  const readyToRelease = ['ready_for_pickup', 'released', 'settled'].includes(work.damageStatus || '');
-
-  if (latestContactDays !== null && latestContactDays > 7) {
-    alerts.push({ label: 'Brak kontaktu z klientem', description: `Ostatni kontakt zapisano ${latestContactDays} dni temu.`, tone: 'amber' });
-  }
-
-  if (needsParts && parts.length === 0) {
-    alerts.push({ label: 'Brak zamówionych części', description: 'Sprawa wygląda na gotową do etapu części, ale nie ma przypisanych zamówień.', tone: 'amber' });
-  }
-
-  if (sentEstimateDays !== null && sentEstimateDays > 3 && !work.insurerDecisionOn && !work.estimateAcceptedOn) {
-    alerts.push({ label: 'Brak decyzji TU > 3 dni', description: `Kosztorys wysłano ${sentEstimateDays} dni temu.`, tone: 'red' });
-  }
-
-  if (readyToRelease) {
-    alerts.push({ label: 'Gotowe do wydania', description: 'Status sprawy wskazuje przygotowanie wydania albo zakończenie naprawy.', tone: 'blue' });
-  }
-
-  if (!work.assignmentOfClaimSigned) {
-    alerts.push({ label: 'Brak cesji', description: 'Uzupełnij dokument formalny przed zamknięciem sprawy.', tone: 'amber' });
-  }
-
-  if (!work.powerOfAttorneySigned) {
-    alerts.push({ label: 'Brak pełnomocnictwa', description: 'Sprawdź komplet dokumentów do obsługi szkody.', tone: 'amber' });
-  }
-
-  if (documents.length === 0) {
-    alerts.push({ label: 'Brak dokumentów', description: 'Do sprawy nie dodano jeszcze dokumentów szkody.', tone: 'amber' });
-  }
-
-  return alerts;
-}
-
-function FlowAlertsPanel({ alerts }: { alerts: FlowAlert[] }) {
+function QualityCheckbox({ label, checked, onChange }: { label: string; checked: boolean; onChange: (checked: boolean) => void }) {
   return (
-    <div className="rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-xs">
-      <div className="mb-3 flex items-center gap-2">
-        <ExclamationTriangleIcon className="size-5 text-amber-500" aria-hidden="true" />
-        <div>
-          <p className="text-sm font-semibold text-gray-900">Przepływ sprawy</p>
-          <p className="text-xs text-gray-500">Proste alerty na podstawie danych zlecenia.</p>
-        </div>
-      </div>
-      {alerts.length === 0 ? (
-        <p className="rounded-md bg-green-50 px-3 py-2 text-sm font-medium text-green-700">Nie wykryto prostych blokad przepływu sprawy.</p>
-      ) : (
-        <div className="grid grid-cols-1 gap-2 md:grid-cols-2">
-          {alerts.slice(0, 6).map(alert => (
-            <div key={`${alert.label}-${alert.description}`} className={`rounded-md border px-3 py-2 text-sm ${flowAlertClasses[alert.tone]}`}>
-              <p className="font-semibold">{alert.label}</p>
-              <p className="mt-1 text-xs opacity-80">{alert.description}</p>
-            </div>
-          ))}
-        </div>
-      )}
-    </div>
+    <label className="flex items-center gap-2 rounded-md border border-gray-200 bg-white px-3 py-2 text-sm text-gray-700">
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={(event) => onChange(event.currentTarget.checked)}
+        className="size-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+      />
+      <span>{label}</span>
+    </label>
   );
 }
 
@@ -249,6 +242,7 @@ export default function RepairOrderOverview({ work, products }: { work: IWorkDat
   const [checklist, setChecklist] = React.useState<ChecklistItem[]>([]);
   const [communication, setCommunication] = React.useState<IWorkCommunicationEntry[]>([]);
   const [documents, setDocuments] = React.useState<IWorkDocument[]>([]);
+  const [qualityState, setQualityState] = React.useState<Record<string, boolean>>({});
 
   React.useEffect(() => {
     query({ url: `work/${work.id}/part-orders`, method: 'GET', onSuccess: (result: WorkPartOrder[]) => setParts(result || []), onFailure: () => setParts([]) });
@@ -258,53 +252,33 @@ export default function RepairOrderOverview({ work, products }: { work: IWorkDat
     query({ url: `work/${work.id}/documents`, method: 'GET', onSuccess: (result: IWorkDocument[]) => setDocuments(result || []), onFailure: () => setDocuments([]) });
   }, [work.id]);
 
+  React.useEffect(() => {
+    const initialState: Record<string, boolean> = {};
+    checklist.forEach(item => {
+      initialState[item.id] = item.isCompleted;
+    });
+    emptyQualityChecklist.forEach(item => {
+      initialState[item] = false;
+    });
+    setQualityState(initialState);
+  }, [checklist]);
+
   const activeStep = statusToStepIndex[work.damageStatus || 'new'] ?? 0;
-  const progress = Math.round(((activeStep + 1) / repairSteps.length) * 100);
-  const completedChecklist = checklist.filter(item => item.isCompleted).length;
+  const completedChecklist = checklist.length > 0
+    ? checklist.filter(item => qualityState[item.id] ?? item.isCompleted).length
+    : emptyQualityChecklist.filter(item => qualityState[item]).length;
+  const checklistLength = checklist.length > 0 ? checklist.length : emptyQualityChecklist.length;
   const estimatedRbg = (work.estimateLaborMechanicalRbg ?? 0) + (work.estimateLaborPaintRbg ?? 0);
   const completedTasks = tasks.filter(task => task.status === 'completed').length;
   const remainingTasks = Math.max(tasks.length - completedTasks, 0);
   const rbgProgress = estimatedRbg > 0 && completedTasks > 0 ? Math.min(100, Math.round((completedTasks / estimatedRbg) * 100)) : null;
-  const releaseMissingItems = [
-    !work.assignmentOfClaimSigned ? 'brak cesji' : '',
-    !work.powerOfAttorneySigned ? 'brak pełnomocnictwa' : '',
-    !work.audatexEstimateNumber ? 'brak kosztorysu' : '',
-    !work.insurerDecisionOn ? 'brak decyzji TU' : '',
-    documents.length === 0 ? 'brak dokumentów' : '',
-    checklist.length === 0 || completedChecklist < checklist.length ? 'brak kontroli jakości' : '',
-    work.clientPaysVat && !work.paymentReceivedOn && work.settlementStatus !== 'settled' ? 'nierozliczona dopłata' : '',
-  ].filter(Boolean);
-  const hasHardReleaseBlocker = !work.audatexEstimateNumber || !work.insurerDecisionOn || checklist.length === 0 || completedChecklist < checklist.length;
-  const releaseReadiness = !work.damageStatus
-    ? {
-        label: 'Nie można jeszcze określić gotowości wydania.',
-        className: 'border-gray-200 bg-gray-50 text-gray-700',
-        badgeClassName: 'bg-gray-100 text-gray-700 ring-gray-500/10',
-      }
-    : releaseMissingItems.length === 0
-      ? {
-          label: 'Gotowe do wydania',
-          className: 'border-green-200 bg-green-50 text-green-900',
-          badgeClassName: 'bg-green-100 text-green-800 ring-green-600/20',
-        }
-      : hasHardReleaseBlocker
-        ? {
-            label: 'Nie można wydać pojazdu',
-            className: 'border-red-200 bg-red-50 text-red-900',
-            badgeClassName: 'bg-red-100 text-red-800 ring-red-600/20',
-          }
-        : {
-            label: 'Wymaga uzupełnienia',
-            className: 'border-amber-200 bg-amber-50 text-amber-900',
-            badgeClassName: 'bg-amber-100 text-amber-800 ring-amber-600/20',
-          };
-  const releaseNextStep = getReleaseNextStep(releaseMissingItems);
-  const flowAlerts = buildFlowAlerts(work, parts, documents, communication);
+  const releaseBlockers = getReleaseBlockers(work, documents, completedChecklist, checklistLength);
+  const flowHistory = buildFlowHistory(work, communication);
   const blockedStepKeys = new Set<string>();
   if (!work.audatexEstimateNumber) blockedStepKeys.add('estimate_sent');
   if (!work.insurerDecisionOn) blockedStepKeys.add('approval_pending');
-  if (checklist.length === 0 || completedChecklist < checklist.length) blockedStepKeys.add('quality_control');
-  if (documents.length === 0 || !work.assignmentOfClaimSigned || !work.powerOfAttorneySigned || releaseMissingItems.includes('nierozliczona dopłata')) blockedStepKeys.add('ready_for_pickup');
+  if (completedChecklist < checklistLength) blockedStepKeys.add('quality_control');
+  if (documents.length === 0 || !work.assignmentOfClaimSigned || !work.powerOfAttorneySigned || releaseBlockers.includes('dopłaty')) blockedStepKeys.add('ready_for_pickup');
   const latestNotes = [
     ...tasks.filter(task => task.comment).map(task => ({ id: `task-${task.id}`, title: task.title, text: task.comment || '' })),
     ...communication.slice(0, 3).map(entry => ({ id: `communication-${entry.id}`, title: getCommunicationCategoryLabel(entry.category), text: entry.note })),
@@ -312,54 +286,54 @@ export default function RepairOrderOverview({ work, products }: { work: IWorkDat
 
   return (
     <section className="mb-6 space-y-5 rounded-lg border border-gray-200 bg-white p-4 shadow-xs">
-      <div className={`rounded-xl border px-5 py-4 shadow-xs ${releaseReadiness.className}`}>
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div>
-            <p className="text-xs font-semibold uppercase tracking-wide">Status gotowości wydania</p>
-            <h2 className="mt-1 text-2xl font-semibold">{releaseReadiness.label}</h2>
-          </div>
-          <span className={`inline-flex w-fit items-center rounded-full px-3 py-1 text-xs font-semibold ring-1 ring-inset ${releaseReadiness.badgeClassName}`}>
-            {releaseMissingItems.length === 0 ? 'Kompletne' : `${releaseMissingItems.length} braków`}
-          </span>
-        </div>
-
-        <div className="mt-4 grid grid-cols-1 gap-4 lg:grid-cols-3">
-          <div className="lg:col-span-2">
-            <p className="text-sm font-semibold">Braki do usunięcia</p>
-            {releaseMissingItems.length > 0 ? (
-              <ul className="mt-2 grid grid-cols-1 gap-1 text-sm sm:grid-cols-2">
-                {releaseMissingItems.map(item => <li key={item}>□ {item}</li>)}
+      {releaseBlockers.length > 0 && (
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
+          <div className="flex items-start gap-2">
+            <ExclamationTriangleIcon className="mt-0.5 size-5 shrink-0 text-red-500" aria-hidden="true" />
+            <div>
+              <p className="font-semibold">Wydanie zablokowane</p>
+              <p className="mt-1 text-red-800">Brakuje:</p>
+              <ul className="mt-1 flex flex-wrap gap-x-4 gap-y-1 text-red-800">
+                {releaseBlockers.map(item => <li key={item}>- {item}</li>)}
               </ul>
-            ) : (
-              <p className="mt-2 text-sm">Nie wykryto braków blokujących wydanie pojazdu.</p>
-            )}
-          </div>
-          <div className="rounded-lg bg-white/60 px-3 py-2 text-sm">
-            <p className="font-semibold">Następny krok</p>
-            <p className="mt-1">{releaseNextStep}</p>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
-      <FlowAlertsPanel alerts={flowAlerts} />
-
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-        <div>
-          <p className="text-sm font-semibold text-gray-900">Status naprawy</p>
-          <h2 className="mt-1 text-xl font-semibold text-gray-900">{getDamageStatusLabel(work.damageStatus) || 'Brak statusu'}</h2>
-          <p className="mt-1 text-sm text-gray-500">{getNextStep(work)}</p>
-        </div>
-        <div className="rounded-md bg-gray-50 px-3 py-2 text-sm text-gray-600">
-          <span className="font-semibold text-gray-900">Postęp:</span> {progress}%
-        </div>
-      </div>
-
-      <div>
-        <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-900">
+      <div className="rounded-lg border border-gray-200 bg-white px-4 py-3 shadow-xs">
+        <div className="mb-3 flex items-center gap-2">
           <ClockIcon className="size-5 text-gray-400" aria-hidden="true" />
-          Etapy naprawy
+          <div>
+            <p className="text-sm font-semibold text-gray-900">Historia przepływu sprawy</p>
+            <p className="text-xs text-gray-500">Najważniejsze zdarzenia zapisane w sprawie.</p>
+          </div>
         </div>
-        <div className="grid grid-cols-2 gap-2 md:grid-cols-5">
+        {flowHistory.length === 0 ? (
+          <p className="rounded-md bg-gray-50 px-3 py-2 text-sm text-gray-600">Brak historii przepływu sprawy.</p>
+        ) : (
+          <div className="space-y-3">
+            {flowHistory.map(event => (
+              <div key={event.id} className="grid grid-cols-[4rem_1fr] gap-3 border-l-2 border-gray-200 pl-3 text-sm">
+                <p className="font-medium text-gray-500">{formatDate(event.date)}</p>
+                <div>
+                  <p className="font-semibold text-gray-900">{event.title}</p>
+                  <p className="text-gray-600">{event.description}</p>
+                  {event.person && <p className="mt-0.5 text-xs text-gray-500">Osoba: {event.person}</p>}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      <details className="rounded-lg border border-gray-200 bg-gray-50 px-4 py-3">
+        <summary className="flex cursor-pointer list-none items-center gap-2 text-sm font-semibold text-gray-900">
+          <ClockIcon className="size-5 text-gray-400" aria-hidden="true" />
+          Techniczne etapy naprawy
+          <span className="ml-auto text-xs font-medium text-gray-400 group-open:hidden">▶</span>
+        </summary>
+        <div className="mt-3 grid grid-cols-2 gap-2 md:grid-cols-5">
           {repairSteps.map((step, index) => {
             const completed = index < activeStep;
             const current = index === activeStep;
@@ -370,7 +344,7 @@ export default function RepairOrderOverview({ work, products }: { work: IWorkDat
                 ? 'border-blue-200 bg-blue-50 text-blue-700'
                 : completed
                   ? 'border-green-200 bg-green-50 text-green-700'
-                  : 'border-gray-200 bg-gray-50 text-gray-500';
+                  : 'border-gray-200 bg-white text-gray-500';
             return (
               <div key={step.key} className={`rounded-md border px-3 py-2 text-xs font-medium ${className}`}>
                 {step.label}
@@ -378,7 +352,7 @@ export default function RepairOrderOverview({ work, products }: { work: IWorkDat
             );
           })}
         </div>
-      </div>
+      </details>
 
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
         <div>
@@ -426,56 +400,53 @@ export default function RepairOrderOverview({ work, products }: { work: IWorkDat
         </div>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-        <div className="rounded-md border border-gray-200 p-3">
-          <p className="text-sm font-semibold text-gray-900">RBG</p>
-          {estimatedRbg > 0 ? (
-            <div className="mt-2 space-y-3">
-              <dl className="space-y-1 text-sm text-gray-600">
-                <div className="flex justify-between"><dt>RBG z kosztorysu</dt><dd>{estimatedRbg}</dd></div>
-                <div className="flex justify-between"><dt>RBG wykonane</dt><dd>{completedTasks}</dd></div>
-                <div className="flex justify-between"><dt>RBG pozostałe</dt><dd>{remainingTasks}</dd></div>
-              </dl>
-              {rbgProgress !== null && (
-                <div>
-                  <div className="mb-1 flex justify-between text-xs text-gray-500">
-                    <span>Postęp RBG</span>
-                    <span>{rbgProgress}%</span>
-                  </div>
-                  <div className="h-2 rounded-full bg-gray-100">
-                    <div className="h-2 rounded-full bg-blue-500" style={{ width: `${rbgProgress}%` }} />
-                  </div>
+      <details className="rounded-md border border-gray-200 p-3">
+        <summary className="cursor-pointer list-none text-sm font-semibold text-gray-900">
+          Szczegóły kosztorysu / RBG
+        </summary>
+        {estimatedRbg > 0 ? (
+          <div className="mt-3 space-y-3">
+            <dl className="space-y-1 text-sm text-gray-600">
+              <div className="flex justify-between"><dt>RBG z kosztorysu</dt><dd>{estimatedRbg}</dd></div>
+              <div className="flex justify-between"><dt>RBG wykonane</dt><dd>{completedTasks}</dd></div>
+              <div className="flex justify-between"><dt>RBG pozostałe</dt><dd>{remainingTasks}</dd></div>
+            </dl>
+            {rbgProgress !== null && (
+              <div>
+                <div className="mb-1 flex justify-between text-xs text-gray-500">
+                  <span>Postęp RBG</span>
+                  <span>{rbgProgress}%</span>
                 </div>
-              )}
-            </div>
-          ) : emptyState('Brak danych RBG.', 'Uzupełnij RBG w kosztorysie, żeby kierownik widział zakres i pozostałą pracę.')}
-        </div>
-
-        <div className="rounded-md border border-gray-200 p-3 xl:col-span-2">
-          <div className="mb-2 flex items-center gap-2 text-sm font-semibold text-gray-900">
-            <CheckCircleIcon className="size-5 text-gray-400" aria-hidden="true" />
-            Kontrola jakości
-          </div>
-          {checklist.length === 0 ? emptyState(
-            'Checklista jakości nie została jeszcze uzupełniona.',
-            'Przed wydaniem sprawdź minimum poniższe punkty. To tylko podpowiedź, bez zapisu do systemu.',
-            <ul className="grid grid-cols-1 gap-1 text-sm text-gray-600 sm:grid-cols-2">
-              {emptyQualityChecklist.map(item => <li key={item}>□ {item}</li>)}
-            </ul>
-          ) : (
-            <div>
-              <p className="mb-2 text-sm text-gray-600">Wykonano {completedChecklist} z {checklist.length} pozycji.</p>
-              <div className="space-y-1">
-                {checklist.slice(0, 6).map(item => (
-                  <p key={item.id} className="text-sm text-gray-600">
-                    <span className={item.isCompleted ? 'text-green-600' : 'text-gray-400'}>{item.isCompleted ? '✓' : '○'}</span>{' '}
-                    {item.itemName}
-                  </p>
-                ))}
+                <div className="h-2 rounded-full bg-gray-100">
+                  <div className="h-2 rounded-full bg-blue-500" style={{ width: `${rbgProgress}%` }} />
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </div>
+        ) : <div className="mt-3">{emptyState('Brak danych RBG.', 'Uzupełnij RBG w kosztorysie, żeby kierownik widział zakres i pozostałą pracę.')}</div>}
+      </details>
+
+      <div className="rounded-md border border-gray-200 p-3">
+        <div className="mb-3 flex items-center gap-2 text-sm font-semibold text-gray-900">
+          <CheckCircleIcon className="size-5 text-gray-400" aria-hidden="true" />
+          Kontrola jakości
         </div>
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3">
+          {(checklist.length > 0 ? checklist : emptyQualityChecklist.map((item, index) => ({
+            id: item,
+            itemName: item,
+            isCompleted: false,
+            sortOrder: index,
+          } as ChecklistItem))).map(item => (
+            <QualityCheckbox
+              key={item.id}
+              label={item.itemName}
+              checked={qualityState[item.id] ?? item.isCompleted}
+              onChange={(checked) => setQualityState(previous => ({ ...previous, [item.id]: checked }))}
+            />
+          ))}
+        </div>
+        {checklist.length === 0 && <p className="mt-3 text-xs text-gray-500">Lista działa lokalnie w przeglądarce i nie zapisuje zmian w systemie.</p>}
       </div>
 
       <div>
