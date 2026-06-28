@@ -95,7 +95,7 @@ const timelineSteps: TimelineStep[] = [
         label: 'Oczekuje na dokończenie',
         statuses: ['on_hold'],
         owner: (work) => work.claimHandlerName,
-        startedOn: (work) => work.plannedReleaseOn || work.changedOn?.toString(),
+        startedOn: (work) => work.plannedReleaseOn || work.startedOn?.toString(),
     },
     {
         key: 'archive',
