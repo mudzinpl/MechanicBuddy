@@ -45,14 +45,14 @@ const timelineSteps: TimelineStep[] = [
     {
         key: 'insurer',
         label: 'Oczekiwanie na TU',
-        statuses: ['estimate_sent', 'approval_pending', 'accepted', 'rejected'],
+        statuses: ['estimate_sent', 'approval_pending', 'rejected'],
         responsible: (work) => work.claimHandlerName,
         startedOn: (work) => work.estimateSentOn || work.insurerDecisionOn,
     },
     {
         key: 'parts',
         label: 'Części',
-        statuses: ['parts_pending'],
+        statuses: ['accepted', 'parts_pending'],
         startedOn: (work) => work.estimateAcceptedOn || work.insurerDecisionOn,
     },
     {
