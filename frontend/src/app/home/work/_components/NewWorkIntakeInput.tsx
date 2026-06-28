@@ -291,7 +291,7 @@ export default function NewWorkIntakeInput() {
                         <div className={fieldColumnClass}>
                             <FormLabel name="liabilityStatus" label="Status odpowiedzialności" />
                             <div className="mt-2 grid grid-cols-1">
-                                <Select name="liabilityStatus" defaultValue="unconfirmed">
+                                <Select name="liabilityStatus" defaultValue="niepotwierdzona">
                                     <option value="niepotwierdzona">Niepotwierdzona</option>
                                     <option value="potwierdzona">Potwierdzona</option>
                                     <option value="sporna">Sporna</option>
@@ -327,12 +327,8 @@ export default function NewWorkIntakeInput() {
             </div>
 
             <div className="mt-6 flex items-center justify-end gap-x-6">
-                <SecondaryButton onClick={() => history.back()}>Anuluj</SecondaryButton>
-                <PrimaryButton onClick={() => {
-                    if (typeof window !== 'undefined') {
-                        window.localStorage.removeItem(draftStorageKey);
-                    }
-                }}>Zapisz sprawę</PrimaryButton>
+                <SecondaryButton onClick={() => window.history.back()}>Anuluj</SecondaryButton>
+                <PrimaryButton onClick={() => saveDraft('Przed zapisem', false)}>Zapisz sprawę</PrimaryButton>
             </div>
         </>
     );
