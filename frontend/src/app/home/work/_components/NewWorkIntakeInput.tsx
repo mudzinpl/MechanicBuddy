@@ -43,8 +43,19 @@ function SaveStageButton({ onClick }: { onClick: () => void }) {
     );
 }
 
+function StageSavedConfirmation({ active }: { active: boolean }) {
+    if (!active) return null;
+
+    return (
+        <span className="ml-3 inline-flex items-center rounded-full bg-green-50 px-3 py-1 text-sm font-medium text-green-700 ring-1 ring-green-600/20">
+            Zapisano etap
+        </span>
+    );
+}
+
 export default function NewWorkIntakeInput() {
     const rootRef = useRef<HTMLDivElement>(null);
+    const savedStageTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const [clientVehicles, setClientVehicles] = useState<IVehicleData[]>([]);
     const [selectedClientVehicleId, setSelectedClientVehicleId] = useState('');
     const [onlyClientVehicles, setOnlyClientVehicles] = useState(true);
@@ -92,6 +103,10 @@ export default function NewWorkIntakeInput() {
         window.localStorage.setItem(draftStorageKey, JSON.stringify(draft));
         if (showMessage) {
             setSavedStage(stageName);
+            if (savedStageTimeoutRef.current) {
+                clearTimeout(savedStageTimeoutRef.current);
+            }
+            savedStageTimeoutRef.current = setTimeout(() => setSavedStage(''), 2500);
         }
     };
 
@@ -125,6 +140,14 @@ export default function NewWorkIntakeInput() {
         });
     }, []);
 
+    useEffect(() => {
+        return () => {
+            if (savedStageTimeoutRef.current) {
+                clearTimeout(savedStageTimeoutRef.current);
+            }
+        };
+    }, []);
+
     const nextStep = inspectionMode === 'remote'
         ? 'Wyślij klientowi dokumenty i poproś o zdjęcia.'
         : 'Przygotuj upoważnienie i umów oględziny.';
@@ -149,6 +172,7 @@ export default function NewWorkIntakeInput() {
                         </div>
                     </div>
                     <SaveStageButton onClick={() => saveDraft('Źródło sprawy')} />
+                    <StageSavedConfirmation active={savedStage === 'Źródło sprawy'} />
                 </div>
 
                 <div className={stageClass}>
@@ -203,6 +227,7 @@ export default function NewWorkIntakeInput() {
                         </div>
                     </div>}
                     <SaveStageButton onClick={() => saveDraft('Klient')} />
+                    <StageSavedConfirmation active={savedStage === 'Klient'} />
                 </div>
 
                 <div className={stageClass}>
@@ -257,10 +282,11 @@ export default function NewWorkIntakeInput() {
                             <FormInput name="newVehicleModel" label="Model" placeholder="np. Corolla" />
                             <FormInput name="newVehicleRegNr" label="Numer rejestracyjny" placeholder="np. WA12345" />
                             <FormInput name="newVehicleVin" label="VIN" placeholder="Numer VIN" />
-                            <FormInput name="newVehicleOdo" type="number" label="Przebieg" placeholder="Wartość przebiegu" />
+                            <FormInput name="newVehicleOdo" label="Przebieg" placeholder="np. 135000" />
                         </div>
                     </div>}
                     <SaveStageButton onClick={() => saveDraft('Pojazd')} />
+                    <StageSavedConfirmation active={savedStage === 'Pojazd'} />
                 </div>
 
                 <div className={stageClass}>
@@ -300,6 +326,7 @@ export default function NewWorkIntakeInput() {
                         </div>
                     </div>
                     <SaveStageButton onClick={() => saveDraft('Dane szkody')} />
+                    <StageSavedConfirmation active={savedStage === 'Dane szkody'} />
                 </div>
 
                 <div className={stageClass}>
@@ -316,13 +343,13 @@ export default function NewWorkIntakeInput() {
                         </div>
                     </div>
                     <SaveStageButton onClick={() => saveDraft('Oględziny')} />
+                    <StageSavedConfirmation active={savedStage === 'Oględziny'} />
                 </div>
 
                 <div className="rounded-lg border border-indigo-200 bg-indigo-50 p-5">
                     <StageHeader number={6} title="Następny krok" description="Po zapisaniu sprawy wykonaj kolejne działanie operacyjne." />
                     <p className="mt-4 text-sm font-medium text-indigo-900">{nextStep}</p>
                     <FormTextArea name="about" rows={4} label="Uwagi do przyjęcia szkody" placeholder="Dodatkowe informacje z rozmowy lub zgłoszenia" />
-                    {savedStage && <p className="mt-3 text-sm text-indigo-700">Zapisano lokalnie etap: {savedStage}.</p>}
                 </div>
             </div>
 
