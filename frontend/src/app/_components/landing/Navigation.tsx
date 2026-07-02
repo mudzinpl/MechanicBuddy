@@ -21,7 +21,7 @@ export function Navigation() {
                 <nav className="flex min-h-[120px] items-center justify-between py-4 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:items-start">
                     <div className="hidden lg:block" />
                     <div className="flex translate-y-10 flex-col items-center gap-4">
-                        <a href="#start" aria-label="APPRA - strona główna">
+                        <a href="#start" aria-label="APPRA - strona główna" className="-translate-y-3">
                             <AppraLogo className="[&>img]:max-h-[134px] [&>img]:max-w-[408px]" />
                         </a>
                         <div className="hidden items-center gap-6 text-[15px] font-semibold lg:flex">

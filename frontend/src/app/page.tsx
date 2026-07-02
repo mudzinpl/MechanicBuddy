@@ -1,4 +1,5 @@
 import { Navigation } from "./_components/landing/Navigation"
+import { CookieBanner } from "./_components/landing/CookieBanner"
 import { AboutSection, ClientIndustrySection, ContactSection, Footer, HeroSection, OfferSection, TaglineSection } from "./_components/landing/Sections"
 
 export default function Home() {
@@ -15,6 +16,7 @@ export default function Home() {
                     <ClientIndustrySection />
                 </main>
                 <Footer />
+                <CookieBanner />
             </div>
             <style>{`
                 :root {

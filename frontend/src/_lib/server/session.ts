@@ -8,6 +8,7 @@ const sessionTimeoutInSecondsString = process.env.NEXT_PUBLIC_SESSION_TIMEOUT;
 if(!secretKey) throw new Error('SESSION_SECRET env not set');
 
 const encodedKey = new TextEncoder().encode(secretKey)
+const useSecureCookies = process.env.NODE_ENV === 'production'
 
 interface SessionPayload extends JWTPayload{
   apiRootJwt:string
@@ -43,7 +44,7 @@ export async function createSession(rootJwt: string,publicJwt: string,mustChange
   const cookieStore = await cookies()
   cookieStore.set('session', session, {
     httpOnly: true, //jwt not accessible by browser
-    secure: false,
+    secure: useSecureCookies,
     expires: expiresAt,
     sameSite: 'lax',
     path: '/',
@@ -51,7 +52,7 @@ export async function createSession(rootJwt: string,publicJwt: string,mustChange
   //jwt for public side resources
   cookieStore.set('jwt',  publicJwt, {
     httpOnly: false,
-    secure: false,
+    secure: useSecureCookies,
     expires: expiresAt,
     sameSite: 'lax',
     path: '/',
@@ -59,7 +60,7 @@ export async function createSession(rootJwt: string,publicJwt: string,mustChange
    //browser app has to know when session started so it can call extend session before api jwt times out
   cookieStore.set('session_timestamp',  Date.now().toString(), {
     httpOnly: false,
-    secure: false,
+    secure: useSecureCookies,
     expires: expiresAt,
     sameSite: 'lax',
     path: '/',

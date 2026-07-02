@@ -1,11 +1,26 @@
 
 import { NextResponse, NextRequest } from 'next/server'
 import { deleteSession, getJwt, getMustChangePassword } from '@/_lib/server/session'
+
+const protectedRoutePrefixes = [
+  '/home',
+  '/dashboard',
+  '/sprawy',
+  '/klienci',
+  '/pojazdy',
+  '/magazyn',
+  '/ustawienia',
+  '/print',
+  '/backend-api',
+  '/api',
+]
+
 export default async function authorizationMiddleware(request: NextRequest,response: NextResponse) {
 
    // 2. Check if the current route is protected or public
    const path = request.nextUrl.pathname
-   const isProtectedRoute = path.startsWith('/home');
+   const isProtectedRoute = protectedRoutePrefixes.some((prefix) => path === prefix || path.startsWith(`${prefix}/`));
+   const isApiRoute = path.startsWith('/api') || path.startsWith('/backend-api');
    const isChangePasswordRoute = path === '/auth/change-password';
     // 3. Decrypt the session from the cookie
 
@@ -18,6 +33,9 @@ export default async function authorizationMiddleware(request: NextRequest,respo
   const jwt = await getJwt();
   // 4. Redirect to /login if the user is not authenticated
   if (isProtectedRoute && !jwt) {
+    if (isApiRoute) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
     return NextResponse.redirect(new URL('/auth/login', request.nextUrl))
   }
 
@@ -34,13 +52,9 @@ export default async function authorizationMiddleware(request: NextRequest,respo
     return NextResponse.redirect(new URL('/home', request.nextUrl))
   }
 
-  // 5. Redirect to /home if the user is authenticated (skip in development to allow viewing landing page)
-  const isDevMode = process.env.NODE_ENV === 'development'
-  const isLandingPage = path === '/'
+  // 5. Redirect authenticated users away from the login page.
   const isAuthRoute = path.startsWith('/auth/login');
-  if (
-    !isProtectedRoute && !isChangePasswordRoute && !isAuthRoute && jwt && !(isDevMode && isLandingPage)
-  ) {
+  if (isAuthRoute && jwt && !mustChangePassword) {
     return NextResponse.redirect(new URL('/home', request.nextUrl))
   }
 

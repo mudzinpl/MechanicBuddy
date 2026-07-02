@@ -6,25 +6,28 @@ config.autoAddCss = false
 import '@/_styles/tailwind.css'
 
 const siteName = 'APPRA'
-const siteDescription = 'APPRA to system zarządzania warsztatem, zleceniami, klientami, pojazdami, magazynem i rozliczeniami.'
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3025'
+const siteDescription = 'APPRA Serwis w Gdyni zapewnia kompleksową obsługę szkód komunikacyjnych, napraw powypadkowych, formalności z ubezpieczycielem i samochodów zastępczych.'
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://appra.eu'
+const siteImage = '/assets/images/hero-damaged-car.jpg'
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
     template: `%s | ${siteName}`,
-    default: `${siteName} - zarządzanie warsztatem`,
+    default: `${siteName} Serwis - naprawy powypadkowe i likwidacja szkód Gdynia`,
   },
   description: siteDescription,
   keywords: [
-    'workshop management',
-    'auto repair software',
-    'mechanic software',
-    'garage management',
-    'work order tracking',
-    'vehicle service',
-    'invoicing software',
-    'inventory management',
+    'APPRA Serwis',
+    'APPRA Gdynia',
+    'likwidacja szkód Gdynia',
+    'naprawy powypadkowe Gdynia',
+    'bezgotówkowa likwidacja szkody',
+    'obsługa szkody komunikacyjnej',
+    'naprawa z OC',
+    'naprawa z AC',
+    'samochód zastępczy Gdynia',
+    'blacharstwo lakiernictwo Gdynia',
     'APPRA',
   ],
   authors: [{ name: siteName }],
@@ -39,19 +42,28 @@ export const metadata: Metadata = {
     locale: 'pl_PL',
     url: siteUrl,
     siteName: siteName,
-    title: `${siteName} - zarządzanie warsztatem`,
+    title: `${siteName} Serwis - naprawy powypadkowe i likwidacja szkód Gdynia`,
     description: siteDescription,
+    images: [
+      {
+        url: siteImage,
+        width: 1200,
+        height: 630,
+        alt: 'APPRA Serwis - naprawy powypadkowe i likwidacja szkód',
+      },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: `${siteName} - zarządzanie warsztatem`,
+    title: `${siteName} Serwis - naprawy powypadkowe i likwidacja szkód Gdynia`,
     description: siteDescription,
+    images: [siteImage],
   },
   icons: {
     icon: '/icon.ico',
     apple: '/apple-touch-icon.png',
   },
-  manifest: '/manifest.json',
+  manifest: '/manifest.webmanifest',
   robots: {
     index: true,
     follow: true,
@@ -66,7 +78,7 @@ export const metadata: Metadata = {
   alternates: {
     canonical: siteUrl,
   },
-  category: 'software',
+  category: 'automotive',
 }
 
 const fontVariables = {
@@ -85,6 +97,7 @@ export default function DefaultLayout({
       <head>
         <link rel="icon" href="/icon.ico" sizes="any" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="manifest" href="/manifest.webmanifest" />
       </head>
       <body className=" h-full ">
      

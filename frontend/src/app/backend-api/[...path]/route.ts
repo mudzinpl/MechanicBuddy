@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getJwt } from '@/_lib/server/session';
 
 const API_URL = process.env.API_URL || 'http://localhost:15567';
 
@@ -41,17 +42,18 @@ async function proxyRequest(
   request: NextRequest,
   params: { path: string[] }
 ) {
+  const jwt = await getJwt();
+
+  if (!jwt) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   const path = params.path.join('/');
   const searchParams = request.nextUrl.searchParams.toString();
   const url = `${API_URL}/api/${path}${searchParams ? `?${searchParams}` : ''}`;
 
   const headers = new Headers();
-
-  // Forward relevant headers
-  const authHeader = request.headers.get('authorization');
-  if (authHeader) {
-    headers.set('Authorization', authHeader);
-  }
+  headers.set('Authorization', `Bearer ${jwt}`);
 
   const contentType = request.headers.get('content-type');
   if (contentType) {

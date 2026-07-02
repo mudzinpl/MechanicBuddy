@@ -12,7 +12,6 @@ import {
     MapPinIcon,
     PhoneIcon,
     ShieldCheckIcon,
-    TruckIcon,
     UserGroupIcon,
     UserIcon,
     WrenchScrewdriverIcon,
@@ -27,6 +26,28 @@ const sectionContainer = "max-w-[1240px] px-4 md:px-6 lg:px-6"
 const openContactFormEvent = "appra:open-contact-form"
 const mapsUrl =
     "https://www.google.com/maps/dir/?api=1&destination=APPRA%20Sp.%20z%20o.o.%2C%20ul.%20Chwarznie%C5%84ska%20140%2C%2081-601%20Gdynia&travelmode=driving"
+
+function PassengerCarIcon({ className }: { className?: string }) {
+    return (
+        <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth={1.5}
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            className={className}
+            aria-hidden="true"
+        >
+            <path d="M4.5 15.5h15" />
+            <path d="M6.2 15.5l1.35-4.05A3 3 0 0 1 10.4 9.4h3.2a3 3 0 0 1 2.85 2.05l1.35 4.05" />
+            <path d="M7.25 15.5h9.5" />
+            <path d="M5.5 15.5v2.1a1 1 0 0 0 1 1h.6a1.25 1.25 0 0 0 1.2-.9l.15-.5h7.1l.15.5a1.25 1.25 0 0 0 1.2.9h.6a1 1 0 0 0 1-1v-2.1" />
+            <path d="M7 13.2h1.6" />
+            <path d="M15.4 13.2H17" />
+        </svg>
+    )
+}
 
 const offerItems = [
     {
@@ -48,7 +69,7 @@ const offerItems = [
     {
         id: "samochod-zastepczy",
         title: "Samochód zastępczy",
-        icon: TruckIcon,
+        icon: PassengerCarIcon,
         image: "/assets/images/hero-damaged-car.jpg",
         details:
             "Na czas naprawy pomagamy w organizacji pojazdu zastępczego, zgodnie z charakterem szkody i dostępnymi możliwościami. Dzięki temu klient może zachować mobilność podczas realizacji naprawy.",
@@ -154,7 +175,11 @@ const footerColumns = [
     },
     {
         title: "Ważne linki",
-        links: [{ label: "Polityka Cookies", href: "#" }],
+        links: [
+            { label: "Polityka prywatności", href: "/polityka-prywatnosci" },
+            { label: "Polityka cookies", href: "/polityka-cookies" },
+            { label: "Kontakt", href: "#kontakt" },
+        ],
     },
 ]
 
@@ -573,6 +598,24 @@ export function ContactSection() {
                                             Wyrażam zgodę na kontakt w celu obsługi zgłoszenia.
                                         </span>
                                     </label>
+                                    <label className="flex items-start gap-3 md:col-span-2">
+                                        <input
+                                            name="privacyConsent"
+                                            type="checkbox"
+                                            required
+                                            className="mt-1 size-4 rounded border-[#777777]/40 accent-[#8C2626]"
+                                        />
+                                        <span className="text-sm font-medium leading-6 text-[#222222]">
+                                            Wyrażam zgodę na przetwarzanie moich danych osobowych zgodnie z{" "}
+                                            <a
+                                                href="/polityka-prywatnosci"
+                                                className="font-bold text-[#8C2626] underline-offset-4 hover:underline"
+                                            >
+                                                Polityką Prywatności
+                                            </a>
+                                            .
+                                        </span>
+                                    </label>
                                 </div>
                                 <button
                                     type="submit"
@@ -758,8 +801,20 @@ export function Footer() {
                         ))}
                     </div>
                 </div>
-                <div className="border-t border-white/20 py-3 text-center text-xs text-white/80">
-                    Polityka prywatności
+                <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 border-t border-white/20 py-3 text-center text-xs text-white/80">
+                    <a href="/polityka-prywatnosci" className="transition-colors hover:text-white">
+                        Polityka prywatności
+                    </a>
+                    <a href="/polityka-cookies" className="transition-colors hover:text-white">
+                        Polityka cookies
+                    </a>
+                    <a
+                        href="#kontakt"
+                        onClick={(event) => handleFooterLinkClick(event, "#kontakt")}
+                        className="transition-colors hover:text-white"
+                    >
+                        Kontakt
+                    </a>
                 </div>
             </Container>
             {isCookiesOpen && (
