@@ -1,104 +1,94 @@
 import { Navigation } from "./_components/landing/Navigation"
-import { HeroSection, ServicesSection, AboutSection, TipsSection, GallerySection, ContactSection, Footer } from "./_components/landing/Sections"
-import { LandingThemeProvider } from "@/_components/ThemeProvider"
-import { IPublicLandingData } from "./home/settings/branding/model"
-import { headers } from "next/headers"
+import { AboutSection, ClientIndustrySection, ContactSection, Footer, HeroSection, OfferSection, TaglineSection } from "./_components/landing/Sections"
 
-// Extract tenant ID from hostname for multi-tenant routing
-async function getTenantIdFromHost(): Promise<string | null> {
-    const headersList = await headers();
-    const host = headersList.get('host');
-    if (!host) return null;
-
-    const parts = host.split('.');
-    if (parts.length >= 2) {
-        const tenantId = parts[0];
-        // Skip common subdomains that aren't tenant IDs
-        if (tenantId && tenantId !== 'www' && tenantId !== 'api' && tenantId !== 'localhost') {
-            return tenantId;
-        }
-    }
-    return null;
-}
-
-async function getLandingData(): Promise<IPublicLandingData | null> {
-    try {
-        const requestHeaders: HeadersInit = {
-            'Content-Type': 'application/json',
-        };
-
-        // Add tenant ID header for multi-tenant routing
-        const tenantId = await getTenantIdFromHost();
-        if (tenantId) {
-            requestHeaders['X-Tenant-ID'] = tenantId;
-        }
-
-        const response = await fetch(`${process.env.API_URL}/api/publiclanding`, {
-            cache: 'no-store',
-            headers: requestHeaders,
-        });
-
-        if (!response.ok) {
-            console.error('Failed to fetch landing data:', response.status);
-            return null;
-        }
-
-        return response.json();
-    } catch (error) {
-        console.error('Error fetching landing data:', error);
-        return null;
-    }
-}
-
-export default async function Home() {
-    const data = await getLandingData();
-
-    // If no data, show a fallback or error state
-    if (!data) {
-        return (
-            <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
-                <div className="text-center">
-                    <h1 className="text-2xl font-bold mb-4">Witamy</h1>
-                    <p className="text-slate-400 mb-6">Treść strony startowej jest obecnie konfigurowana.</p>
-                    <a
-                        href="/auth/login"
-                        className="inline-flex items-center px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-medium rounded-lg transition-colors"
-                    >
-                        Zaloguj się
-                    </a>
-                </div>
-            </div>
-        );
-    }
-
-    // Generate inline CSS for immediate color application (prevents flash)
-    const landingColors = data.branding.landingColors;
-    const themeStyles = landingColors ? `
-        :root {
-            ${landingColors.primaryColor ? `--landing-primary: ${landingColors.primaryColor};` : ''}
-            ${landingColors.secondaryColor ? `--landing-secondary: ${landingColors.secondaryColor};` : ''}
-            ${landingColors.accentColor ? `--landing-accent: ${landingColors.accentColor};` : ''}
-            ${landingColors.headerBg ? `--landing-header-bg: ${landingColors.headerBg};` : ''}
-            ${landingColors.footerBg ? `--landing-footer-bg: ${landingColors.footerBg};` : ''}
-        }
-    ` : '';
-
+export default function Home() {
     return (
-        <>
-            {/* Inline styles to prevent color flash on page load */}
-            {themeStyles && <style dangerouslySetInnerHTML={{ __html: themeStyles }} />}
-            <LandingThemeProvider colors={data.branding.landingColors}>
-                <Navigation data={data} />
+        <div className="bg-[#1F1F21]">
+            <div className="landing-page mx-auto w-full max-w-[1440px] overflow-hidden bg-[#1F1F21] shadow-[0_0_80px_rgba(0,0,0,0.35)]">
+                <Navigation />
                 <main>
-                    <HeroSection data={data} />
-                    <ServicesSection data={data} />
-                    <AboutSection data={data} />
-                    <TipsSection data={data} />
-                    <GallerySection data={data} />
-                    <ContactSection data={data} />
+                    <HeroSection />
+                    <AboutSection />
+                    <TaglineSection />
+                    <OfferSection />
+                    <ContactSection />
+                    <ClientIndustrySection />
                 </main>
-                <Footer data={data} />
-            </LandingThemeProvider>
-        </>
+                <Footer />
+            </div>
+            <style>{`
+                :root {
+                    --appra-primary: #8C2626;
+                    --appra-dark: #1F1F21;
+                    --appra-gray: #777777;
+                    --appra-white: #FFFFFF;
+                    --appra-light: #F5F5F5;
+                    --appra-black: #222222;
+                    --appra-radius: 5px;
+                    --appra-radius-pill: 100px;
+                }
+
+                .landing-page .landing-fade-in {
+                    animation: landingFadeIn 900ms ease-out both;
+                }
+
+                .landing-page .landing-slide-up {
+                    animation: landingSlideUp 900ms ease-out 160ms both;
+                }
+
+                .landing-page .landing-hero-image {
+                    animation: landingHeroDrift 14s ease-out both;
+                    transform-origin: 70% 50%;
+                    will-change: transform;
+                }
+
+                .landing-page .landing-reveal {
+                    opacity: 0;
+                    transform: translateY(20px);
+                    animation: landingReveal 800ms ease-out both;
+                    animation-timeline: view();
+                    animation-range: entry 0% cover 28%;
+                }
+
+                @keyframes landingFadeIn {
+                    from { opacity: 0; }
+                    to { opacity: 1; }
+                }
+
+                @keyframes landingSlideUp {
+                    from { opacity: 0; transform: translateY(18px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+
+                @keyframes landingHeroDrift {
+                    from { transform: translate3d(0, 0, 0); }
+                    to { transform: translate3d(-1%, 0, 0); }
+                }
+
+                @keyframes landingReveal {
+                    from { opacity: 0; transform: translateY(20px); }
+                    to { opacity: 1; transform: translateY(0); }
+                }
+
+                @supports not (animation-timeline: view()) {
+                    .landing-page .landing-reveal {
+                        opacity: 1;
+                        transform: none;
+                        animation: none;
+                    }
+                }
+
+                @media (prefers-reduced-motion: reduce) {
+                    .landing-page .landing-fade-in,
+                    .landing-page .landing-slide-up,
+                    .landing-page .landing-hero-image,
+                    .landing-page .landing-reveal {
+                        opacity: 1;
+                        transform: none;
+                        animation: none;
+                    }
+                }
+            `}</style>
+        </div>
     )
 }

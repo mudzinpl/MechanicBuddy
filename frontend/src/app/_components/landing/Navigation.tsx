@@ -1,150 +1,75 @@
 'use client'
 
 import { Container } from "@/_components/layout/Container"
-import Link from "next/link"
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline"
 import { useState } from "react"
-import { PhoneIcon, MapPinIcon, ClockIcon } from "@heroicons/react/24/outline"
-import { IPublicLandingData } from "@/app/home/settings/branding/model"
-import SocialIcons from "./SocialIcons"
+import { AppraLogo } from "./AppraLogo"
 
-interface NavigationProps {
-    data: IPublicLandingData;
-}
+const navLinks = [
+    { name: "Główna", href: "#home", active: true },
+    { name: "O firmie", href: "#o-firmie" },
+    { name: "Oferta", href: "#oferta" },
+    { name: "Kontakt", href: "#kontakt" },
+]
 
-export function Navigation({ data }: NavigationProps) {
+export function Navigation() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
-    const { branding, content, companyInfo } = data;
-    const headerSocialLinks = (content.socialLinks || []).filter(l => l.isActive && l.showInHeader).sort((a, b) => a.sortOrder - b.sortOrder);
-
-    const navLinks = [
-        { name: "Usługi", href: "#services" },
-        { name: "O nas", href: "#about" },
-        ...(content.tipsSection.isVisible && content.sectionVisibility?.tipsVisible ? [{ name: "Porady motoryzacyjne", href: "#tips" }] : []),
-        ...(content.sectionVisibility?.galleryVisible && content.galleryPhotos?.length > 0 ? [{ name: "Galeria", href: "#gallery" }] : []),
-        { name: "Kontakt", href: "#contact" },
-    ]
 
     return (
-        <header className="bg-landing-header-bg text-white">
-            <div className="py-2 bg-landing-primary">
-                <Container>
-                    <div className="flex flex-wrap justify-between items-center text-sm">
-                        <div className="flex items-center gap-6">
-                            {companyInfo.phone && (
-                                <a href={`tel:${companyInfo.phone}`} className="flex items-center gap-2 hover:text-slate-200 transition-colors">
-                                    <PhoneIcon className="h-4 w-4" />
-                                    <span>{companyInfo.phone}</span>
-                                </a>
-                            )}
-                            {companyInfo.address && (
-                                <span className="hidden sm:flex items-center gap-2">
-                                    <MapPinIcon className="h-4 w-4" />
-                                    <span>{companyInfo.address}</span>
+        <header className="absolute inset-x-0 top-0 z-50 text-white">
+            <Container className="max-w-[1240px] px-4 md:px-6 lg:px-6">
+                <nav className="flex min-h-[120px] items-center justify-between py-4 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:items-start">
+                    <div className="hidden lg:block" />
+                    <div className="flex translate-y-10 flex-col items-center gap-4">
+                        <a href="#start" aria-label="APPRA - strona główna">
+                            <AppraLogo className="[&>img]:max-h-[134px] [&>img]:max-w-[408px]" />
+                        </a>
+                        <div className="hidden items-center gap-6 text-[15px] font-semibold lg:flex">
+                            {navLinks.map((link, index) => (
+                                <span key={link.name} className="flex items-center gap-6">
+                                    {index > 0 && <span className="text-white/45">|</span>}
+                                    <a
+                                        href={link.href}
+                                        className={[
+                                            "border-b-2 pb-1 transition-colors duration-[250ms] hover:border-[#8C2626] hover:text-white",
+                                            link.active ? "border-[#8C2626] text-white" : "border-transparent text-white/90",
+                                        ].join(" ")}
+                                    >
+                                        {link.name}
+                                    </a>
                                 </span>
-                            )}
-                        </div>
-                        <div className="flex items-center gap-4">
-                            {content.contact.businessHours.length > 0 && (
-                                <span className="hidden md:flex items-center gap-2">
-                                    <ClockIcon className="h-4 w-4" />
-                                    <span>
-                                        {content.contact.businessHours
-                                            .filter(h => h.day && h.open && h.open !== 'Closed' && h.open !== 'Zamknięte')
-                                            .slice(0, 2)
-                                            .map(h => `${h.day!.slice(0, 3)}: ${h.open} - ${h.close}`)
-                                            .join(' | ')}
-                                    </span>
-                                </span>
-                            )}
-                            {headerSocialLinks.length > 0 && (
-                                <SocialIcons links={headerSocialLinks} className="hidden sm:flex" />
-                            )}
+                            ))}
                         </div>
                     </div>
-                </Container>
-            </div>
+                    <div className="flex justify-end lg:hidden">
+                        <button
+                            type="button"
+                            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                            className="rounded-full bg-black/55 p-3 text-white shadow-[0_10px_30px_rgba(0,0,0,0.25)]"
+                            aria-label="Przełącz menu"
+                        >
+                            {mobileMenuOpen ? <XMarkIcon className="size-6" /> : <Bars3Icon className="size-6" />}
+                        </button>
+                    </div>
+                </nav>
+            </Container>
 
-            <Container>
-                <nav className="relative flex justify-between items-center py-4">
-                    <Link href="/" className="flex items-center gap-3">
-                        {branding.logoBase64 ? (
-                            <img
-                                src={`data:${branding.logoMimeType};base64,${branding.logoBase64}`}
-                                alt={content.hero.companyName}
-                                className="h-10 w-auto"
-                            />
-                        ) : (
-                            <span className="text-xl font-bold tracking-tight">{content.hero.companyName}</span>
-                        )}
-                    </Link>
-
-                    <div className="hidden md:flex items-center gap-6">
+            {mobileMenuOpen && (
+                <div className="border-y border-white/10 bg-[#1F1F21]/95 px-4 py-4 backdrop-blur-md lg:hidden">
+                    <div className="mx-auto flex max-w-[1240px] flex-col gap-1">
                         {navLinks.map((link) => (
                             <a
                                 key={link.name}
                                 href={link.href}
-                                className="text-sm font-medium transition-colors hover:opacity-80 px-2"
+                                onClick={() => setMobileMenuOpen(false)}
+                                className="rounded-[5px] px-3 py-3 text-base font-semibold text-white transition-colors duration-[250ms] hover:bg-white/10"
                             >
                                 {link.name}
                             </a>
                         ))}
-                        <Link
-                            href="/auth/login"
-                            className="ml-2 px-5 py-2.5 rounded-lg text-sm font-semibold transition-all shadow-lg hover:opacity-90 bg-landing-secondary"
-                        >
-                            Portal mechanika
-                        </Link>
                     </div>
-
-                    {/* Mobile menu button */}
-                    <button
-                        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                        className="md:hidden p-2 hover:bg-slate-800 rounded-lg transition-colors"
-                        aria-label="Przełącz menu"
-                    >
-                        {mobileMenuOpen ? (
-                            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                        ) : (
-                            <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-                            </svg>
-                        )}
-                    </button>
-
-                    {/* Mobile menu panel */}
-                    {mobileMenuOpen && (
-                        <>
-                            <div
-                                className="fixed inset-0 z-40 bg-black/50"
-                                onClick={() => setMobileMenuOpen(false)}
-                            />
-                            <div className="absolute top-full left-0 right-0 z-50 mt-2 mx-4 bg-slate-800 rounded-xl shadow-xl p-4">
-                                <div className="flex flex-col gap-2">
-                                    {navLinks.map((link) => (
-                                        <a
-                                            key={link.name}
-                                            href={link.href}
-                                            onClick={() => setMobileMenuOpen(false)}
-                                            className="text-base font-medium py-3 px-4 rounded-lg hover:bg-slate-700 transition-colors"
-                                        >
-                                            {link.name}
-                                        </a>
-                                    ))}
-                                    <Link
-                                        href="/auth/login"
-                                        onClick={() => setMobileMenuOpen(false)}
-                                        className="mt-2 px-5 py-3 rounded-lg text-base font-semibold text-center transition-all shadow-lg hover:opacity-90 bg-landing-secondary"
-                                    >
-                                        Portal mechanika
-                                    </Link>
-                                </div>
-                            </div>
-                        </>
-                    )}
-                </nav>
-            </Container>
+                </div>
+            )}
         </header>
     )
 }
