@@ -259,6 +259,7 @@ export default function NewWorkIntakeInput() {
             <div ref={rootRef} className="space-y-6" onChange={() => saveDraft('automatycznie', false)}>
                 <input type="hidden" name="damageStatus" value="inspection_pending" />
                 <input type="hidden" name="plannedInspectionOn" value={plannedInspectionOn} />
+                <input type="hidden" name="inspectionPreparationProvided" value="true" />
 
                 <div className={stageClass}>
                     <StageHeader number={1} title="Źródło sprawy" description="Określ, skąd pochodzi zgłoszenie szkody." />
@@ -556,7 +557,7 @@ export default function NewWorkIntakeInput() {
                         </ul>}
                     </div>
                     <p className="mt-3 text-xs text-indigo-800">
-                        Tryb oględzin, termin oraz uwagi zostaną zapisane w sprawie. Dane osoby przyjeżdżającej, dodatkowy telefon, e-mail obsługi zdalnej i checklista są obecnie przechowywane tylko w lokalnym szkicu tej przeglądarki.
+                        Tryb oględzin, termin, dane kontaktowe, status upoważnienia, checklista oraz uwagi zostaną zapisane w sprawie. Lokalny szkic nadal chroni formularz przed przypadkową utratą danych przed zapisem.
                     </p>
                     <FormTextArea name="about" rows={4} label="Uwagi do przyjęcia szkody" placeholder="Dodatkowe informacje z rozmowy lub zgłoszenia" />
                 </div>

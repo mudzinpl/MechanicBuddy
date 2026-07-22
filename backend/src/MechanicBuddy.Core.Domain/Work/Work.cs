@@ -274,6 +274,36 @@ namespace MechanicBuddy.Core.Domain
             PlannedReleaseOn = plannedReleaseOn;
             PlannedInspectionOn = plannedInspectionOn;
         }
+
+        public virtual void UpdateInspectionPreparation(
+            string inspectionMode,
+            string inspectionVisitorName,
+            string inspectionContactPhone,
+            string inspectionRemoteEmail,
+            bool powerOfAttorneyPrepared,
+            bool powerOfAttorneySent,
+            bool vehiclePhotosReceived,
+            bool damagePhotosReceived,
+            bool registrationDocumentPhotoReceived,
+            bool drivingLicencePhotoReceived,
+            bool incidentStatementReceived,
+            bool responsiblePartyDataReceived,
+            bool policyNumberReceived)
+        {
+            InspectionMode = inspectionMode;
+            InspectionVisitorName = inspectionVisitorName;
+            InspectionContactPhone = inspectionContactPhone;
+            InspectionRemoteEmail = inspectionRemoteEmail;
+            PowerOfAttorneyPrepared = powerOfAttorneyPrepared;
+            PowerOfAttorneySent = powerOfAttorneySent;
+            VehiclePhotosReceived = vehiclePhotosReceived;
+            DamagePhotosReceived = damagePhotosReceived;
+            RegistrationDocumentPhotoReceived = registrationDocumentPhotoReceived;
+            DrivingLicencePhotoReceived = drivingLicencePhotoReceived;
+            IncidentStatementReceived = incidentStatementReceived;
+            ResponsiblePartyDataReceived = responsiblePartyDataReceived;
+            PolicyNumberReceived = policyNumberReceived;
+        }
          
         public virtual void WithoutVehicle()
         {
@@ -346,6 +376,19 @@ namespace MechanicBuddy.Core.Domain
         public virtual DateTime? PlannedIntakeOn { get; protected set; }
         public virtual DateTime? PlannedReleaseOn { get; protected set; }
         public virtual DateTime? PlannedInspectionOn { get; protected set; }
+        public virtual string InspectionMode { get; protected set; }
+        public virtual string InspectionVisitorName { get; protected set; }
+        public virtual string InspectionContactPhone { get; protected set; }
+        public virtual string InspectionRemoteEmail { get; protected set; }
+        public virtual bool PowerOfAttorneyPrepared { get; protected set; }
+        public virtual bool PowerOfAttorneySent { get; protected set; }
+        public virtual bool VehiclePhotosReceived { get; protected set; }
+        public virtual bool DamagePhotosReceived { get; protected set; }
+        public virtual bool RegistrationDocumentPhotoReceived { get; protected set; }
+        public virtual bool DrivingLicencePhotoReceived { get; protected set; }
+        public virtual bool IncidentStatementReceived { get; protected set; }
+        public virtual bool ResponsiblePartyDataReceived { get; protected set; }
+        public virtual bool PolicyNumberReceived { get; protected set; }
         public virtual DateTime StartedOn { get; protected set; }
 
         public virtual DateTime ChangedOn { get; protected set; } //todo protected and user id too?

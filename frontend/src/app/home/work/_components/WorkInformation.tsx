@@ -2,7 +2,7 @@
 
 'use client'
 import { damageStatuses, getDamageStatusLabel, getEstimateStatusLabel, getEstimateSystemLabel, getSettlementStatusLabel, IWorkData, statusNames } from '../model';
-import { BanknotesIcon, ClipboardDocumentListIcon, ClockIcon, ExclamationTriangleIcon } from '@heroicons/react/20/solid';
+import { BanknotesIcon, ClipboardDocumentListIcon, ClockIcon, ExclamationTriangleIcon, EyeIcon } from '@heroicons/react/20/solid';
 import moment from 'moment';
 import React from 'react';
 import { startAnActivity } from '../actions/startAnActivity';
@@ -193,6 +193,29 @@ export function WorkInformation({
             formatCurrency(work.estimateGrossAmount),
         ].filter(Boolean).join(' · ')
         : 'Brak kosztorysu';
+    const inspectionPreparationItems = [
+        ['Zdjęcia pojazdu', work.vehiclePhotosReceived, false],
+        ['Zdjęcia uszkodzeń', work.damagePhotosReceived, false],
+        ['Zdjęcie dowodu rejestracyjnego', work.registrationDocumentPhotoReceived, false],
+        ['Zdjęcie prawa jazdy', work.drivingLicencePhotoReceived, true],
+        ['Oświadczenie o zdarzeniu', work.incidentStatementReceived, true],
+        ['Dane sprawcy', work.responsiblePartyDataReceived, true],
+        ['Numer polisy', work.policyNumberReceived, true],
+    ] as [string, boolean, boolean][];
+    const inspectionPreparationDetails = [
+        ['Tryb', work.inspectionMode === 'remote' ? 'Obsługa zdalna' : work.inspectionMode === 'workshop' ? 'Klient przyjedzie do warsztatu' : 'Nie ustalono'],
+        ['Termin', formatDateTime(work.plannedInspectionOn)],
+        ['Osoba przyjeżdżająca', work.inspectionVisitorName],
+        ['Telefon', work.inspectionContactPhone],
+        ['E-mail obsługi zdalnej', work.inspectionRemoteEmail],
+        ['Upoważnienie przygotowane', work.powerOfAttorneyPrepared ? 'Tak' : 'Nie'],
+        ['Upoważnienie wysłane', work.powerOfAttorneySent ? 'Tak' : 'Nie'],
+        ['Upoważnienie odebrane', work.powerOfAttorneySigned ? 'Tak' : 'Nie'],
+    ].filter(([, value]) => value) as DetailRow[];
+    const receivedInspectionItems = inspectionPreparationItems.filter(([, received]) => received).length;
+    const compactInspectionPreparation = work.inspectionMode
+        ? `${work.inspectionMode === 'remote' ? 'Zdalnie' : 'Warsztat'} · dokumentacja ${receivedInspectionItems}/${inspectionPreparationItems.length}`
+        : 'Nie ustalono sposobu oględzin';
     const compactSettlement = [
         getSettlementStatusLabel(work.settlementStatus),
         work.clientPaysVat ? `dopłata VAT ${work.clientVatPercent ?? 100}%` : '',
@@ -391,6 +414,21 @@ export function WorkInformation({
                                 <ButtonGroup options={editButtonOptions}></ButtonGroup>
                             }
                         </div>
+                    </div>
+                </DetailSection>
+
+                <DetailSection title="Przygotowanie oględzin" icon={EyeIcon} summary={compactInspectionPreparation}>
+                    <DetailRows rows={inspectionPreparationDetails} />
+                    <div className="mt-4 border-t border-gray-100 pt-4">
+                        <p className="mb-2 font-semibold text-gray-900">Dokumentacja od klienta</p>
+                        <ul className="space-y-1">
+                            {inspectionPreparationItems.map(([label, received, optional]) => (
+                                <li key={label} className={received ? 'text-green-700' : 'text-gray-500'}>
+                                    <span className="mr-2 font-semibold">{received ? '✓' : '○'}</span>
+                                    {label}{optional ? ' (jeśli dotyczy)' : ''}
+                                </li>
+                            ))}
+                        </ul>
                     </div>
                 </DetailSection>
 
