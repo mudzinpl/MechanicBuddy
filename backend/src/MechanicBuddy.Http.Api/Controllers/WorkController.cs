@@ -149,6 +149,19 @@ namespace MechanicBuddy.Http.Api.Controllers
                 work.PlannedIntakeOn,
                 work.PlannedReleaseOn,
                 work.PlannedInspectionOn,
+                work.InspectionMode,
+                work.InspectionVisitorName,
+                work.InspectionContactPhone,
+                work.InspectionRemoteEmail,
+                work.PowerOfAttorneyPrepared,
+                work.PowerOfAttorneySent,
+                work.VehiclePhotosReceived,
+                work.DamagePhotosReceived,
+                work.RegistrationDocumentPhotoReceived,
+                work.DrivingLicencePhotoReceived,
+                work.IncidentStatementReceived,
+                work.ResponsiblePartyDataReceived,
+                work.PolicyNumberReceived,
                 ReplacementVehicle = replacementVehicle,
                 Mechanics = work.Mechanics.ToList().Select(x => new { x.Id, x.Name }).ToArray(),
                 Status= status,
@@ -633,6 +646,23 @@ namespace MechanicBuddy.Http.Api.Controllers
                 model.PaymentReceivedOn,
                 model.SettlementNotes);
             work.UpdateSchedule(model.PlannedIntakeOn, model.PlannedReleaseOn, model.PlannedInspectionOn);
+            if (model.InspectionPreparationProvided)
+            {
+                work.UpdateInspectionPreparation(
+                    model.InspectionMode,
+                    model.InspectionVisitorName,
+                    model.InspectionContactPhone,
+                    model.InspectionRemoteEmail,
+                    model.PowerOfAttorneyPrepared.GetValueOrDefault(),
+                    model.PowerOfAttorneySent.GetValueOrDefault(),
+                    model.VehiclePhotosReceived.GetValueOrDefault(),
+                    model.DamagePhotosReceived.GetValueOrDefault(),
+                    model.RegistrationDocumentPhotoReceived.GetValueOrDefault(),
+                    model.DrivingLicencePhotoReceived.GetValueOrDefault(),
+                    model.IncidentStatementReceived.GetValueOrDefault(),
+                    model.ResponsiblePartyDataReceived.GetValueOrDefault(),
+                    model.PolicyNumberReceived.GetValueOrDefault());
+            }
 
             if (model.AssignedTo != null) work.Assign(model.AssignedTo.Select(x => repository.Get<Employee>(x)).ToArray());
              
@@ -738,6 +768,23 @@ namespace MechanicBuddy.Http.Api.Controllers
                 model.PaymentReceivedOn,
                 model.SettlementNotes);
             work.UpdateSchedule(model.PlannedIntakeOn, model.PlannedReleaseOn, model.PlannedInspectionOn);
+            if (model.InspectionPreparationProvided)
+            {
+                work.UpdateInspectionPreparation(
+                    model.InspectionMode,
+                    model.InspectionVisitorName,
+                    model.InspectionContactPhone,
+                    model.InspectionRemoteEmail,
+                    model.PowerOfAttorneyPrepared.GetValueOrDefault(),
+                    model.PowerOfAttorneySent.GetValueOrDefault(),
+                    model.VehiclePhotosReceived.GetValueOrDefault(),
+                    model.DamagePhotosReceived.GetValueOrDefault(),
+                    model.RegistrationDocumentPhotoReceived.GetValueOrDefault(),
+                    model.DrivingLicencePhotoReceived.GetValueOrDefault(),
+                    model.IncidentStatementReceived.GetValueOrDefault(),
+                    model.ResponsiblePartyDataReceived.GetValueOrDefault(),
+                    model.PolicyNumberReceived.GetValueOrDefault());
+            }
             work.Assign(model.AssignedTo == null ? Enumerable.Empty<Employee>().ToArray() : model.AssignedTo.Select(x => repository.Get<Employee>(x)).ToArray());
 
             work.Changed();//well, can i use dry here

@@ -99,6 +99,14 @@ export async function createOrUpdate(
        vehicleId = await vehicleResponse.json();
     }
 
+    const inspectionPreparationProvided = formData.get('inspectionPreparationProvided') === 'true';
+    const powerOfAttorneySigned = inspectionPreparationProvided
+       ? formData.get('authorizationReceived') === 'on'
+       : formData.get('powerOfAttorneySigned') === 'on';
+    const powerOfAttorneySignedOn = inspectionPreparationProvided
+       ? (powerOfAttorneySigned ? new Date().toISOString() : null)
+       : formData.get('powerOfAttorneySignedOn')?.toString() || null;
+
  //Guid? ClientId, string Description, Guid? VehicleId, Guid[] AssignedTo, int? Odo, bool StartWithOffer
     const body = {
        clientId: clientId == '' ? null : clientId,
@@ -113,8 +121,8 @@ export async function createOrUpdate(
        damageStatus: formData.get('damageStatus')?.toString() || null,
        assignmentOfClaimSigned: formData.get('assignmentOfClaimSigned') == 'on',
        assignmentOfClaimSignedOn: formData.get('assignmentOfClaimSignedOn')?.toString() || null,
-       powerOfAttorneySigned: formData.get('powerOfAttorneySigned') == 'on',
-       powerOfAttorneySignedOn: formData.get('powerOfAttorneySignedOn')?.toString() || null,
+       powerOfAttorneySigned,
+       powerOfAttorneySignedOn,
        clientPaysVat: formData.get('clientPaysVat') == 'on',
        clientVatPercent: optionalNumber('clientVatPercent'),
        clientVatAmount: optionalNumber('clientVatAmount'),
@@ -146,7 +154,21 @@ export async function createOrUpdate(
        estimateDocumentId: formData.get('estimateDocumentId')?.toString() || null,
        plannedIntakeOn: formData.get('plannedIntakeOn')?.toString() || null,
        plannedReleaseOn: formData.get('plannedReleaseOn')?.toString() || null,
-       plannedInspectionOn: formData.get('plannedInspectionOn')?.toString() || null
+       plannedInspectionOn: formData.get('plannedInspectionOn')?.toString() || null,
+       inspectionPreparationProvided,
+       inspectionMode: formData.get('inspectionMode')?.toString() || null,
+       inspectionVisitorName: formData.get('inspectionVisitorName')?.toString() || null,
+       inspectionContactPhone: formData.get('inspectionContactPhone')?.toString() || null,
+       inspectionRemoteEmail: formData.get('remoteClientEmail')?.toString() || null,
+       powerOfAttorneyPrepared: inspectionPreparationProvided ? formData.get('authorizationPrepared') === 'on' : null,
+       powerOfAttorneySent: inspectionPreparationProvided ? formData.get('authorizationSent') === 'on' : null,
+       vehiclePhotosReceived: inspectionPreparationProvided ? formData.get('vehiclePhotos') === 'on' : null,
+       damagePhotosReceived: inspectionPreparationProvided ? formData.get('damagePhotos') === 'on' : null,
+       registrationDocumentPhotoReceived: inspectionPreparationProvided ? formData.get('registrationDocumentPhoto') === 'on' : null,
+       drivingLicencePhotoReceived: inspectionPreparationProvided ? formData.get('drivingLicencePhoto') === 'on' : null,
+       incidentStatementReceived: inspectionPreparationProvided ? formData.get('incidentStatement') === 'on' : null,
+       responsiblePartyDataReceived: inspectionPreparationProvided ? formData.get('responsiblePartyData') === 'on' : null,
+       policyNumberReceived: inspectionPreparationProvided ? formData.get('policyNumber') === 'on' : null
     }; 
     const url = "work"; 
     

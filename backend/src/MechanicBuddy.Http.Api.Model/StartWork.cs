@@ -73,7 +73,21 @@ namespace MechanicBuddy.Http.Api.Models
         string InvoiceSourceSystem,
         DateTime? PlannedIntakeOn,
         DateTime? PlannedReleaseOn,
-        DateTime? PlannedInspectionOn);
+        DateTime? PlannedInspectionOn,
+        bool InspectionPreparationProvided,
+        string InspectionMode,
+        string InspectionVisitorName,
+        string InspectionContactPhone,
+        string InspectionRemoteEmail,
+        bool? PowerOfAttorneyPrepared,
+        bool? PowerOfAttorneySent,
+        bool? VehiclePhotosReceived,
+        bool? DamagePhotosReceived,
+        bool? RegistrationDocumentPhotoReceived,
+        bool? DrivingLicencePhotoReceived,
+        bool? IncidentStatementReceived,
+        bool? ResponsiblePartyDataReceived,
+        bool? PolicyNumberReceived);
 
     public record DashboardTileDto(string Key, int Count);
 
