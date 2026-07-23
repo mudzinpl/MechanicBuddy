@@ -1,6 +1,6 @@
 'use client'
 
-import {IActivities, IActivity, IOfferIssuance, IWorkData, IWorkDocument } from '../model'
+import {IActivities, IActivity, IInspectionFinding, IOfferIssuance, IWorkData, IWorkDocument } from '../model'
 import { IWorkCommunicationEntry } from '../communicationModel'
 import clsx from 'clsx'
 import Link from 'next/link'
@@ -49,12 +49,14 @@ export default function Activities({
   issueances,
   documents,
   communicationEntries,
+  inspectionFindings,
 }: {
   work: IWorkData,
   activities: IActivities,
   issueances: IOfferIssuance[]
   documents: IWorkDocument[]
   communicationEntries: IWorkCommunicationEntry[]
+  inspectionFindings: IInspectionFinding[]
 }) {
  
   const confirmRemoveActivityRef = React.useRef<ConfirmDialogHandle>(null);
@@ -86,7 +88,7 @@ export default function Activities({
             title="Wykonanie oględzin"
             summary={work.inspectionExecutionReady ? 'kompletne · można przejść dalej' : `kompletność ${work.inspectionExecutionCompletionPercent ?? 0}%`}
           >
-            <InspectionExecutionEditor work={work} documents={documents}></InspectionExecutionEditor>
+            <InspectionExecutionEditor work={work} documents={documents} findings={inspectionFindings}></InspectionExecutionEditor>
           </CollapsibleAsideSection>
         </li>
         <li>

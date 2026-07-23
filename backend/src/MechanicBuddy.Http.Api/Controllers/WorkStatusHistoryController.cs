@@ -112,7 +112,13 @@ namespace MechanicBuddy.Http.Api.Controllers
                     WHERE workid = @WorkId
                       AND category = 'vehicle_photos'
                 )", new { WorkId = work.Id });
-            work.EnsureInspectionExecutionAllows(newStatus, hasInspectionPhotoDocumentation);
+            var hasInspectionFindings = session.Connection.ExecuteScalar<bool>(@"
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM domain.work_inspection_finding
+                    WHERE workid = @WorkId
+                )", new { WorkId = work.Id });
+            work.EnsureInspectionExecutionAllows(newStatus, hasInspectionPhotoDocumentation, hasInspectionFindings);
             EnsureInitialHistory(work.Id, oldStatus, work.StartedOn, work.Starter?.Id);
             work.UpdateClaimDetails(
                 work.ClaimNumber,

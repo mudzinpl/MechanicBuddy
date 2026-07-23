@@ -393,7 +393,7 @@ namespace MechanicBuddy.Core.Domain
             InspectionNotes = inspectionNotes;
         }
 
-        public virtual IReadOnlyCollection<string> GetInspectionExecutionBlockers(bool hasPhotoDocumentation)
+        public virtual IReadOnlyCollection<string> GetInspectionExecutionBlockers(bool hasPhotoDocumentation, bool hasInspectionFindings)
         {
             var blockers = new List<string>();
             if (!InspectionPerformedOn.HasValue) blockers.Add("Brak daty wykonania oględzin");
@@ -404,16 +404,17 @@ namespace MechanicBuddy.Core.Domain
             if (!InspectionDamagePhotosComplete) blockers.Add("Nie potwierdzono kompletu zdjęć uszkodzeń");
             if (!InspectionVinPhotoComplete) blockers.Add("Nie potwierdzono zdjęcia VIN");
             if (!hasPhotoDocumentation) blockers.Add("Brak plików ze zdjęciami w dokumentach sprawy");
+            if (!hasInspectionFindings) blockers.Add("Brak listy uszkodzeń z oględzin");
             return blockers.AsReadOnly();
         }
 
-        public virtual int GetInspectionExecutionCompletionPercent(bool hasPhotoDocumentation)
+        public virtual int GetInspectionExecutionCompletionPercent(bool hasPhotoDocumentation, bool hasInspectionFindings)
         {
-            const int totalRequirements = 8;
-            return (int)Math.Round((totalRequirements - GetInspectionExecutionBlockers(hasPhotoDocumentation).Count) * 100d / totalRequirements);
+            const int totalRequirements = 9;
+            return (int)Math.Round((totalRequirements - GetInspectionExecutionBlockers(hasPhotoDocumentation, hasInspectionFindings).Count) * 100d / totalRequirements);
         }
 
-        public virtual void EnsureInspectionExecutionAllows(string newDamageStatus, bool hasPhotoDocumentation)
+        public virtual void EnsureInspectionExecutionAllows(string newDamageStatus, bool hasPhotoDocumentation, bool hasInspectionFindings)
         {
             var currentStatus = string.IsNullOrWhiteSpace(DamageStatus) ? "new" : DamageStatus.Trim().ToLowerInvariant();
             if (currentStatus != "new" && currentStatus != "inspection_pending") return;
@@ -426,7 +427,7 @@ namespace MechanicBuddy.Core.Domain
             };
             if (!statusesAfterInspection.Contains(newDamageStatus ?? string.Empty)) return;
 
-            var blockers = GetInspectionExecutionBlockers(hasPhotoDocumentation);
+            var blockers = GetInspectionExecutionBlockers(hasPhotoDocumentation, hasInspectionFindings);
             if (blockers.Count > 0)
             {
                 throw new UserException($"Nie można zakończyć oględzin. Brakuje: {string.Join(", ", blockers)}.");
