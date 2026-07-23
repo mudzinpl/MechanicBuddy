@@ -191,7 +191,7 @@ function isReactionStep(step: TimelineStep, work: IWorkData, currentIndex: numbe
     const damageStatus = normalizeStatus(work.damageStatus);
 
     if (['on_hold', 'rejected'].includes(damageStatus)) return true;
-    if (step.key === 'inspection' && !work.inspectionPreparationReady) return true;
+    if (step.key === 'inspection' && (!work.inspectionPreparationReady || !work.inspectionExecutionReady)) return true;
     if (step.key === 'insurer' && !work.insurerDecisionOn && !work.estimateAcceptedOn) return true;
     if (step.key === 'estimate' && !work.audatexEstimateNumber) return true;
     if (step.key === 'settlement' && getSettlementStatusLabel(work.settlementStatus) !== 'Rozliczone') return true;
@@ -260,10 +260,15 @@ function getNextStep(work: IWorkData, currentIndex: number) {
         reason = 'Brakuje potwierdzenia kolejnego kroku z klientem.';
     }
     else if (currentKey === 'inspection') {
-        reason = work.inspectionPreparationReady
-            ? 'Przygotowanie oględzin jest kompletne.'
-            : `Przygotowanie oględzin jest kompletne w ${work.inspectionPreparationCompletionPercent ?? 0}%.`;
-        missing.push(...(work.inspectionPreparationBlockers ?? []));
+        if (!work.inspectionPreparationReady) {
+            reason = `Przygotowanie oględzin jest kompletne w ${work.inspectionPreparationCompletionPercent ?? 0}%.`;
+            missing.push(...(work.inspectionPreparationBlockers ?? []));
+        } else if (!work.inspectionExecutionReady) {
+            reason = `Oględziny są kompletne w ${work.inspectionExecutionCompletionPercent ?? 0}%.`;
+            missing.push(...(work.inspectionExecutionBlockers ?? []));
+        } else {
+            reason = 'Oględziny są kompletne. Można przejść do kosztorysu.';
+        }
         deadline = work.plannedInspectionOn ? formatDateTime(work.plannedInspectionOn) : '';
     }
     else if (currentKey === 'estimate') {

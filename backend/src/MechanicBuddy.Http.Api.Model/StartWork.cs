@@ -106,6 +106,16 @@ namespace MechanicBuddy.Http.Api.Models
         bool ResponsiblePartyDataReceived,
         bool PolicyNumberReceived);
 
+    public record PutInspectionExecution(
+        DateTime? InspectionPerformedOn,
+        int? Odo,
+        bool InspectionVinVerified,
+        bool InspectionDamageScopeConfirmed,
+        bool InspectionVehiclePhotosComplete,
+        bool InspectionDamagePhotosComplete,
+        bool InspectionVinPhotoComplete,
+        string InspectionNotes);
+
     public record DashboardTileDto(string Key, int Count);
 
     public record DashboardWorkItemDto(

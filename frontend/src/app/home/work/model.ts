@@ -81,6 +81,17 @@ export interface IWorkData extends IActivity{
     inspectionPreparationReady: boolean;
     inspectionPreparationCompletionPercent: number;
     inspectionPreparationBlockers: string[];
+    inspectionPerformedOn: string;
+    inspectionVinVerified: boolean;
+    inspectionDamageScopeConfirmed: boolean;
+    inspectionVehiclePhotosComplete: boolean;
+    inspectionDamagePhotosComplete: boolean;
+    inspectionVinPhotoComplete: boolean;
+    inspectionNotes: string;
+    inspectionExecutionReady: boolean;
+    inspectionExecutionCompletionPercent: number;
+    inspectionExecutionBlockers: string[];
+    hasInspectionPhotoDocumentation: boolean;
     mechanics:       IMechanic[];
     status:          string;
     issuance:       IWorkIssuance;  

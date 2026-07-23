@@ -372,6 +372,66 @@ namespace MechanicBuddy.Core.Domain
                 throw new UserException($"Nie można zakończyć przygotowania oględzin. Brakuje: {string.Join(", ", blockers)}.");
             }
         }
+
+        public virtual void UpdateInspectionExecution(
+            DateTime? inspectionPerformedOn,
+            int? odo,
+            bool inspectionVinVerified,
+            bool inspectionDamageScopeConfirmed,
+            bool inspectionVehiclePhotosComplete,
+            bool inspectionDamagePhotosComplete,
+            bool inspectionVinPhotoComplete,
+            string inspectionNotes)
+        {
+            InspectionPerformedOn = inspectionPerformedOn;
+            Odo = odo;
+            InspectionVinVerified = inspectionVinVerified;
+            InspectionDamageScopeConfirmed = inspectionDamageScopeConfirmed;
+            InspectionVehiclePhotosComplete = inspectionVehiclePhotosComplete;
+            InspectionDamagePhotosComplete = inspectionDamagePhotosComplete;
+            InspectionVinPhotoComplete = inspectionVinPhotoComplete;
+            InspectionNotes = inspectionNotes;
+        }
+
+        public virtual IReadOnlyCollection<string> GetInspectionExecutionBlockers(bool hasPhotoDocumentation)
+        {
+            var blockers = new List<string>();
+            if (!InspectionPerformedOn.HasValue) blockers.Add("Brak daty wykonania oględzin");
+            if (!Odo.HasValue || Odo.Value < 0) blockers.Add("Brak przebiegu pojazdu");
+            if (!InspectionVinVerified) blockers.Add("VIN nie został zweryfikowany");
+            if (!InspectionDamageScopeConfirmed) blockers.Add("Zakres uszkodzeń nie został potwierdzony");
+            if (!InspectionVehiclePhotosComplete) blockers.Add("Nie potwierdzono kompletu zdjęć pojazdu");
+            if (!InspectionDamagePhotosComplete) blockers.Add("Nie potwierdzono kompletu zdjęć uszkodzeń");
+            if (!InspectionVinPhotoComplete) blockers.Add("Nie potwierdzono zdjęcia VIN");
+            if (!hasPhotoDocumentation) blockers.Add("Brak plików ze zdjęciami w dokumentach sprawy");
+            return blockers.AsReadOnly();
+        }
+
+        public virtual int GetInspectionExecutionCompletionPercent(bool hasPhotoDocumentation)
+        {
+            const int totalRequirements = 8;
+            return (int)Math.Round((totalRequirements - GetInspectionExecutionBlockers(hasPhotoDocumentation).Count) * 100d / totalRequirements);
+        }
+
+        public virtual void EnsureInspectionExecutionAllows(string newDamageStatus, bool hasPhotoDocumentation)
+        {
+            var currentStatus = string.IsNullOrWhiteSpace(DamageStatus) ? "new" : DamageStatus.Trim().ToLowerInvariant();
+            if (currentStatus != "new" && currentStatus != "inspection_pending") return;
+
+            var statusesAfterInspection = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "inspected", "estimate_preparing", "estimate_sent", "approval_pending", "accepted",
+                "parts_pending", "repair", "paint_shop", "quality_control", "ready_for_pickup",
+                "released", "settled"
+            };
+            if (!statusesAfterInspection.Contains(newDamageStatus ?? string.Empty)) return;
+
+            var blockers = GetInspectionExecutionBlockers(hasPhotoDocumentation);
+            if (blockers.Count > 0)
+            {
+                throw new UserException($"Nie można zakończyć oględzin. Brakuje: {string.Join(", ", blockers)}.");
+            }
+        }
          
         public virtual void WithoutVehicle()
         {
@@ -457,6 +517,13 @@ namespace MechanicBuddy.Core.Domain
         public virtual bool IncidentStatementReceived { get; protected set; }
         public virtual bool ResponsiblePartyDataReceived { get; protected set; }
         public virtual bool PolicyNumberReceived { get; protected set; }
+        public virtual DateTime? InspectionPerformedOn { get; protected set; }
+        public virtual bool InspectionVinVerified { get; protected set; }
+        public virtual bool InspectionDamageScopeConfirmed { get; protected set; }
+        public virtual bool InspectionVehiclePhotosComplete { get; protected set; }
+        public virtual bool InspectionDamagePhotosComplete { get; protected set; }
+        public virtual bool InspectionVinPhotoComplete { get; protected set; }
+        public virtual string InspectionNotes { get; protected set; }
         public virtual DateTime StartedOn { get; protected set; }
 
         public virtual DateTime ChangedOn { get; protected set; } //todo protected and user id too?
