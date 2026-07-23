@@ -78,6 +78,9 @@ export interface IWorkData extends IActivity{
     incidentStatementReceived: boolean;
     responsiblePartyDataReceived: boolean;
     policyNumberReceived: boolean;
+    inspectionPreparationReady: boolean;
+    inspectionPreparationCompletionPercent: number;
+    inspectionPreparationBlockers: string[];
     mechanics:       IMechanic[];
     status:          string;
     issuance:       IWorkIssuance;  
