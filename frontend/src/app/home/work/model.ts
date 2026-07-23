@@ -92,6 +92,7 @@ export interface IWorkData extends IActivity{
     inspectionExecutionCompletionPercent: number;
     inspectionExecutionBlockers: string[];
     hasInspectionPhotoDocumentation: boolean;
+    hasInspectionFindings: boolean;
     mechanics:       IMechanic[];
     status:          string;
     issuance:       IWorkIssuance;  
@@ -139,6 +140,19 @@ export interface IWorkDocument {
     fileSize: number;
     uploadedOn: string;
     uploadedByName: string;
+}
+
+export interface IInspectionFinding {
+    id: string;
+    workId: string;
+    elementName: string;
+    vehicleSide: string;
+    damageType: string;
+    recommendedAction: string;
+    notes?: string | null;
+    sortOrder: number;
+    createdOn: string;
+    changedOn: string;
 }
 
 export const damageStatuses = [

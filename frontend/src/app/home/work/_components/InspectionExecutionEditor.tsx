@@ -3,7 +3,8 @@
 import { FormEvent, useMemo, useRef, useState, useTransition } from 'react';
 import { useRouter } from 'next/navigation';
 import { InspectionExecutionUpdate, updateInspectionExecution } from '../actions/updateInspectionExecution';
-import { IWorkData, IWorkDocument } from '../model';
+import { IInspectionFinding, IWorkData, IWorkDocument } from '../model';
+import InspectionFindings from './InspectionFindings';
 
 const checkboxItems: Array<{ key: keyof InspectionExecutionUpdate; label: string }> = [
     { key: 'inspectionVinVerified', label: 'VIN zweryfikowany z pojazdem' },
@@ -23,9 +24,11 @@ function toLocalInput(value?: string | null) {
 export default function InspectionExecutionEditor({
     work,
     documents,
+    findings,
 }: {
     work: IWorkData;
     documents: IWorkDocument[];
+    findings: IInspectionFinding[];
 }) {
     const router = useRouter();
     const uploadFormRef = useRef<HTMLFormElement>(null);
@@ -163,6 +166,8 @@ export default function InspectionExecutionEditor({
                     {isSaving ? 'Zapisywanie…' : 'Zapisz oględziny'}
                 </button>
             </form>
+
+            <InspectionFindings workId={work.id} findings={findings} />
 
             <form ref={uploadFormRef} onSubmit={upload} className="rounded-lg border border-gray-200 bg-gray-50 p-3">
                 <p className="text-sm font-semibold text-gray-900">Dokumentacja fotograficzna</p>

@@ -1,7 +1,7 @@
 'use server'
 
 import { httpGet } from '@/_lib/server/query-api'
-import { IWorkData, IActivities, IOfferIssuance, IWorkDocument, IWorkStatusHistory } from '../model';
+import { IWorkData, IActivities, IInspectionFinding, IOfferIssuance, IWorkDocument, IWorkStatusHistory } from '../model';
 import { IWorkCommunicationEntry } from '../communicationModel';
 import { Card, CardHeader } from '@/_components/Card';
 import NoProducts from '../_components/NoProducts';
@@ -62,6 +62,9 @@ export default async function Page({
     data = await httpGet(`work/${work.id}/communication`);
     const communicationEntries = await data.json() as IWorkCommunicationEntry[];
 
+    data = await httpGet(`work/${work.id}/inspection-findings`);
+    const inspectionFindings = await data.json() as IInspectionFinding[];
+
     data = await httpGet(`workstatushistory/${work.id}`);
     work.statusHistory = await data.json() as IWorkStatusHistory[];
  
@@ -70,7 +73,7 @@ export default async function Page({
 
     return (
         <div  >
-              <Activities work={work} issueances={issueances} activities={activities} documents={documents} communicationEntries={communicationEntries}></Activities>
+              <Activities work={work} issueances={issueances} activities={activities} documents={documents} communicationEntries={communicationEntries} inspectionFindings={inspectionFindings}></Activities>
             <main className='pl-0 lg:pl-62  2xl:pr-108  '>
                 <div>
                     <div className="  px-4  xl:py-10 xl:px-8 xl:py-6 ">

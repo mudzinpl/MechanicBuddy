@@ -56,7 +56,8 @@ namespace MechanicBuddy.Http.Api.Controllers
             var work = session.Get<Work>(id);
             var inspectionPreparationBlockers = work.GetInspectionPreparationBlockers();
             var hasInspectionPhotoDocumentation = HasInspectionPhotoDocumentation(id);
-            var inspectionExecutionBlockers = work.GetInspectionExecutionBlockers(hasInspectionPhotoDocumentation);
+            var hasInspectionFindings = HasInspectionFindings(id);
+            var inspectionExecutionBlockers = work.GetInspectionExecutionBlockers(hasInspectionPhotoDocumentation, hasInspectionFindings);
 
             // Initialize lazy collections to avoid "could not initialize collection" errors
             NHibernateUtil.Initialize(work.Offers);
@@ -173,9 +174,10 @@ namespace MechanicBuddy.Http.Api.Controllers
                 work.InspectionVinPhotoComplete,
                 work.InspectionNotes,
                 InspectionExecutionReady = inspectionExecutionBlockers.Count == 0,
-                InspectionExecutionCompletionPercent = work.GetInspectionExecutionCompletionPercent(hasInspectionPhotoDocumentation),
+                InspectionExecutionCompletionPercent = work.GetInspectionExecutionCompletionPercent(hasInspectionPhotoDocumentation, hasInspectionFindings),
                 InspectionExecutionBlockers = inspectionExecutionBlockers,
                 HasInspectionPhotoDocumentation = hasInspectionPhotoDocumentation,
+                HasInspectionFindings = hasInspectionFindings,
                 InspectionPreparationReady = inspectionPreparationBlockers.Count == 0,
                 InspectionPreparationCompletionPercent = work.GetInspectionPreparationCompletionPercent(),
                 InspectionPreparationBlockers = inspectionPreparationBlockers,
@@ -728,7 +730,7 @@ namespace MechanicBuddy.Http.Api.Controllers
         {
             var work = repository.Get<Work>(id);
             work.EnsureInspectionPreparationAllows(model.DamageStatus);
-            work.EnsureInspectionExecutionAllows(model.DamageStatus, HasInspectionPhotoDocumentation(id));
+            work.EnsureInspectionExecutionAllows(model.DamageStatus, HasInspectionPhotoDocumentation(id), HasInspectionFindings(id));
             if (model.ClientId is not null)
             {
                 var client = repository.Get<Client>(model.ClientId.Value);
@@ -864,11 +866,12 @@ namespace MechanicBuddy.Http.Api.Controllers
             repository.Update(work);
 
             var hasPhotoDocumentation = HasInspectionPhotoDocumentation(id);
-            var blockers = work.GetInspectionExecutionBlockers(hasPhotoDocumentation);
+            var hasInspectionFindings = HasInspectionFindings(id);
+            var blockers = work.GetInspectionExecutionBlockers(hasPhotoDocumentation, hasInspectionFindings);
             return Ok(new
             {
                 Ready = blockers.Count == 0,
-                CompletionPercent = work.GetInspectionExecutionCompletionPercent(hasPhotoDocumentation),
+                CompletionPercent = work.GetInspectionExecutionCompletionPercent(hasPhotoDocumentation, hasInspectionFindings),
                 Blockers = blockers
             });
         }
@@ -881,6 +884,16 @@ namespace MechanicBuddy.Http.Api.Controllers
                     FROM domain.workdocument
                     WHERE workid = @WorkId
                       AND category = 'vehicle_photos'
+                )", new { WorkId = workId });
+        }
+
+        private bool HasInspectionFindings(Guid workId)
+        {
+            return session.Connection.ExecuteScalar<bool>(@"
+                SELECT EXISTS (
+                    SELECT 1
+                    FROM domain.work_inspection_finding
+                    WHERE workid = @WorkId
                 )", new { WorkId = workId });
         }
 
