@@ -22,6 +22,7 @@ import PartOrders from './PartOrders'
 import WorkTasks from './WorkTasks'
 import QualityChecklist from './QualityChecklist'
 import VehicleRelease from './VehicleRelease'
+import InspectionExecutionEditor from './InspectionExecutionEditor'
 
 function CollapsibleAsideSection({ title, summary, children }: { title: string, summary?: React.ReactNode, children: React.ReactNode }) {
   return (
@@ -79,6 +80,14 @@ export default function Activities({
               settlementContent={<InvoiceSettlement workId={work.id}></InvoiceSettlement>}
             ></WorkInformation>
           </div>
+        </li>
+        <li>
+          <CollapsibleAsideSection
+            title="Wykonanie oględzin"
+            summary={work.inspectionExecutionReady ? 'kompletne · można przejść dalej' : `kompletność ${work.inspectionExecutionCompletionPercent ?? 0}%`}
+          >
+            <InspectionExecutionEditor work={work} documents={documents}></InspectionExecutionEditor>
+          </CollapsibleAsideSection>
         </li>
         <li>
           <CollapsibleAsideSection title="Naprawa" summary={repairSummary}>

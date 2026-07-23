@@ -377,6 +377,13 @@ namespace MechanicBuddy.Core.Persistence.Postgres.Repositories
             Map(x => x.IncidentStatementReceived).Column("incidentstatementreceived").Access.BackingField();
             Map(x => x.ResponsiblePartyDataReceived).Column("responsiblepartydatareceived").Access.BackingField();
             Map(x => x.PolicyNumberReceived).Column("policynumberreceived").Access.BackingField();
+            Map(x => x.InspectionPerformedOn).Column("inspectionperformedon").Access.BackingField().CustomType<UtcDateType>();
+            Map(x => x.InspectionVinVerified).Column("inspectionvinverified").Access.BackingField();
+            Map(x => x.InspectionDamageScopeConfirmed).Column("inspectiondamagescopeconfirmed").Access.BackingField();
+            Map(x => x.InspectionVehiclePhotosComplete).Column("inspectionvehiclephotoscomplete").Access.BackingField();
+            Map(x => x.InspectionDamagePhotosComplete).Column("inspectiondamagephotoscomplete").Access.BackingField();
+            Map(x => x.InspectionVinPhotoComplete).Column("inspectionvinphotocomplete").Access.BackingField();
+            Map(x => x.InspectionNotes).Column("inspectionnotes").Access.BackingField();
             Map(x => x.CompletedOn).Column("completedon").CustomType<UtcDateType>().Access.BackingField(); ;//.HasConversion<DateTimeUtcConverter>();
             Map(x => x.ChangedOn).Column("changedon").CustomType<UtcDateType>().Access.BackingField();
             Map(x => x.Odo).Column("odo").Access.BackingField();
