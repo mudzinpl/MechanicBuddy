@@ -32,6 +32,11 @@ const BaseDialog = React.forwardRef<BaseDialogHandle, Props>((props, ref) => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  const closeDialog = () => {
+    setIsDialogOpen(false);
+    setIsLoading(false);
+  };
+
   const confirm = () => {
 
     onConfirm();
@@ -40,10 +45,10 @@ const BaseDialog = React.forwardRef<BaseDialogHandle, Props>((props, ref) => {
   useImperativeHandle(ref, () => {
     return {
       close() {
-        setIsDialogOpen(false);
-        setIsLoading(false);
+        closeDialog();
       },
       open() {
+        setIsLoading(false);
         setIsDialogOpen(true);
       },
 
@@ -54,7 +59,7 @@ const BaseDialog = React.forwardRef<BaseDialogHandle, Props>((props, ref) => {
   }, []);
 
   return (
-    <Dialog open={isDialogOpen} onClose={setIsDialogOpen} className="relative z-10">
+    <Dialog open={isDialogOpen} onClose={closeDialog} className="relative z-10">
       <DialogBackdrop
         transition
         className="fixed inset-0 bg-gray-500/75 transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"
@@ -97,7 +102,7 @@ const BaseDialog = React.forwardRef<BaseDialogHandle, Props>((props, ref) => {
               </div>
               <div className='mr-2'>
                 <SecondaryButton
-                  onClick={() => setIsDialogOpen(false)}
+                  onClick={closeDialog}
                 >{noButtonText}
                 </SecondaryButton>
               </div>

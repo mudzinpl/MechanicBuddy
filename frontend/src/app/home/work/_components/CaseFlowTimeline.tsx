@@ -33,7 +33,7 @@ const timelineSteps: TimelineStep[] = [
     },
     {
         key: 'inspection',
-        label: 'Oględziny',
+        label: 'Przygotowanie oględzin',
         statuses: ['inspection_pending', 'inspected'],
         owner: (work) => work.claimHandlerName,
         startedOn: (work) => work.plannedInspectionOn,
@@ -191,6 +191,7 @@ function isReactionStep(step: TimelineStep, work: IWorkData, currentIndex: numbe
     const damageStatus = normalizeStatus(work.damageStatus);
 
     if (['on_hold', 'rejected'].includes(damageStatus)) return true;
+    if (step.key === 'inspection' && !work.inspectionPreparationReady) return true;
     if (step.key === 'insurer' && !work.insurerDecisionOn && !work.estimateAcceptedOn) return true;
     if (step.key === 'estimate' && !work.audatexEstimateNumber) return true;
     if (step.key === 'settlement' && getSettlementStatusLabel(work.settlementStatus) !== 'Rozliczone') return true;
@@ -251,15 +252,18 @@ function getNextStep(work: IWorkData, currentIndex: number) {
     let deadline = '';
 
     if (!work.claimNumber) missing.push('Numer szkody');
-    if (!work.assignmentOfClaimSigned) missing.push('Cesja');
-    if (!work.powerOfAttorneySigned) missing.push('Pełnomocnictwo');
 
     const currentKey = timelineSteps[currentIndex]?.key;
+    if (currentKey !== 'inspection' && !work.assignmentOfClaimSigned) missing.push('Cesja');
+    if (currentKey !== 'inspection' && !work.powerOfAttorneySigned) missing.push('Pełnomocnictwo');
     if (currentKey === 'new' || currentKey === 'contact') {
         reason = 'Brakuje potwierdzenia kolejnego kroku z klientem.';
     }
     else if (currentKey === 'inspection') {
-        reason = 'Oględziny wymagają przygotowania albo potwierdzenia.';
+        reason = work.inspectionPreparationReady
+            ? 'Przygotowanie oględzin jest kompletne.'
+            : `Przygotowanie oględzin jest kompletne w ${work.inspectionPreparationCompletionPercent ?? 0}%.`;
+        missing.push(...(work.inspectionPreparationBlockers ?? []));
         deadline = work.plannedInspectionOn ? formatDateTime(work.plannedInspectionOn) : '';
     }
     else if (currentKey === 'estimate') {

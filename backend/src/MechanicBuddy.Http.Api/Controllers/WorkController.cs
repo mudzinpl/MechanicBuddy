@@ -54,6 +54,7 @@ namespace MechanicBuddy.Http.Api.Controllers
         public dynamic Get(Guid id)
         {
             var work = session.Get<Work>(id);
+            var inspectionPreparationBlockers = work.GetInspectionPreparationBlockers();
 
             // Initialize lazy collections to avoid "could not initialize collection" errors
             NHibernateUtil.Initialize(work.Offers);
@@ -162,6 +163,9 @@ namespace MechanicBuddy.Http.Api.Controllers
                 work.IncidentStatementReceived,
                 work.ResponsiblePartyDataReceived,
                 work.PolicyNumberReceived,
+                InspectionPreparationReady = inspectionPreparationBlockers.Count == 0,
+                InspectionPreparationCompletionPercent = work.GetInspectionPreparationCompletionPercent(),
+                InspectionPreparationBlockers = inspectionPreparationBlockers,
                 ReplacementVehicle = replacementVehicle,
                 Mechanics = work.Mechanics.ToList().Select(x => new { x.Id, x.Name }).ToArray(),
                 Status= status,
@@ -655,6 +659,7 @@ namespace MechanicBuddy.Http.Api.Controllers
                     model.InspectionRemoteEmail,
                     model.PowerOfAttorneyPrepared.GetValueOrDefault(),
                     model.PowerOfAttorneySent.GetValueOrDefault(),
+                    model.PowerOfAttorneySigned,
                     model.VehiclePhotosReceived.GetValueOrDefault(),
                     model.DamagePhotosReceived.GetValueOrDefault(),
                     model.RegistrationDocumentPhotoReceived.GetValueOrDefault(),
@@ -709,6 +714,7 @@ namespace MechanicBuddy.Http.Api.Controllers
         public virtual OkObjectResult Put(Guid id, [FromBody] PostOrPutWork model)
         {
             var work = repository.Get<Work>(id);
+            work.EnsureInspectionPreparationAllows(model.DamageStatus);
             if (model.ClientId is not null)
             {
                 var client = repository.Get<Client>(model.ClientId.Value);
@@ -777,6 +783,7 @@ namespace MechanicBuddy.Http.Api.Controllers
                     model.InspectionRemoteEmail,
                     model.PowerOfAttorneyPrepared.GetValueOrDefault(),
                     model.PowerOfAttorneySent.GetValueOrDefault(),
+                    model.PowerOfAttorneySigned,
                     model.VehiclePhotosReceived.GetValueOrDefault(),
                     model.DamagePhotosReceived.GetValueOrDefault(),
                     model.RegistrationDocumentPhotoReceived.GetValueOrDefault(),
@@ -792,6 +799,38 @@ namespace MechanicBuddy.Http.Api.Controllers
 
 
             return Ok(work.Id);
+        }
+
+        [HttpPut("{id}/inspection-preparation")]
+        public virtual OkObjectResult PutInspectionPreparation(Guid id, [FromBody] PutInspectionPreparation model)
+        {
+            var work = repository.Get<Work>(id);
+            work.UpdateSchedule(work.PlannedIntakeOn, work.PlannedReleaseOn, model.PlannedInspectionOn);
+            work.UpdateInspectionPreparation(
+                model.InspectionMode,
+                model.InspectionVisitorName,
+                model.InspectionContactPhone,
+                model.InspectionRemoteEmail,
+                model.PowerOfAttorneyPrepared,
+                model.PowerOfAttorneySent,
+                model.PowerOfAttorneyReceived,
+                model.VehiclePhotosReceived,
+                model.DamagePhotosReceived,
+                model.RegistrationDocumentPhotoReceived,
+                model.DrivingLicencePhotoReceived,
+                model.IncidentStatementReceived,
+                model.ResponsiblePartyDataReceived,
+                model.PolicyNumberReceived);
+            work.Changed();
+            repository.Update(work);
+
+            var blockers = work.GetInspectionPreparationBlockers();
+            return Ok(new
+            {
+                Ready = blockers.Count == 0,
+                CompletionPercent = work.GetInspectionPreparationCompletionPercent(),
+                Blockers = blockers
+            });
         }
 
 

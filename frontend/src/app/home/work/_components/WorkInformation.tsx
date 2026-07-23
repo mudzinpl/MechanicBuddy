@@ -23,6 +23,7 @@ import FormSwitch from '@/_components/FormSwitch';
 import { Field, Label } from '@headlessui/react';
 import { changeDamageStatus, changeWorkStatus } from '../actions/changeWorkStatus';
 import FormTextArea from '@/_components/FormTextArea';
+import InspectionPreparationEditor from './InspectionPreparationEditor';
 
 type DetailRow = [string, React.ReactNode];
 
@@ -212,9 +213,8 @@ export function WorkInformation({
         ['Upoważnienie wysłane', work.powerOfAttorneySent ? 'Tak' : 'Nie'],
         ['Upoważnienie odebrane', work.powerOfAttorneySigned ? 'Tak' : 'Nie'],
     ].filter(([, value]) => value) as DetailRow[];
-    const receivedInspectionItems = inspectionPreparationItems.filter(([, received]) => received).length;
     const compactInspectionPreparation = work.inspectionMode
-        ? `${work.inspectionMode === 'remote' ? 'Zdalnie' : 'Warsztat'} · dokumentacja ${receivedInspectionItems}/${inspectionPreparationItems.length}`
+        ? `${work.inspectionMode === 'remote' ? 'Zdalnie' : 'Warsztat'} · kompletność ${work.inspectionPreparationCompletionPercent ?? 0}%`
         : 'Nie ustalono sposobu oględzin';
     const compactSettlement = [
         getSettlementStatusLabel(work.settlementStatus),
@@ -324,13 +324,18 @@ export function WorkInformation({
                 onConfirm={async () => {
                     if (!statusToChange) return;
                     changeStatusRef.current?.loading(true);
-                    if (statusToChange.kind === 'damage') {
-                        await changeDamageStatus(work.id, statusToChange.status, statusComment);
+                    try {
+                        if (statusToChange.kind === 'damage') {
+                            await changeDamageStatus(work.id, statusToChange.status, statusComment);
+                        }
+                        else {
+                            await changeWorkStatus(work.id, statusToChange.status, statusComment);
+                        }
+                        changeStatusRef.current?.close();
                     }
-                    else {
-                        await changeWorkStatus(work.id, statusToChange.status, statusComment);
+                    finally {
+                        changeStatusRef.current?.loading(false);
                     }
-                    changeStatusRef.current?.close();
                 }}
             >
                 <FormTextArea
@@ -418,6 +423,30 @@ export function WorkInformation({
                 </DetailSection>
 
                 <DetailSection title="Przygotowanie oględzin" icon={EyeIcon} summary={compactInspectionPreparation}>
+                    <div className="mb-4 rounded-md bg-gray-50 p-3">
+                        <div className="flex items-center justify-between gap-3 text-sm">
+                            <span className="font-semibold text-gray-900">Kompletność etapu</span>
+                            <span className={work.inspectionPreparationReady ? 'font-semibold text-green-700' : 'font-semibold text-amber-700'}>
+                                {work.inspectionPreparationCompletionPercent ?? 0}%
+                            </span>
+                        </div>
+                        <div className="mt-2 h-2 overflow-hidden rounded-full bg-gray-200">
+                            <div
+                                className={work.inspectionPreparationReady ? 'h-full rounded-full bg-green-600' : 'h-full rounded-full bg-amber-500'}
+                                style={{ width: `${Math.min(100, Math.max(0, work.inspectionPreparationCompletionPercent ?? 0))}%` }}
+                            />
+                        </div>
+                        {work.inspectionPreparationReady ? (
+                            <p className="mt-2 text-sm font-medium text-green-700">Można przejść do wykonania oględzin.</p>
+                        ) : (
+                            <div className="mt-3">
+                                <p className="text-sm font-semibold text-red-800">Etap blokują:</p>
+                                <ul className="mt-1 list-disc space-y-1 pl-5 text-sm text-red-700">
+                                    {(work.inspectionPreparationBlockers ?? []).map(blocker => <li key={blocker}>{blocker}</li>)}
+                                </ul>
+                            </div>
+                        )}
+                    </div>
                     <DetailRows rows={inspectionPreparationDetails} />
                     <div className="mt-4 border-t border-gray-100 pt-4">
                         <p className="mb-2 font-semibold text-gray-900">Dokumentacja od klienta</p>
@@ -430,6 +459,7 @@ export function WorkInformation({
                             ))}
                         </ul>
                     </div>
+                    <InspectionPreparationEditor work={work} />
                 </DetailSection>
 
                 <DetailSection title="Kosztorys" icon={ClipboardDocumentListIcon} summary={compactEstimate}>

@@ -104,6 +104,7 @@ namespace MechanicBuddy.Http.Api.Controllers
                 return Ok();
             }
 
+            work.EnsureInspectionPreparationAllows(newStatus);
             EnsureInitialHistory(work.Id, oldStatus, work.StartedOn, work.Starter?.Id);
             work.UpdateClaimDetails(
                 work.ClaimNumber,

@@ -282,6 +282,7 @@ namespace MechanicBuddy.Core.Domain
             string inspectionRemoteEmail,
             bool powerOfAttorneyPrepared,
             bool powerOfAttorneySent,
+            bool powerOfAttorneyReceived,
             bool vehiclePhotosReceived,
             bool damagePhotosReceived,
             bool registrationDocumentPhotoReceived,
@@ -296,6 +297,11 @@ namespace MechanicBuddy.Core.Domain
             InspectionRemoteEmail = inspectionRemoteEmail;
             PowerOfAttorneyPrepared = powerOfAttorneyPrepared;
             PowerOfAttorneySent = powerOfAttorneySent;
+            if (PowerOfAttorneySigned != powerOfAttorneyReceived)
+            {
+                PowerOfAttorneySignedOn = powerOfAttorneyReceived ? DateTime.UtcNow : null;
+            }
+            PowerOfAttorneySigned = powerOfAttorneyReceived;
             VehiclePhotosReceived = vehiclePhotosReceived;
             DamagePhotosReceived = damagePhotosReceived;
             RegistrationDocumentPhotoReceived = registrationDocumentPhotoReceived;
@@ -303,6 +309,68 @@ namespace MechanicBuddy.Core.Domain
             IncidentStatementReceived = incidentStatementReceived;
             ResponsiblePartyDataReceived = responsiblePartyDataReceived;
             PolicyNumberReceived = policyNumberReceived;
+        }
+
+        public virtual IReadOnlyCollection<string> GetInspectionPreparationBlockers()
+        {
+            var blockers = new List<string>();
+            var mode = InspectionMode?.Trim().ToLowerInvariant();
+
+            if (mode != "workshop" && mode != "remote")
+            {
+                blockers.Add("Nie wybrano sposobu oględzin");
+                return blockers.AsReadOnly();
+            }
+
+            if (mode == "workshop")
+            {
+                if (!PlannedInspectionOn.HasValue) blockers.Add("Brak terminu przyjazdu");
+                if (string.IsNullOrWhiteSpace(InspectionVisitorName)) blockers.Add("Brak osoby, która przyjedzie");
+                if (string.IsNullOrWhiteSpace(InspectionContactPhone) && string.IsNullOrWhiteSpace(ClaimHandlerPhone) && string.IsNullOrWhiteSpace(Client?.Phone))
+                    blockers.Add("Brak telefonu kontaktowego");
+                if (!PowerOfAttorneyPrepared) blockers.Add("Upoważnienie nie jest przygotowane");
+            }
+            else
+            {
+                if (string.IsNullOrWhiteSpace(InspectionRemoteEmail)) blockers.Add("Brak e-maila klienta");
+                if (!PowerOfAttorneyPrepared) blockers.Add("Upoważnienie nie jest przygotowane");
+                if (!PowerOfAttorneySent) blockers.Add("Upoważnienie nie zostało wysłane");
+                if (!PowerOfAttorneySigned) blockers.Add("Upoważnienie nie zostało odebrane");
+                if (!VehiclePhotosReceived) blockers.Add("Brak zdjęć pojazdu");
+                if (!DamagePhotosReceived) blockers.Add("Brak zdjęć uszkodzeń");
+                if (!RegistrationDocumentPhotoReceived) blockers.Add("Brak zdjęcia dowodu rejestracyjnego");
+            }
+
+            return blockers.AsReadOnly();
+        }
+
+        public virtual int GetInspectionPreparationCompletionPercent()
+        {
+            var mode = InspectionMode?.Trim().ToLowerInvariant();
+            if (mode != "workshop" && mode != "remote") return 0;
+
+            var totalRequirements = mode == "workshop" ? 5 : 8;
+            return (int)Math.Round((totalRequirements - GetInspectionPreparationBlockers().Count) * 100d / totalRequirements);
+        }
+
+        public virtual void EnsureInspectionPreparationAllows(string newDamageStatus)
+        {
+            var currentStatus = string.IsNullOrWhiteSpace(DamageStatus) ? "new" : DamageStatus.Trim().ToLowerInvariant();
+            if (currentStatus != "new" && currentStatus != "inspection_pending") return;
+
+            var statusesAfterPreparation = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "inspected", "estimate_preparing", "estimate_sent", "approval_pending", "accepted",
+                "parts_pending", "repair", "paint_shop", "quality_control", "ready_for_pickup",
+                "released", "settled"
+            };
+            if (!statusesAfterPreparation.Contains(newDamageStatus ?? string.Empty)) return;
+
+            var blockers = GetInspectionPreparationBlockers();
+            if (blockers.Count > 0)
+            {
+                throw new UserException($"Nie można zakończyć przygotowania oględzin. Brakuje: {string.Join(", ", blockers)}.");
+            }
         }
          
         public virtual void WithoutVehicle()
